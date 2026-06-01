@@ -13,7 +13,7 @@ const RECIPES: RecipeData[] = [
     name: 'Spiked Peach Tea',
     spirit: 'Sweet Tea Vodka',
     accent: '#C23B22',
-    bottle: '/images/bottle_sweettea.png',
+    bottle: '/images/bottle_caramel.png',
     ingredients: [
       '2 oz SE Sweet Tea Vodka',
       'Peach purée',
@@ -41,7 +41,7 @@ const RECIPES: RecipeData[] = [
     name: 'Pineapple Edge',
     spirit: 'Sweet Tea Vodka',
     accent: '#C23B22',
-    bottle: '/images/bottle_sweettea.png',
+    bottle: '/images/bottle_caramel.png',
     ingredients: [
       '2 oz SE Sweet Tea Vodka',
       '2 oz pineapple juice',

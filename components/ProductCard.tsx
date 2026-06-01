@@ -42,7 +42,7 @@ export default function ProductCard({ product, index, cardRef }: Props) {
       gsap.to(bottleRef.current, { y: 0, duration: 0.35 })
     }
     if (glowRef.current) {
-      gsap.to(glowRef.current, { opacity: 0.06, duration: 0.35 })
+      gsap.to(glowRef.current, { opacity: 0.15, duration: 0.35 })
     }
   }
 
@@ -78,7 +78,7 @@ export default function ProductCard({ product, index, cardRef }: Props) {
             position: 'absolute',
             inset: 0,
             background: `radial-gradient(circle at center, ${product.accent}22 0%, transparent 70%)`,
-            opacity: 0.06,
+            opacity: 0.15,
             zIndex: 0,
           }}
         />

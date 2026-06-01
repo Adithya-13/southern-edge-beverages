@@ -60,8 +60,7 @@ export const PRODUCTS: Product[] = [
     officialNotes:
       'Light golden color with a green tea nose, a very sweet and inviting palate, and a short, delightful finish that makes it perfect for fun cocktails.',
     shortNotes: 'Green tea nose · Sweet inviting palate · Delightful finish',
-    bottleFile: '/images/bottle_sweettea.png',
-    lowRes: true,
+    bottleFile: '/images/bottle_caramel.png',
   },
   {
     id: 'caramel',
@@ -91,8 +90,7 @@ export const PRODUCTS: Product[] = [
     officialNotes:
       'Originating in Jalisco Mexico, 100% Blue Agave with refreshing citrus notes of lemon and lime. Distilled 6 times.',
     shortNotes: '100% Blue Agave · Lemon & lime citrus · 6× distilled',
-    bottleFile: '/images/bottle_limon.png',
-    lowRes: true,
+    bottleFile: '/images/bottle_caramel.png',
   },
 ]
 
