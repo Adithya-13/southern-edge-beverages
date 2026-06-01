@@ -26,7 +26,6 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
         onVerified()
         return
       }
-      // Fade in on mount
       gsap.fromTo(containerRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5, delay: 0.1 })
     },
     { scope: containerRef },

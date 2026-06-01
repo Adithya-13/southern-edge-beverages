@@ -5,21 +5,9 @@ import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { POSTS, SOCIAL } from '@/lib/constants'
 
 gsap.registerPlugin(ScrollTrigger)
-
-// 9 posts curated from assets.md — one image per post, links to original
-const POSTS = [
-  { file: 'southernedgebeverages/C81tWTXAudB_1.jpg', url: 'https://www.instagram.com/p/C81tWTXAudB/', handle: '@southernedgebeverages' },
-  { file: 'southernedgebeverages/C8TVtdfg2ng_1.jpg', url: 'https://www.instagram.com/p/C8TVtdfg2ng/', handle: '@southernedgebeverages' },
-  { file: 'liquiddisga/DTAhwowAFU9_1.jpg', url: 'https://www.instagram.com/p/DTAhwowAFU9/', handle: '@liquiddisga' },
-  { file: 'southernedgebeverages/C7soFQwglTb_1.jpg', url: 'https://www.instagram.com/p/C7soFQwglTb/', handle: '@southernedgebeverages' },
-  { file: 'suepremetravels/DQ7ycQcD-yo_1.jpg', url: 'https://www.instagram.com/p/DQ7ycQcD-yo/', handle: '@suepremetravels' },
-  { file: 'vueatlanta/DP4Bz4djc3a_12.jpg', url: 'https://www.instagram.com/p/DP4Bz4djc3a/', handle: '@vueatlanta' },
-  { file: 'southernedgebeverages/C0nAU1ePf6a_1.jpg', url: 'https://www.instagram.com/p/C0nAU1ePf6a/', handle: '@southernedgebeverages' },
-  { file: 'chubblive/DP2xyAZDcyi_1.jpg', url: 'https://www.instagram.com/p/DP2xyAZDcyi/', handle: '@chubblive' },
-  { file: 'southernedgebeverages/Cyy2zlKCEq7_1.jpg', url: 'https://www.instagram.com/p/Cyy2zlKCEq7/', handle: '@southernedgebeverages' },
-]
 
 // Varied heights for Instagram masonry feel
 const HEIGHTS = [300, 220, 280, 260, 300, 200, 240, 280, 260]
@@ -111,7 +99,7 @@ export default function Community() {
           Join us at tastings, events, and everywhere Southern Edge pours.
         </p>
         <a
-          href="https://www.instagram.com/southernedgebeverages/"
+          href={SOCIAL.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
           style={{

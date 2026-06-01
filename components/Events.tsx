@@ -1,37 +1,7 @@
 'use client'
 
 import { Award } from 'lucide-react'
-
-const MARQUEE_TEXT =
-  'Whiskey & Vodka Tasting — Tega Cay Liquors  ·  Summer Sips — Edisto Beer Garden  ·  Vodka & Whiskey Tasting — Village ABC  ·  '
-
-const AWARDS = [
-  {
-    medal: 'Silver Medal',
-    competition: 'USA Spirits Ratings 2024',
-    points: '84 Points — Salted Caramel Whiskey',
-    location: 'San Francisco, CA',
-  },
-  {
-    medal: 'Silver Medal',
-    competition: 'USA Spirits Ratings 2024',
-    points: '83 Points — Sweet Tea Vodka',
-    location: 'San Francisco, CA',
-  },
-]
-
-const PRESS = [
-  {
-    pub: 'Cuisine Noir',
-    quote: '"Sweet Sips with Notes of Nostalgia"',
-    url: 'https://www.cuisinenoirmag.com/southern-edge-creates-sweet-sips-with-notes-of-nostaglia/',
-  },
-  {
-    pub: 'Rolling Out',
-    quote: '"Creating Recipes That Come From Their Roots"',
-    url: 'https://rollingout.com/2022/07/29/southern-edge-beverage-founders-creating-recipes-that-come-from-their-roots/',
-  },
-]
+import { MARQUEE_TEXT, AWARDS, PRESS } from '@/lib/constants'
 
 export default function Events() {
   return (

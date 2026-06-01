@@ -45,7 +45,6 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
         border: '1px solid var(--smoke)',
       }}
     >
-      {/* Image area */}
       <div
         style={{
           height: 240,
@@ -53,7 +52,6 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
           background: `linear-gradient(160deg, var(--bg-void) 0%, ${recipe.accent}33 60%, ${recipe.accent}55 100%)`,
         }}
       >
-        {/* Decorative spirit name watermark */}
         <span
           style={{
             position: 'absolute',
@@ -72,7 +70,6 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
           {recipe.spirit}
         </span>
 
-        {/* Product bottle */}
         <div
           style={{
             position: 'absolute',
@@ -97,7 +94,6 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
         </div>
       </div>
 
-      {/* Content */}
       <div style={{ padding: 28 }}>
         <h3
           style={{
@@ -112,7 +108,6 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
           {recipe.name}
         </h3>
 
-        {/* Spirit pill */}
         <span
           style={{
             display: 'inline-block',
@@ -132,7 +127,6 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
           {recipe.spirit}
         </span>
 
-        {/* Toggle button */}
         <button
           onClick={toggleOpen}
           style={{

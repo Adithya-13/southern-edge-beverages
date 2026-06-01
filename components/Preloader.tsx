@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
-import gsap from 'gsap'
+import { gsap } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
 
 interface PreloaderProps {
@@ -86,7 +86,6 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         justifyContent: 'center',
       }}
     >
-      {/* Amber bloom — absolutely centered */}
       <div
         ref={bloomRef}
         style={{
@@ -104,7 +103,6 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         }}
       />
 
-      {/* Logo */}
       <div ref={logoRef} style={{ opacity: 0, position: 'relative', zIndex: 1 }}>
         <Image
           src="/images/logo_se_circle_white.png"
@@ -116,7 +114,6 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         />
       </div>
 
-      {/* Brand name */}
       <p
         ref={textRef}
         style={{

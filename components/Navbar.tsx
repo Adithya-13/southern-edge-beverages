@@ -2,17 +2,8 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ScrollSmoother } from 'gsap/ScrollSmoother'
-
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
-
-const NAV_LINKS = [
-  { label: 'Our Story', href: '#manifesto' },
-  { label: 'The Pour', href: '#thepour' },
-  { label: 'Community', href: '#community' },
-]
+import { ScrollSmoother } from '@/lib/gsap'
+import { NAV_LINKS } from '@/lib/constants'
 
 function scrollToSection(href: string) {
   const target = document.querySelector(href)

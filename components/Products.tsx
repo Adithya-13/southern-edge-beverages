@@ -5,41 +5,20 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import ProductCard, { type ProductCardData } from './ProductCard'
+import { PRODUCTS as PRODUCT_DATA } from '@/lib/constants'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const PRODUCTS: ProductCardData[] = [
-  {
-    id: 'sweettea',
-    spiritType: 'Sweet Tea Vodka',
-    name: 'Sweet Tea Flavored Vodka',
-    bottle: '/images/bottle_caramel.png',
-    accent: '#C23B22',
-    tagline: 'Made with succulent corn, authentic black tea, and juicy sugar cane.',
-    notes: ['Green tea nose', 'Sweet inviting palate', 'Delightful finish'],
-    award: 'Silver Medal — USA Spirits Ratings 2024 — 83pts',
-  },
-  {
-    id: 'caramel',
-    spiritType: 'Salted Caramel Whiskey',
-    name: 'Salted Caramel Flavored Whiskey',
-    bottle: '/images/bottle_caramel.png',
-    accent: '#D4781A',
-    tagline: 'Aged in oak barrels, with a pleasing balance of salty and sweet that does not overpower.',
-    notes: ['Hazelnut nose', 'Maple & salted donut palate', 'Caramel finish'],
-    award: 'Silver Medal — USA Spirits Ratings 2024 — 84pts',
-  },
-  {
-    id: 'limon',
-    spiritType: 'Se Limón Tequila',
-    name: 'Se Limón Flavored Tequila',
-    bottle: '/images/bottle_caramel.png',
-    accent: '#7CB342',
-    tagline: 'Originating in Jalisco Mexico, 100% Blue Agave with refreshing citrus notes of lemon and lime.',
-    notes: ['100% Blue Agave', 'Lemon & lime citrus', '6× distilled'],
-    award: null,
-  },
-]
+const PRODUCTS: ProductCardData[] = PRODUCT_DATA.map((p) => ({
+  id: p.id,
+  spiritType: p.spiritShort,
+  name: p.name,
+  bottle: p.bottleFile,
+  accent: p.accentColor,
+  tagline: p.description,
+  notes: p.notesShort,
+  award: p.award,
+}))
 
 export default function Products() {
   const sectionRef = useRef<HTMLElement>(null)

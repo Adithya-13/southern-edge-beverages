@@ -5,53 +5,18 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import RecipeCard, { RecipeData } from '@/components/RecipeCard'
+import { RECIPES as RECIPE_DATA } from '@/lib/constants'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const RECIPES: RecipeData[] = [
-  {
-    name: 'Spiked Peach Tea',
-    spirit: 'Sweet Tea Vodka',
-    accent: '#C23B22',
-    bottle: '/images/bottle_caramel.png',
-    ingredients: [
-      '2 oz SE Sweet Tea Vodka',
-      'Peach purée',
-      'Splash of sour mix',
-      'Peach garnish',
-    ],
-    instructions: 'Build in a glass over ice. Garnish with fresh peach.',
-  },
-  {
-    name: 'Cranberry Caramel Cooler',
-    spirit: 'Salted Caramel Whiskey',
-    accent: '#D4781A',
-    bottle: '/images/bottle_caramel.png',
-    ingredients: [
-      '1½ oz SE Salted Caramel Whiskey',
-      '2 oz cranberry juice',
-      '1 oz simple syrup',
-      'Club soda',
-      'Fresh cranberries and rosemary for garnish',
-    ],
-    instructions:
-      'Shake whiskey, juice, syrup with ice. Top with club soda. Garnish with cranberries and rosemary.',
-  },
-  {
-    name: 'Pineapple Edge',
-    spirit: 'Sweet Tea Vodka',
-    accent: '#C23B22',
-    bottle: '/images/bottle_caramel.png',
-    ingredients: [
-      '2 oz SE Sweet Tea Vodka',
-      '2 oz pineapple juice',
-      '1 oz lemonade',
-      'Simple syrup (adjust to taste)',
-      'Pineapple slices and lemon slices for garnish',
-    ],
-    instructions: 'Pour, shake, enjoy. Garnish with pineapple and lemon slices.',
-  },
-]
+const RECIPES: RecipeData[] = RECIPE_DATA.map((r) => ({
+  name: r.name,
+  spirit: r.baseSpirit,
+  accent: r.accentColor,
+  bottle: r.bottleFile,
+  ingredients: r.ingredients,
+  instructions: r.instructions,
+}))
 
 export default function Recipes() {
   const sectionRef = useRef<HTMLElement>(null)

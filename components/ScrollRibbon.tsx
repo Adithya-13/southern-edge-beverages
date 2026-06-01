@@ -1,13 +1,9 @@
 'use client'
 
 import { useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { gsap } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
-
-gsap.registerPlugin(ScrollTrigger)
-
-const ITEMS = ['TASTE THE EDGE', 'WORK HARD · DRINK SMOOTH', 'CRAFTED IN SC', 'FINE SPIRITS', '60 PROOF', 'GLUTEN FREE']
+import { RIBBON_ITEMS } from '@/lib/constants'
 
 export default function ScrollRibbon() {
   const ribbonRef = useRef<HTMLDivElement>(null)
@@ -16,7 +12,6 @@ export default function ScrollRibbon() {
   useGSAP(() => {
     if (!trackRef.current || !ribbonRef.current) return
 
-    // Continuous auto-scroll left
     gsap.to(trackRef.current, {
       x: '-50%',
       repeat: -1,
@@ -41,7 +36,7 @@ export default function ScrollRibbon() {
     )
   }, { scope: ribbonRef })
 
-  const allItems = [...ITEMS, ...ITEMS]
+  const allItems = [...RIBBON_ITEMS, ...RIBBON_ITEMS]
 
   return (
     <div

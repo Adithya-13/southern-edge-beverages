@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { gsap } from '@/lib/gsap'
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin'
 import { useGSAP } from '@gsap/react'
 import GlassPour from './GlassPour'
+import { PRODUCTS } from '@/lib/constants'
 
-gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin)
+gsap.registerPlugin(DrawSVGPlugin)
 
 interface Cocktail {
   name: string
@@ -23,44 +23,15 @@ interface Pour {
   cocktail: Cocktail
 }
 
-const POURS: Pour[] = [
-  {
-    id: 'sweettea',
-    spirit: 'Sweet Tea Vodka',
-    spiritFull: 'Sweet Tea Flavored Vodka',
-    accent: '#C23B22',
-    bottle: '/images/bottle_caramel.png',
-    tastingNotes: ['Green tea nose', 'Sweet, inviting palate', 'Short, delightful finish'],
-    cocktail: {
-      name: 'Spiked Peach Tea',
-      ingredients: ['2 oz SE Sweet Tea Vodka', 'Peach purée', 'Splash of sour mix', 'Peach garnish'],
-    },
-  },
-  {
-    id: 'caramel',
-    spirit: 'Salted Caramel Whiskey',
-    spiritFull: 'Salted Caramel Flavored Whiskey',
-    accent: '#D4781A',
-    bottle: '/images/bottle_caramel.png',
-    tastingNotes: ['Macadamia & hazelnut nose', 'Maple & salted donut palate', 'Caramel finish'],
-    cocktail: {
-      name: 'Cranberry Caramel Cooler',
-      ingredients: ['1½ oz SE Salted Caramel Whiskey', '2 oz cranberry juice', '1 oz simple syrup', 'Club soda', 'Cranberries & rosemary'],
-    },
-  },
-  {
-    id: 'limon',
-    spirit: 'Se Limón Tequila',
-    spiritFull: 'Se Limón Flavored Tequila',
-    accent: '#7CB342',
-    bottle: '/images/bottle_caramel.png',
-    tastingNotes: ['Fresh citrus nose', '100% Blue Agave', '6× distilled, smooth finish'],
-    cocktail: {
-      name: 'Se Limón Paloma',
-      ingredients: ['2 oz Se Limón Tequila', 'Grapefruit soda', 'Squeeze of lime', 'Salt rim'],
-    },
-  },
-]
+const POURS: Pour[] = PRODUCTS.map((p) => ({
+  id: p.id,
+  spirit: p.spiritShort,
+  spiritFull: p.name,
+  accent: p.accentColor,
+  bottle: p.bottleFile,
+  tastingNotes: p.tastingNotes,
+  cocktail: p.pourCocktail,
+}))
 
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-dm-sans)',

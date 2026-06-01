@@ -5,10 +5,11 @@ import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { COPY, BRAND_FACTS } from '@/lib/constants'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const QUOTE = '"The Legacy of Southern Edge Spirits is like a sip of the South, embodying its rich history, warm hospitality and vibrant culture."'
+const QUOTE = COPY.manifesto
 
 export default function Manifesto() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -18,7 +19,7 @@ export default function Manifesto() {
   const watermarkRef = useRef<HTMLDivElement>(null)
   const quoteRef = useRef<HTMLDivElement>(null)
 
-  const FACTS = ['6× Distilled', '60 Proof', 'Natural Ingredients', 'Gluten Free']
+  const FACTS = BRAND_FACTS
   const words = QUOTE.split(' ')
 
   useGSAP(
@@ -114,7 +115,6 @@ export default function Manifesto() {
         padding: 'clamp(60px,8vw,120px) clamp(20px,5vw,60px)',
       }}
     >
-      {/* Background watermark */}
       <div
         ref={watermarkRef}
         style={{
@@ -139,7 +139,6 @@ export default function Manifesto() {
         />
       </div>
 
-      {/* Content */}
       <div
         style={{
           position: 'relative',
@@ -148,13 +147,11 @@ export default function Manifesto() {
           maxWidth: 960,
         }}
       >
-        {/* Section label */}
         <span className="amber-rule" />
         <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 500, fontSize: 10, letterSpacing: '0.3em', color: 'var(--amber)', textTransform: 'uppercase', display: 'block', marginBottom: 32, textAlign: 'center' }}>
           OUR STORY
         </span>
 
-        {/* Quote with decorative mark */}
         <div ref={quoteRef} style={{ position: 'relative' }}>
           <span style={{
             position: 'absolute',
@@ -208,15 +205,13 @@ export default function Manifesto() {
             margin: '32px auto 0',
           }}
         >
-          We invite you to experience the essence of the South in every drop of Southern Edge.
+          {COPY.manifestoSub}
         </p>
 
-        {/* Signature tagline */}
         <span style={{ fontFamily: 'var(--font-vibes)', fontSize: 28, color: 'var(--amber)', opacity: 0.7, display: 'block', marginTop: 24, textAlign: 'center' }}>
           — Southern Edge Fine Spirits
         </span>
 
-        {/* Facts bar */}
         <span style={{ display: 'block', width: 40, height: 1, background: 'var(--amber)', margin: '40px auto 32px', opacity: 0.5 }} />
         <div
           ref={factsRef}

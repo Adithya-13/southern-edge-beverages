@@ -2,11 +2,8 @@
 
 import Image from 'next/image'
 import { useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { gsap } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export type ProductCardData = {
   id: string
@@ -91,7 +88,6 @@ export default function ProductCard({ product, index, cardRef }: Props) {
         minWidth: 0,
       }}
     >
-      {/* Top accent stripe */}
       <div
         style={{
           position: 'absolute',
@@ -104,7 +100,6 @@ export default function ProductCard({ product, index, cardRef }: Props) {
         }}
       />
 
-      {/* Image area */}
       <div
         style={{
           height: 'clamp(260px, 22vw, 320px)',
@@ -114,7 +109,6 @@ export default function ProductCard({ product, index, cardRef }: Props) {
           justifyContent: 'center',
         }}
       >
-        {/* Glow */}
         <div
           ref={glowRef}
           style={{
@@ -125,7 +119,6 @@ export default function ProductCard({ product, index, cardRef }: Props) {
             zIndex: 0,
           }}
         />
-        {/* Bottle image */}
         <div style={{ position: 'relative', zIndex: 1, height: 280, display: 'flex', alignItems: 'center' }}>
           <div ref={bottleParallaxRef}>
             <Image
@@ -145,7 +138,6 @@ export default function ProductCard({ product, index, cardRef }: Props) {
         </div>
       </div>
 
-      {/* Content */}
       <div style={{ padding: '24px 28px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <span style={{ display: 'block', width: 16, height: 1, background: product.accent, flexShrink: 0 }} />
@@ -200,7 +192,6 @@ export default function ProductCard({ product, index, cardRef }: Props) {
         )}
       </div>
 
-      {/* Bottom accent strip */}
       <div
         style={{
           position: 'absolute',

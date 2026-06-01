@@ -2,12 +2,8 @@
 
 import { useRef } from 'react'
 import Image from 'next/image'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ScrollSmoother } from 'gsap/ScrollSmoother'
+import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
-
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
 
 interface HeroProps {
   isVisible: boolean

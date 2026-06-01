@@ -2,33 +2,8 @@
 
 import Image from 'next/image'
 import { ScrollSmoother } from 'gsap/ScrollSmoother'
-
-const LABEL_STYLE: React.CSSProperties = {
-  fontFamily: 'var(--font-dm-sans)',
-  fontWeight: 500,
-  fontSize: '10px',
-  color: 'var(--silver)',
-  letterSpacing: '0.2em',
-  marginBottom: '20px',
-  textTransform: 'uppercase',
-  display: 'block',
-}
-
-const LINK_STYLE: React.CSSProperties = {
-  fontFamily: 'var(--font-dm-sans)',
-  fontWeight: 300,
-  fontSize: '14px',
-  color: 'rgba(240,228,204,0.55)',
-  display: 'block',
-  marginBottom: '12px',
-  textDecoration: 'none',
-}
-
-const EXPLORE_LINKS = [
-  { label: 'Our Story', href: '#manifesto' },
-  { label: 'The Pour', href: '#thepour' },
-  { label: 'Community', href: '#community' },
-]
+import { NAV_LINKS, SOCIAL } from '@/lib/constants'
+import { LABEL_STYLE, LINK_STYLE } from '@/lib/styles'
 
 function hoverIn(e: React.MouseEvent<HTMLAnchorElement>) {
   e.currentTarget.style.color = 'var(--cream)'
@@ -96,7 +71,7 @@ export default function Footer() {
           {/* Col 2 — Explore */}
           <div>
             <span style={LABEL_STYLE}>Explore</span>
-            {EXPLORE_LINKS.map((link) => (
+            {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
@@ -113,19 +88,19 @@ export default function Footer() {
           {/* Col 3 — Connect */}
           <div>
             <span style={LABEL_STYLE}>Connect</span>
-            <a href="https://www.instagram.com/southernedgebeverages/" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+            <a href={SOCIAL.instagramUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               Instagram ↗
             </a>
-            <a href="https://web.facebook.com/SouthernEdgeBeverages" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+            <a href={SOCIAL.facebookUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               Facebook ↗
             </a>
-            <a href="https://www.tiktok.com/@southernedgebeverages" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+            <a href={SOCIAL.tiktokUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               TikTok ↗
             </a>
-            <a href="https://linktr.ee/southernedgebeverages" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+            <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               Linktree ↗
             </a>
-            <a href="mailto:contact@southernedgespirits.com" style={{ ...LINK_STYLE, marginTop: 4 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+            <a href={`mailto:${SOCIAL.email}`} style={{ ...LINK_STYLE, marginTop: 4 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               contact@southernedgespirits.com
             </a>
             <div style={{ borderTop: '1px solid var(--smoke)', marginTop: '20px', paddingTop: '20px' }}>
