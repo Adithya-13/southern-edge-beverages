@@ -15,6 +15,8 @@ export default function Manifesto() {
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([])
   const subRef = useRef<HTMLParagraphElement>(null)
   const factsRef = useRef<HTMLDivElement>(null)
+  const watermarkRef = useRef<HTMLDivElement>(null)
+  const quoteRef = useRef<HTMLDivElement>(null)
 
   const FACTS = ['6× Distilled', '60 Proof', 'Natural Ingredients', 'Gluten Free']
   const words = QUOTE.split(' ')
@@ -70,6 +72,28 @@ export default function Manifesto() {
           },
         }
       )
+
+      gsap.to(watermarkRef.current, {
+        rotation: 360,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 2,
+        },
+      })
+
+      gsap.to(quoteRef.current, {
+        y: -40,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.5,
+        },
+      })
     },
     { scope: sectionRef }
   )
@@ -91,7 +115,20 @@ export default function Manifesto() {
       }}
     >
       {/* Background watermark */}
-      <div className="watermark-spin" style={{ zIndex: 0 }}>
+      <div
+        ref={watermarkRef}
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          opacity: 0.04,
+          pointerEvents: 'none',
+          width: 600,
+          height: 'auto',
+          zIndex: 0,
+        }}
+      >
         <Image
           src="/images/logo_lockup.png"
           alt=""
@@ -118,7 +155,7 @@ export default function Manifesto() {
         </span>
 
         {/* Quote with decorative mark */}
-        <div style={{ position: 'relative' }}>
+        <div ref={quoteRef} style={{ position: 'relative' }}>
           <span style={{
             position: 'absolute',
             top: '-20px',

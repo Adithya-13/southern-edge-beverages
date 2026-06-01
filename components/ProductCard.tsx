@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -27,6 +28,22 @@ type Props = {
 export default function ProductCard({ product, index, cardRef }: Props) {
   const bottleRef = useRef<HTMLImageElement>(null)
   const glowRef = useRef<HTMLDivElement>(null)
+  const cardContainerRef = useRef<HTMLDivElement | null>(null)
+  const bottleParallaxRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    if (!bottleParallaxRef.current || !cardContainerRef.current) return
+    gsap.to(bottleParallaxRef.current, {
+      y: -50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: cardContainerRef.current,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.5,
+      },
+    })
+  }, { scope: cardContainerRef })
 
   const handleMouseEnter = () => {
     if (bottleRef.current) {
@@ -58,7 +75,10 @@ export default function ProductCard({ product, index, cardRef }: Props) {
 
   return (
     <div
-      ref={cardRef}
+      ref={(el) => {
+        cardContainerRef.current = el
+        if (cardRef) cardRef(el)
+      }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -107,19 +127,21 @@ export default function ProductCard({ product, index, cardRef }: Props) {
         />
         {/* Bottle image */}
         <div style={{ position: 'relative', zIndex: 1, height: 280, display: 'flex', alignItems: 'center' }}>
-          <Image
-            ref={bottleRef as React.Ref<HTMLImageElement>}
-            src={product.bottle}
-            alt={product.name}
-            width={200}
-            height={280}
-            style={{
-              objectFit: 'contain',
-              maxHeight: 280,
-              width: 'auto',
-              display: 'block',
-            }}
-          />
+          <div ref={bottleParallaxRef}>
+            <Image
+              ref={bottleRef as React.Ref<HTMLImageElement>}
+              src={product.bottle}
+              alt={product.name}
+              width={200}
+              height={280}
+              style={{
+                objectFit: 'contain',
+                maxHeight: 280,
+                width: 'auto',
+                display: 'block',
+              }}
+            />
+          </div>
         </div>
       </div>
 

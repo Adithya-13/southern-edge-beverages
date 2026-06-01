@@ -249,17 +249,111 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
       })
 
-      // ── MOBILE: static hero ─────────────────────────────────────────────
+      // ── MOBILE: scroll-driven reveal (mirrors desktop, shorter pin distance) ──
       mm.add('(max-width: 768px)', () => {
-        if (frameRef.current) {
-          frameRef.current.src = frameUrls[59] // frame_060
-          frameRef.current.style.opacity = '1'
+        const TOTAL_SCROLL_MOBILE = 1200
+        let revealDone = false
+
+        const setFinalStateMobile = () => {
+          if (frameRef.current) frameRef.current.style.opacity = '0'
+          if (videoRef.current) videoRef.current.style.opacity = '0.75'
+          if (overlayRef.current) overlayRef.current.style.opacity = '1'
+          if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
+          if (glowRef.current) glowRef.current.style.opacity = '0.3'
+          if (textRef.current) textRef.current.style.opacity = '1'
+          if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
+          if (beat0Ref.current) beat0Ref.current.style.opacity = '0'
+          if (beat1Ref.current) beat1Ref.current.style.opacity = '0'
+          if (beat2Ref.current) beat2Ref.current.style.opacity = '0'
         }
-        if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
-        if (glowRef.current) glowRef.current.style.opacity = '0.3'
-        if (textRef.current) textRef.current.style.opacity = '1'
-        if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
-        return () => {}
+
+        // Nudge animation
+        gsap.to(scrollPromptRef.current, {
+          y: 10,
+          repeat: -1,
+          yoyo: true,
+          duration: 0.9,
+          ease: 'sine.inOut',
+        })
+
+        let stMobile: ScrollTrigger
+        stMobile = ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: 'top top',
+          end: `+=${TOTAL_SCROLL_MOBILE}`,
+          pin: true,
+          scrub: 0.5,
+          onUpdate: (self) => {
+            if (revealDone) { setFinalStateMobile(); return }
+            const p = self.progress
+
+            if (frameRef.current) {
+              const idx = Math.min(Math.round(p * 119), 119)
+              frameRef.current.src = frameUrls[idx]
+            }
+
+            if (scrollPromptRef.current) {
+              scrollPromptRef.current.style.opacity = String(Math.max(0, 1 - p * 60))
+            }
+
+            // Story beats
+            const beatRefs = [beat0Ref, beat1Ref, beat2Ref]
+            beatRefs.forEach((ref, i) => {
+              if (!ref.current) return
+              if (p >= REVEAL_START_P) {
+                ref.current.style.opacity = '0'
+              } else {
+                const dist = Math.abs(p - STORY_BEATS[i].peak)
+                ref.current.style.opacity = String(Math.max(0, 1 - dist / STORY_BEATS[i].halfWidth))
+              }
+            })
+
+            if (p >= REVEAL_START_P) {
+              const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
+              const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
+              if (frameRef.current) frameRef.current.style.opacity = String(1 - eased)
+              if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
+              if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
+              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = String(eased)
+              if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
+              if (textRef.current) textRef.current.style.opacity = String(eased)
+            } else {
+              if (frameRef.current) frameRef.current.style.opacity = '1'
+              if (videoRef.current) videoRef.current.style.opacity = '0'
+              if (overlayRef.current) overlayRef.current.style.opacity = '0'
+              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
+              if (glowRef.current) glowRef.current.style.opacity = '0'
+              if (textRef.current) textRef.current.style.opacity = '0'
+            }
+
+            if (p >= FRAME_END_P - 0.01) {
+              revealDone = true
+              setFinalStateMobile()
+              if (!revealedRef.current) {
+                revealedRef.current = true
+                onRevealedRef.current?.()
+              }
+            }
+          },
+          onLeave: () => {
+            revealDone = true
+            setFinalStateMobile()
+            if (!revealedRef.current) {
+              revealedRef.current = true
+              onRevealedRef.current?.()
+            }
+            stMobile.kill()
+            ScrollTrigger.refresh()
+            window.scrollTo(0, 0)
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('hero-revealed'))
+            }
+          },
+        })
+
+        return () => {
+          stMobile.kill()
+        }
       })
 
       return () => {
