@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-void: #080604;
+  --bg-deep: #100D09;
+  --bg-surface: #1A1510;
+  --amber: #D4781A;
+  --coral: #C23B22;
+  --lime: #7CB342;
+  --gold: #F0C040;
+  --cream: #F0E4CC;
+  --silver: #C8C8C8;
+  --smoke: rgba(240, 228, 204, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--bg-void);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+/* Preloader amber bloom keyframe */
+@keyframes amberBloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Rotating watermark */
+@keyframes slowSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Marquee */
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
