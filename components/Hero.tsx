@@ -152,8 +152,14 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               revealedRef.current = true
               onRevealedRef.current?.()
             }
+            const heroEl = sectionRef.current
             st.kill()
             ScrollTrigger.refresh()
+            // Killing the pin removes the 2000px spacer, causing a scroll jump.
+            // Snap to right below the hero so the next section lands cleanly.
+            if (heroEl) {
+              window.scrollTo(0, heroEl.offsetTop + heroEl.offsetHeight)
+            }
           },
         })
 
@@ -177,8 +183,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           opacity: 0,
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'bottom top+=100',
-            end: 'bottom top-=200',
+            // Start well below hero so this doesn't activate right after pin kill + scroll snap
+            start: 'bottom top-=300',
+            end: 'bottom top-=600',
             scrub: 1,
           },
         })

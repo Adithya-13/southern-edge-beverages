@@ -8,10 +8,23 @@ import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const HEIGHTS = [240, 180, 300, 200, 260, 180, 300, 220, 240]
-const ACCENTS = ['var(--amber)', 'var(--coral)', 'var(--lime)']
+// 9 posts curated from assets.md — one image per post, links to original
+const POSTS = [
+  { file: 'southernedgebeverages/C81tWTXAudB_1.jpg', url: 'https://www.instagram.com/p/C81tWTXAudB/', handle: '@southernedgebeverages' },
+  { file: 'southernedgebeverages/C8TVtdfg2ng_1.jpg', url: 'https://www.instagram.com/p/C8TVtdfg2ng/', handle: '@southernedgebeverages' },
+  { file: 'liquiddisga/DTAhwowAFU9_1.jpg', url: 'https://www.instagram.com/p/DTAhwowAFU9/', handle: '@liquiddisga' },
+  { file: 'southernedgebeverages/C7soFQwglTb_1.jpg', url: 'https://www.instagram.com/p/C7soFQwglTb/', handle: '@southernedgebeverages' },
+  { file: 'suepremetravels/DQ7ycQcD-yo_1.jpg', url: 'https://www.instagram.com/p/DQ7ycQcD-yo/', handle: '@suepremetravels' },
+  { file: 'vueatlanta/DP4Bz4djc3a_1.jpg', url: 'https://www.instagram.com/p/DP4Bz4djc3a/', handle: '@vueatlanta' },
+  { file: 'southernedgebeverages/C0nAU1ePf6a_1.jpg', url: 'https://www.instagram.com/p/C0nAU1ePf6a/', handle: '@southernedgebeverages' },
+  { file: 'chubblive/DP2xyAZDcyi_1.jpg', url: 'https://www.instagram.com/p/DP2xyAZDcyi/', handle: '@chubblive' },
+  { file: 'southernedgebeverages/Cyy2zlKCEq7_1.jpg', url: 'https://www.instagram.com/p/Cyy2zlKCEq7/', handle: '@southernedgebeverages' },
+]
 
-// Split 9 items into 3 columns (col 0: items 0,3,6 | col 1: items 1,4,7 | col 2: items 2,5,8)
+// Varied heights for Instagram masonry feel
+const HEIGHTS = [300, 220, 280, 260, 300, 200, 240, 280, 260]
+
+// col 0: 0,3,6 | col 1: 1,4,7 | col 2: 2,5,8
 const COLUMNS = [
   [0, 3, 6],
   [1, 4, 7],
@@ -97,83 +110,66 @@ export default function Community() {
         >
           Join us at tastings, events, and everywhere Southern Edge pours.
         </p>
-        <span
+        <a
+          href="https://www.instagram.com/southernedgebeverages/"
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             fontFamily: 'var(--font-dm-sans)',
             fontWeight: 500,
             fontSize: 14,
             color: 'var(--amber)',
             marginTop: 16,
-            display: 'block',
-            textAlign: 'center',
+            display: 'inline-block',
+            textDecoration: 'none',
           }}
         >
-          <a
-            href="https://www.instagram.com/southernedgebeverages/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--amber)', textDecoration: 'none' }}
-          >
-            @southernedgebeverages ↗
-          </a>
-        </span>
+          @southernedgebeverages ↗
+        </a>
       </div>
 
       {/* Masonry Grid */}
       <div className="community-grid" style={{ maxWidth: 1200, margin: '0 auto' }}>
         {COLUMNS.map((itemIndices, colIdx) => (
-          <div key={colIdx} ref={colRefs[colIdx]} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div key={colIdx} ref={colRefs[colIdx]} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {itemIndices.map((itemIdx) => {
-              const accent = ACCENTS[itemIdx % 3]
+              const post = POSTS[itemIdx]
               return (
-                <div
+                <a
                   key={itemIdx}
+                  href={post.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="community-card"
                   style={{
                     height: HEIGHTS[itemIdx],
-                    background: 'var(--bg-surface)',
-                    borderRadius: 8,
+                    borderRadius: 6,
                     overflow: 'hidden',
                     position: 'relative',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: 'block',
+                    flexShrink: 0,
                   }}
                 >
-                  {/* Radial accent overlay */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: `radial-gradient(circle at 30% 40%, ${accent}22 0%, transparent 60%)`,
-                      zIndex: 0,
-                    }}
+                  <Image
+                    src={`/images/instagram/${post.file}`}
+                    alt={`${post.handle} on Instagram`}
+                    fill
+                    sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw"
+                    style={{ objectFit: 'cover' }}
                   />
-                  {/* SE circle logo watermark */}
-                  <div style={{ position: 'absolute', zIndex: 1, opacity: 0.12 }}>
-                    <Image
-                      src="/images/logo_se_circle.png"
-                      alt=""
-                      width={48}
-                      height={48}
-                      aria-hidden="true"
-                    />
-                  </div>
-                  {/* Handle watermark text */}
-                  <span
-                    style={{
-                      position: 'absolute',
-                      bottom: 8,
-                      left: 12,
+                  {/* Hover overlay */}
+                  <div className="community-overlay">
+                    <span style={{
                       fontFamily: 'var(--font-dm-sans)',
-                      fontSize: 11,
-                      color: 'rgba(240,228,204,0.06)',
-                      userSelect: 'none',
-                      zIndex: 2,
-                    }}
-                  >
-                    @southernedgebeverages
-                  </span>
-                </div>
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: 'var(--cream)',
+                      letterSpacing: '0.05em',
+                    }}>
+                      {post.handle} ↗
+                    </span>
+                  </div>
+                </a>
               )
             })}
           </div>
@@ -184,7 +180,7 @@ export default function Community() {
         .community-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
+          gap: 12px;
         }
         @media (max-width: 1199px) and (min-width: 768px) {
           .community-grid {
@@ -195,6 +191,19 @@ export default function Community() {
           .community-grid {
             grid-template-columns: 1fr;
           }
+        }
+        .community-card .community-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(8,6,4,0.55);
+          display: flex;
+          align-items: flex-end;
+          padding: 14px;
+          opacity: 0;
+          transition: opacity 0.25s ease;
+        }
+        .community-card:hover .community-overlay {
+          opacity: 1;
         }
       `}</style>
     </section>

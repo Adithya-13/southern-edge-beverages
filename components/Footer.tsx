@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
 
 const LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-dm-sans)',
@@ -35,6 +36,19 @@ function hoverIn(e: React.MouseEvent<HTMLAnchorElement>) {
 }
 function hoverOut(e: React.MouseEvent<HTMLAnchorElement>) {
   e.currentTarget.style.color = 'rgba(240,228,204,0.55)'
+}
+
+function handleSectionClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+  if (!href.startsWith('#')) return
+  e.preventDefault()
+  const target = document.querySelector(href)
+  if (!target) return
+  const smoother = ScrollSmoother.get()
+  if (smoother) {
+    smoother.scrollTo(target, true, 'top top+=80')
+  } else {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 export default function Footer() {
@@ -88,6 +102,7 @@ export default function Footer() {
                 key={link.href}
                 href={link.href}
                 style={LINK_STYLE}
+                onClick={(e) => handleSectionClick(e, link.href)}
                 onMouseEnter={hoverIn}
                 onMouseLeave={hoverOut}
               >

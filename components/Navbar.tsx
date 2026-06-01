@@ -6,8 +6,9 @@ import { Menu, X } from 'lucide-react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
 
 const NAV_LINKS = [
   { label: 'Our Story', href: '#manifesto' },
@@ -18,6 +19,17 @@ const NAV_LINKS = [
 
 interface NavbarProps {
   visible?: boolean
+}
+
+function scrollToSection(href: string) {
+  const target = document.querySelector(href)
+  if (!target) return
+  const smoother = ScrollSmoother.get()
+  if (smoother) {
+    smoother.scrollTo(target, true, 'top top+=80')
+  } else {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 export default function Navbar({ visible = false }: NavbarProps) {
@@ -50,8 +62,10 @@ export default function Navbar({ visible = false }: NavbarProps) {
     { scope: navRef },
   )
 
-  const handleLinkClick = () => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault()
     setMenuOpen(false)
+    scrollToSection(href)
   }
 
   return (
@@ -71,8 +85,12 @@ export default function Navbar({ visible = false }: NavbarProps) {
         }}
         className="px-6 md:px-12 py-4 flex items-center justify-between"
       >
-        {/* Logo */}
-        <a href="#hero" aria-label="Southern Edge home" className="flex-shrink-0">
+        <a
+          href="#hero"
+          aria-label="Southern Edge home"
+          className="flex-shrink-0"
+          onClick={(e) => handleLinkClick(e, '#hero')}
+        >
           <Image
             src="/images/logo_se.png"
             alt="Southern Edge"
@@ -83,7 +101,6 @@ export default function Navbar({ visible = false }: NavbarProps) {
           />
         </a>
 
-        {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <li key={link.label}>
@@ -91,6 +108,7 @@ export default function Navbar({ visible = false }: NavbarProps) {
                 href={link.href}
                 className="font-sans font-light text-sm tracking-wide"
                 style={{ color: 'rgba(240,228,204,0.70)', transition: 'color 0.2s' }}
+                onClick={(e) => handleLinkClick(e, link.href)}
                 onMouseEnter={(e) =>
                   ((e.currentTarget as HTMLAnchorElement).style.color = '#F0E4CC')
                 }
@@ -105,7 +123,6 @@ export default function Navbar({ visible = false }: NavbarProps) {
           ))}
         </ul>
 
-        {/* Mobile hamburger */}
         <button
           className="md:hidden flex items-center justify-center"
           style={{ color: 'var(--cream)', background: 'none', border: 'none', cursor: 'pointer' }}
@@ -116,7 +133,6 @@ export default function Navbar({ visible = false }: NavbarProps) {
         </button>
       </nav>
 
-      {/* Mobile full-screen overlay */}
       <div
         className="md:hidden"
         style={{
@@ -139,7 +155,7 @@ export default function Navbar({ visible = false }: NavbarProps) {
           <a
             key={link.label}
             href={link.href}
-            onClick={handleLinkClick}
+            onClick={(e) => handleLinkClick(e, link.href)}
             className="font-bebas text-4xl tracking-widest"
             style={{ color: 'var(--cream)', textDecoration: 'none' }}
           >
