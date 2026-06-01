@@ -7,6 +7,8 @@ import Hero from '@/components/Hero'
 import Manifesto from '@/components/Manifesto'
 import Products from '@/components/Products'
 import Recipes from '@/components/Recipes'
+import Community from '@/components/Community'
+import Events from '@/components/Events'
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
@@ -22,6 +24,8 @@ export default function Home() {
           <Manifesto />
           <Products />
           <Recipes />
+          <Community />
+          <Events />
         </main>
       )}
     </>

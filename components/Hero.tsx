@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -12,155 +12,152 @@ interface HeroProps {
   isVisible: boolean
 }
 
+const FRAME_COUNT = 120
+const frameUrls = Array.from(
+  { length: FRAME_COUNT },
+  (_, i) => `/images/frames/frame_${String(i + 1).padStart(3, '0')}.webp`,
+)
+
 export default function Hero({ isVisible }: HeroProps) {
-  const containerRef = useRef<HTMLElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const smokeRef = useRef<HTMLDivElement>(null)
-  const frameRef = useRef<HTMLImageElement>(null)
-  const glowRef = useRef<HTMLDivElement>(null)
-  const bottleRef = useRef<HTMLDivElement>(null)
-  const textCenterRef = useRef<HTMLDivElement>(null)
-  const smoothTagRef = useRef<HTMLSpanElement>(null)
-  const scrollArrowRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const frameRef = useRef<HTMLImageElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const bottleWrapRef = useRef<HTMLDivElement | null>(null)
+  const glowRef = useRef<HTMLDivElement | null>(null)
+  const textRef = useRef<HTMLDivElement | null>(null)
+  const scrollPromptRef = useRef<HTMLDivElement | null>(null)
 
-  const WORK_HARD = 'WORK HARD'
-
-  // Progressive frame preload
-  useEffect(() => {
-    // Preload first 10 immediately
-    for (let i = 1; i <= 10; i++) {
-      const img = new window.Image()
-      img.src = `/images/frames/frame_${String(i).padStart(3, '0')}.webp`
-    }
-    // Progressive load: chunks of 10 with increasing delay
-    for (let chunk = 1; chunk <= 11; chunk++) {
-      const start = chunk * 10 + 1
-      const end = Math.min(start + 9, 120)
-      setTimeout(
-        () => {
-          for (let i = start; i <= end; i++) {
-            const img = new window.Image()
-            img.src = `/images/frames/frame_${String(i).padStart(3, '0')}.webp`
-          }
-        },
-        chunk * 200,
-      )
-    }
-  }, [])
-
-  // Entrance timeline — fires when isVisible becomes true
   useGSAP(
     () => {
       if (!isVisible) return
 
-      const tl = gsap.timeline()
-
-      // L1 video fade in
-      tl.to(videoRef.current, { opacity: 0.8, duration: 1.5, ease: 'power2.out' })
-
-      // L5 bottle scale up + fade in
-      tl.to(
-        bottleRef.current,
-        { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' },
-        0.4,
-      )
-
-      // L4 glow pulse
-      tl.to(glowRef.current, { opacity: 0.25, duration: 1 }, 0.8)
-
-      // "WORK HARD" char-by-char drop from top
-      const charSpans = containerRef.current?.querySelectorAll<HTMLElement>('[data-char]')
-      if (charSpans) {
-        charSpans.forEach((el, i) => {
-          tl.fromTo(
-            el,
-            { opacity: 0, y: -40 },
-            { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' },
-            1.0 + i * 0.04,
-          )
-        })
-      }
-
-      // "Drink Smooth." fade in
-      tl.fromTo(
-        smoothTagRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
-        1.4,
-      )
-
-      // Scroll arrow infinite bob
-      gsap.to(scrollArrowRef.current, {
-        y: 8,
-        duration: 1.5,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-        delay: 1.8,
+      // Eager-load first 15 frames
+      frameUrls.slice(0, 15).forEach((url) => {
+        const img = new window.Image()
+        img.src = url
       })
+      // Progressive load remaining frames in chunks
+      let loaded = 15
+      const loadNext = () => {
+        if (loaded >= FRAME_COUNT) return
+        frameUrls.slice(loaded, loaded + 10).forEach((url) => {
+          const img = new window.Image()
+          img.src = url
+        })
+        loaded += 10
+        setTimeout(loadNext, 400)
+      }
+      setTimeout(loadNext, 800)
 
-      // Frame sequencer ScrollTrigger (desktop only)
-      const mmFrames = gsap.matchMedia()
-      mmFrames.add('(min-width: 769px)', () => {
-        ScrollTrigger.create({
-          trigger: containerRef.current,
+      const mm = gsap.matchMedia()
+
+      // ── DESKTOP: pinned scroll sequence ──────────────────────────────
+      mm.add('(min-width: 769px)', () => {
+        const st = ScrollTrigger.create({
+          trigger: sectionRef.current,
           start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
+          end: '+=3000',
+          pin: true,
+          scrub: 0.5,
           onUpdate: (self) => {
-            if (!frameRef.current) return
-            const progress = self.progress
-            const idx = Math.round(progress * 119)
-            frameRef.current.src = `/images/frames/frame_${String(idx + 1).padStart(3, '0')}.webp`
-            // fade in frame layer: 0→0.7 over first 5% of scroll
-            frameRef.current.style.opacity = String(Math.min(progress * 20, 0.7))
+            const p = self.progress
+
+            // Frame swap
+            if (frameRef.current) {
+              const idx = Math.min(Math.round(p * 119), 119)
+              frameRef.current.src = frameUrls[idx]
+            }
+
+            // Scroll prompt fades out immediately (gone by 2.5%)
+            if (scrollPromptRef.current) {
+              scrollPromptRef.current.style.opacity = String(
+                Math.max(0, 1 - p * 40),
+              )
+            }
+
+            // Phase 3: reveal environment (last 12%)
+            if (p >= 0.88) {
+              const phase = (p - 0.88) / 0.12
+              // ease-in-out quadratic
+              const eased =
+                phase < 0.5
+                  ? 2 * phase * phase
+                  : -1 + (4 - 2 * phase) * phase
+
+              if (videoRef.current)
+                videoRef.current.style.opacity = String(eased * 0.75)
+              if (bottleWrapRef.current)
+                bottleWrapRef.current.style.opacity = String(eased)
+              if (glowRef.current)
+                glowRef.current.style.opacity = String(eased * 0.3)
+              if (textRef.current)
+                textRef.current.style.opacity = String(eased)
+            } else {
+              // Reset when scrolled back into earlier phases
+              if (videoRef.current) videoRef.current.style.opacity = '0'
+              if (bottleWrapRef.current)
+                bottleWrapRef.current.style.opacity = '0'
+              if (glowRef.current) glowRef.current.style.opacity = '0'
+              if (textRef.current) textRef.current.style.opacity = '0'
+            }
           },
         })
+
+        // After pin releases: bottle + text scroll out
+        // Use xPercent/yPercent to keep centering intact while animating y
+        gsap.to([bottleWrapRef.current, textRef.current], {
+          y: -60,
+          opacity: 0,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'bottom top+=100',
+            end: 'bottom top-=200',
+            scrub: 1,
+          },
+        })
+
+        // Recalculate scroll positions after pin spacer is inserted
+        ScrollTrigger.refresh()
+
+        return () => {
+          st.kill()
+        }
+      })
+
+      // ── MOBILE: static hero ───────────────────────────────────────────
+      mm.add('(max-width: 768px)', () => {
+        // Show mid-reveal frame
+        if (frameRef.current) {
+          frameRef.current.src = frameUrls[59] // frame_060
+          frameRef.current.style.opacity = '1'
+        }
+        // Reveal bottle, glow and text immediately
+        if (bottleWrapRef.current) bottleWrapRef.current.style.opacity = '1'
+        if (glowRef.current) glowRef.current.style.opacity = '0.3'
+        if (textRef.current) textRef.current.style.opacity = '1'
+        if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
         return () => {}
       })
 
-      // Scroll out: bottle drifts up, text fades
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '20% top',
-        scrub: 1,
-        animation: gsap.timeline()
-          .to(bottleRef.current, { y: -60, ease: 'none' }, 0)
-          .to(textCenterRef.current, { opacity: 0, ease: 'none' }, 0),
-      })
-
-      // Mouse parallax — desktop only
-      const mmMouse = gsap.matchMedia()
-      mmMouse.add('(min-width: 769px)', () => {
-        function onMouseMove(e: MouseEvent) {
-          const x = (e.clientX / window.innerWidth - 0.5) * 2
-          const y = (e.clientY / window.innerHeight - 0.5) * 2
-          gsap.to(bottleRef.current, { x: x * 15, y: y * 15, duration: 0.8 })
-          gsap.to(smokeRef.current, { x: -x * 20, y: -y * 20, duration: 0.8 })
-          gsap.to(videoRef.current, { x: x * 5, y: y * 5, duration: 0.8 })
-        }
-        window.addEventListener('mousemove', onMouseMove)
-        return () => {
-          window.removeEventListener('mousemove', onMouseMove)
-        }
-      })
+      return () => {
+        mm.revert()
+      }
     },
-    { scope: containerRef, dependencies: [isVisible] },
+    { scope: sectionRef, dependencies: [isVisible] },
   )
 
   return (
     <section
       id="hero"
-      ref={containerRef}
+      ref={sectionRef}
       style={{
         height: '100vh',
         position: 'relative',
         overflow: 'hidden',
-        background: 'var(--bg-void)',
+        background: '#080604',
       }}
     >
-      {/* L1 — Video background */}
+      {/* L0 — Background video (fades in during Phase 3, behind frames) */}
       <video
         ref={videoRef}
         autoPlay
@@ -176,210 +173,170 @@ export default function Hero({ isVisible }: HeroProps) {
           opacity: 0,
           zIndex: 0,
         }}
-        className="hero-video-desktop"
       >
         <source src="/videos/hero_atmosphere.mp4" type="video/mp4" />
       </video>
 
-      {/* L1 mobile fallback gradient — hidden on desktop */}
-      <div
-        className="hero-mobile-fallback"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-void) 100%)',
-          zIndex: 0,
-        }}
-      />
-
-      {/* L2 — Smoke overlay */}
-      <div
-        ref={smokeRef}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(ellipse at 30% 50%, rgba(212,120,26,0.08) 0%, transparent 60%)',
-          mixBlendMode: 'screen',
-          zIndex: 1,
-          animation: 'smokeDrift 8s ease-in-out alternate infinite',
-        }}
-      />
-
-      {/* L3 — Frame sequencer (desktop only) */}
+      {/* L1 — Frame sequencer (full-screen, no blend mode) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         ref={frameRef}
         src="/images/frames/frame_001.webp"
         alt=""
-        className="hero-frame-desktop"
         style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          mixBlendMode: 'screen',
-          opacity: 0,
-          zIndex: 2,
+          zIndex: 1,
         }}
       />
 
-      {/* L4 — Amber glow */}
+      {/* L2 — Amber glow behind bottle */}
       <div
         ref={glowRef}
         style={{
           position: 'absolute',
-          width: 400,
-          height: 400,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(212,120,26,0.4) 0%, transparent 70%)',
           left: '50%',
           top: '55%',
           transform: 'translate(-50%, -50%)',
+          width: 400,
+          height: 400,
+          borderRadius: '50%',
+          background:
+            'radial-gradient(circle, rgba(212,120,26,0.45) 0%, transparent 70%)',
           opacity: 0,
-          zIndex: 3,
+          zIndex: 2,
           pointerEvents: 'none',
         }}
       />
 
-      {/* L5 — Bottle */}
+      {/* L3 — Real labeled bottle */}
       <div
-        ref={bottleRef}
+        ref={bottleWrapRef}
         style={{
           position: 'absolute',
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%) scale(0.85)',
+          transform: 'translate(-50%, -50%)',
           opacity: 0,
-          zIndex: 4,
+          zIndex: 3,
           pointerEvents: 'none',
         }}
       >
         <Image
           src="/images/bottle_caramel.png"
           alt="Southern Edge Salted Caramel Whiskey"
+          width={340}
+          height={580}
           priority
-          width={400}
-          height={600}
           style={{
-            height: '70vh',
-            width: 'auto',
             objectFit: 'contain',
-            maxWidth: '400px',
+            maxHeight: '70vh',
+            width: 'auto',
           }}
         />
       </div>
 
-      {/* L6 — Text layer */}
-
-      {/* Top-left brand label */}
+      {/* L4 — Text overlay */}
       <div
+        ref={textRef}
         style={{
           position: 'absolute',
-          top: 24,
-          left: 'clamp(16px, 2.8vw, 40px)',
-          fontFamily: 'var(--font-dm-sans)',
-          fontSize: 11,
-          letterSpacing: '0.25em',
-          color: 'var(--silver)',
-          textTransform: 'uppercase',
-          zIndex: 5,
-        }}
-      >
-        Southern Edge Fine Spirits
-      </div>
-
-      {/* Center headline */}
-      <div
-        ref={textCenterRef}
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
+          inset: 0,
+          zIndex: 4,
+          opacity: 0,
           pointerEvents: 'none',
-          zIndex: 5,
-          width: '100%',
         }}
       >
-        {/* "WORK HARD" — split into individual char spans */}
+        {/* Top-left brand mark */}
         <span
           style={{
-            fontFamily: 'var(--font-bebas)',
-            fontSize: 'clamp(80px, 12vw, 180px)',
-            color: 'var(--cream)',
-            lineHeight: 0.9,
-            display: 'block',
-            letterSpacing: '0.05em',
+            position: 'absolute',
+            top: 24,
+            left: 40,
+            fontFamily: 'var(--font-dm-sans)',
+            fontSize: 11,
+            letterSpacing: '0.25em',
+            color: 'var(--silver)',
+            textTransform: 'uppercase',
           }}
         >
-          {WORK_HARD.split('').map((char, i) => (
-            <span
-              key={i}
-              data-char
-              style={{
-                display: 'inline-block',
-                opacity: 0,
-                // preserve space
-                whiteSpace: char === ' ' ? 'pre' : 'normal',
-              }}
-            >
-              {char}
-            </span>
-          ))}
+          Southern Edge Fine Spirits
         </span>
 
-        {/* "Drink Smooth." */}
-        <span
-          ref={smoothTagRef}
+        {/* Center headline */}
+        <div
           style={{
-            fontFamily: 'var(--font-vibes)',
-            fontSize: 'clamp(40px, 6vw, 90px)',
-            color: 'var(--gold)',
-            display: 'block',
-            marginTop: -8,
-            opacity: 0,
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            width: '100%',
           }}
         >
-          Drink Smooth.
-        </span>
+          <div
+            style={{
+              fontFamily: 'var(--font-bebas)',
+              fontSize: 'clamp(80px, 12vw, 180px)',
+              color: 'var(--cream)',
+              lineHeight: 0.9,
+              letterSpacing: '0.02em',
+            }}
+          >
+            WORK HARD
+          </div>
+          <div
+            style={{
+              fontFamily: 'var(--font-vibes)',
+              fontSize: 'clamp(40px, 6vw, 90px)',
+              color: 'var(--gold)',
+              marginTop: -8,
+            }}
+          >
+            Drink Smooth.
+          </div>
+        </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* L5 — Scroll prompt (fades out on scroll start) */}
       <div
-        ref={scrollArrowRef}
+        ref={scrollPromptRef}
         style={{
           position: 'absolute',
           bottom: 32,
           left: '50%',
           transform: 'translateX(-50%)',
-          fontFamily: 'var(--font-dm-sans)',
-          fontSize: 12,
-          color: 'rgba(200,200,200,0.5)',
-          letterSpacing: '0.15em',
-          textTransform: 'uppercase',
           zIndex: 5,
           textAlign: 'center',
           pointerEvents: 'none',
         }}
       >
-        <span style={{ display: 'block', marginBottom: 6 }}>Scroll to explore</span>
-        <span style={{ display: 'block', fontSize: 16 }}>↓</span>
+        <span
+          style={{
+            fontFamily: 'var(--font-dm-sans)',
+            fontSize: 11,
+            letterSpacing: '0.2em',
+            color: 'rgba(200,200,200,0.4)',
+            textTransform: 'uppercase',
+            display: 'block',
+          }}
+        >
+          Scroll to Reveal
+        </span>
+        <span
+          style={{
+            display: 'block',
+            color: 'rgba(200,200,200,0.4)',
+            fontSize: 18,
+            marginTop: 8,
+          }}
+        >
+          ↓
+        </span>
       </div>
-
-      {/* Responsive styles */}
-      <style>{`
-        @media (max-width: 767px) {
-          .hero-video-desktop { display: none !important; }
-          .hero-frame-desktop { display: none !important; }
-          .hero-mobile-fallback { display: block !important; }
-        }
-        @media (min-width: 768px) {
-          .hero-mobile-fallback { display: none !important; }
-        }
-      `}</style>
     </section>
   )
 }
