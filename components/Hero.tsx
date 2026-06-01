@@ -236,19 +236,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
         window.addEventListener('mousemove', onMouseMove)
 
-        // After pin releases: bottle inner wrapper drifts up, text fades
-        // Target bottleInnerRef (not outer) so flexbox centering is never touched
-        gsap.to([bottleInnerRef.current, textRef.current], {
-          y: -60,
-          opacity: 0,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            // Start well below hero so this doesn't activate right after pin kill + scroll snap
-            start: 'bottom top-=300',
-            end: 'bottom top-=600',
-            scrub: 1,
-          },
-        })
+        // Scroll-out tween intentionally removed.
+        // With scroll reset to 0 after pin kill, textRef's GSAP FROM state is opacity:0
+        // (its JSX initial value), so a scrub would restore it to 0 at scroll=0 — overriding
+        // setFinalState(). The hero exits naturally as the user scrolls into the next section.
 
         ScrollTrigger.refresh()
 
