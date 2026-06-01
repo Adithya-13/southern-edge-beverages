@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { useGSAP } from '@gsap/react'
@@ -17,10 +17,6 @@ const NAV_LINKS = [
   { label: 'Community', href: '#community' },
 ]
 
-interface NavbarProps {
-  visible?: boolean
-}
-
 function scrollToSection(href: string) {
   const target = document.querySelector(href)
   if (!target) return
@@ -32,9 +28,17 @@ function scrollToSection(href: string) {
   }
 }
 
-export default function Navbar({ visible = false }: NavbarProps) {
+export default function Navbar() {
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  // Manages own visibility — revealed when hero-revealed event fires
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const handler = () => setVisible(true)
+    window.addEventListener('hero-revealed', handler)
+    return () => window.removeEventListener('hero-revealed', handler)
+  }, [])
 
   useGSAP(
     () => {
@@ -77,7 +81,7 @@ export default function Navbar({ visible = false }: NavbarProps) {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 50,
+          zIndex: 9999,
           backgroundColor: 'rgba(0,0,0,0)',
           transition: 'opacity 0.8s ease',
           opacity: visible ? 1 : 0,
@@ -92,11 +96,11 @@ export default function Navbar({ visible = false }: NavbarProps) {
           onClick={(e) => handleLinkClick(e, '#hero')}
         >
           <Image
-            src="/images/logo_se.png"
+            src="/images/logo_se_circle.png"
             alt="Southern Edge"
-            width={31}
-            height={32}
-            style={{ width: 'auto', height: '32px' }}
+            width={36}
+            height={36}
+            style={{ width: 'auto', height: '36px' }}
             priority
           />
         </a>
@@ -138,7 +142,7 @@ export default function Navbar({ visible = false }: NavbarProps) {
         style={{
           position: 'fixed',
           inset: 0,
-          zIndex: 49,
+          zIndex: 9998,
           backgroundColor: 'rgba(8,6,4,0.97)',
           backdropFilter: 'blur(8px)',
           display: 'flex',

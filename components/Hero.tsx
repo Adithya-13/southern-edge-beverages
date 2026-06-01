@@ -34,16 +34,26 @@ const REVEAL_END_P = 1.0
 
 interface StoryBeat {
   peak: number
+  halfWidth: number
   lines: [string, string]
   align: 'left' | 'right' | 'center'
   xStyle: React.CSSProperties
+  fontSize?: string
+  fontFamily?: string
 }
 const STORY_BEATS: StoryBeat[] = [
-  { peak: 0.20, lines: ['CRAFTED IN', 'SOUTH CAROLINA'], align: 'left',   xStyle: { left: '8vw', right: 'auto', textAlign: 'left' } },
-  { peak: 0.40, lines: ['6× DISTILLED', '60 PROOF'],     align: 'right',  xStyle: { right: '8vw', left: 'auto', textAlign: 'right' } },
-  { peak: 0.57, lines: ['NATURAL INGREDIENTS', 'GLUTEN FREE'], align: 'center', xStyle: { left: '50%', transform: 'translateX(-50%)', textAlign: 'center' } },
+  // Beat 0: welcome — visible at p=0, fades out as scrolling starts
+  {
+    peak: 0.00, halfWidth: 0.12,
+    lines: ['SOUTHERN EDGE', 'FINE SPIRITS'],
+    align: 'center',
+    xStyle: { left: '50%', transform: 'translateX(-50%)', textAlign: 'center' },
+    fontSize: 'clamp(28px,3.5vw,52px)',
+    fontFamily: 'var(--font-bebas)',
+  },
+  { peak: 0.30, halfWidth: 0.10, lines: ['CRAFTED IN', 'SOUTH CAROLINA'], align: 'left',  xStyle: { left: '8vw', right: 'auto', textAlign: 'left' } },
+  { peak: 0.55, halfWidth: 0.10, lines: ['6× DISTILLED', '60 PROOF'],     align: 'right', xStyle: { right: '8vw', left: 'auto', textAlign: 'right' } },
 ]
-const BEAT_HALF_WIDTH = 0.10
 
 export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
@@ -154,7 +164,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
                 ref.current.style.opacity = '0'
               } else {
                 const dist = Math.abs(p - STORY_BEATS[i].peak)
-                ref.current.style.opacity = String(Math.max(0, 1 - dist / BEAT_HALF_WIDTH))
+                ref.current.style.opacity = String(Math.max(0, 1 - dist / STORY_BEATS[i].halfWidth))
               }
             })
 
@@ -197,19 +207,18 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               revealedRef.current = true
               onRevealedRef.current?.()
             }
-            const heroEl = sectionRef.current
             st.kill()
             ScrollTrigger.refresh()
-            // Killing the pin removes the 2000px spacer, causing a scroll jump.
-            // Snap to right below the hero so the next section lands cleanly.
-            if (heroEl) {
-              const target = heroEl.offsetTop + heroEl.offsetHeight
-              const smoother = ScrollSmoother.get()
-              if (smoother) {
-                smoother.scrollTo(target, false)
-              } else {
-                window.scrollTo(0, target)
-              }
+            // Reset to 0: back-scroll through hero is just one natural 100vh pass
+            const smoother = ScrollSmoother.get()
+            if (smoother) {
+              smoother.scrollTo(0, false)
+            } else {
+              window.scrollTo(0, 0)
+            }
+            // Notify outside-ScrollSmoother components (Navbar lives outside the transform)
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('hero-revealed'))
             }
           },
         })
@@ -344,13 +353,14 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
                 ? 'translate(-50%, -50%)'
                 : 'translateY(-50%)',
               ...beat.xStyle,
-              opacity: 0,
+              // Initial opacity: pre-calculated at p=0 so beat 0 (welcome) is visible on load
+              opacity: Math.max(0, 1 - Math.abs(0 - beat.peak) / beat.halfWidth),
               zIndex: 4,
               pointerEvents: 'none',
             }}
           >
             <div style={{
-              width: 32,
+              width: beat.fontFamily ? 48 : 32,
               height: 1,
               background: 'var(--amber)',
               marginBottom: 12,
@@ -359,13 +369,13 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             }} />
             {beat.lines.map((line, li) => (
               <div key={li} style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontWeight: 500,
-                fontSize: 'clamp(10px,1.1vw,13px)',
-                letterSpacing: '0.25em',
-                color: 'rgba(240,228,204,0.65)',
+                fontFamily: beat.fontFamily ?? 'var(--font-dm-sans)',
+                fontWeight: beat.fontFamily ? 400 : 500,
+                fontSize: beat.fontSize ?? 'clamp(10px,1.1vw,13px)',
+                letterSpacing: beat.fontFamily ? '0.08em' : '0.25em',
+                color: 'rgba(240,228,204,0.80)',
                 textTransform: 'uppercase',
-                lineHeight: 1.6,
+                lineHeight: 1.1,
               }}>
                 {line}
               </div>

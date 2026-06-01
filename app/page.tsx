@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Preloader from '@/components/Preloader'
 import AgeGate from '@/components/AgeGate'
-import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import Manifesto from '@/components/Manifesto'
 import Products from '@/components/Products'
@@ -15,7 +14,6 @@ import Footer from '@/components/Footer'
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
   const [ageVerified, setAgeVerified] = useState(false)
-  const [heroRevealed, setHeroRevealed] = useState(false)
 
   return (
     <>
@@ -23,8 +21,7 @@ export default function Home() {
       {preloaderDone && !ageVerified && <AgeGate onVerified={() => setAgeVerified(true)} />}
       {ageVerified && (
         <main>
-          <Navbar visible={heroRevealed} />
-          <Hero isVisible={ageVerified} onRevealed={() => setHeroRevealed(true)} />
+          <Hero isVisible={ageVerified} />
           <Manifesto />
           <Products />
           <Recipes />
