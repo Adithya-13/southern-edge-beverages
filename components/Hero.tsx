@@ -19,19 +19,17 @@ const frameUrls = Array.from(
   (_, i) => `/images/frames/frame_${String(i + 1).padStart(3, '0')}.webp`,
 )
 
-// Total pin distance (scroll units)
-// First 3000px drive the frames; remaining 1500px are a "dwell" hold
-// for mouse interaction before the pin releases
-const FRAME_SCROLL = 3000
-const DWELL_SCROLL = 1500
-const TOTAL_SCROLL = FRAME_SCROLL + DWELL_SCROLL // 4500
+// Pin distance: 2000px drives the full frame sequence.
+// No dwell phase — pin releases immediately when reveal completes.
+// On the way back, onLeave kills the pin so back-scroll is one normal 100vh section.
+const TOTAL_SCROLL = 2000
 
-// Progress at which frames are fully revealed (p = FRAME_SCROLL / TOTAL_SCROLL)
-const FRAME_END_P = FRAME_SCROLL / TOTAL_SCROLL // ≈ 0.667
+// Frames run the entire pin distance
+const FRAME_END_P = 1.0
 
-// Phase 3 reveal window mapped within the frame range
-const REVEAL_START_P = 0.88 * FRAME_END_P // ≈ 0.587
-const REVEAL_END_P = FRAME_END_P // ≈ 0.667
+// Reveal window: last 30% of pin (progress 0.70→1.0 = 600px of transition)
+const REVEAL_START_P = 0.70
+const REVEAL_END_P = 1.0
 
 export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
@@ -87,7 +85,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
         }
 
-        const st = ScrollTrigger.create({
+        let st: ScrollTrigger
+        st = ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top top',
           end: `+=${TOTAL_SCROLL}`,
@@ -116,12 +115,6 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               )
             }
 
-            // Fire onRevealed callback once
-            if (p >= REVEAL_START_P && !revealedRef.current) {
-              revealedRef.current = true
-              onRevealedRef.current?.()
-            }
-
             // Phase 3: frame fades OUT, environment fades IN
             if (p >= REVEAL_START_P) {
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
@@ -140,11 +133,27 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
-            // Dwell phase reached — lock reveal permanently
-            if (p >= FRAME_END_P) {
+            // Reveal fully complete — lock state and show navbar
+            if (p >= FRAME_END_P - 0.01) {
               revealDone = true
               setFinalState()
+              // Fire navbar callback only when reveal is 100% done
+              if (!revealedRef.current) {
+                revealedRef.current = true
+                onRevealedRef.current?.()
+              }
             }
+          },
+          // Pin releases here — kill it so back-scroll is a normal 100vh pass
+          onLeave: () => {
+            revealDone = true
+            setFinalState()
+            if (!revealedRef.current) {
+              revealedRef.current = true
+              onRevealedRef.current?.()
+            }
+            st.kill()
+            ScrollTrigger.refresh()
           },
         })
 
