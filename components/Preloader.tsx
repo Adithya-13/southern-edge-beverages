@@ -1,80 +1,78 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
 interface PreloaderProps {
-  onComplete?: () => void
+  onComplete: () => void
 }
 
 export default function Preloader({ onComplete }: PreloaderProps) {
-  // 'pending' | 'animate' | 'done'
-  const [phase, setPhase] = useState<'pending' | 'animate' | 'done'>('pending')
+  const [skip, setSkip] = useState<boolean | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const logoWrapRef = useRef<HTMLDivElement>(null)
-  const textRef = useRef<HTMLParagraphElement>(null)
   const bloomRef = useRef<HTMLDivElement>(null)
+  const logoRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem('preloaderShown')
-    if (alreadyShown) {
-      setPhase('done')
-      onComplete?.()
+    if (sessionStorage.getItem('preloaderShown')) {
+      setSkip(true)
+      onComplete()
     } else {
-      setPhase('animate')
+      setSkip(false)
     }
   }, [onComplete])
 
   useGSAP(
     () => {
-      if (phase !== 'animate') return
-      if (!containerRef.current || !logoWrapRef.current || !textRef.current || !bloomRef.current) return
+      if (skip !== false) return
 
       const tl = gsap.timeline({
         onComplete: () => {
           sessionStorage.setItem('preloaderShown', 'true')
-          setPhase('done')
-          onComplete?.()
+          onComplete()
         },
       })
 
-      // t=0.0s — logo fade in + scale
+      // t=0.0 logo fade+scale
       tl.fromTo(
-        logoWrapRef.current,
+        logoRef.current,
         { opacity: 0, scale: 0.85 },
         { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }
       )
 
-      // t=0.5s — amber bloom CSS animation trigger
-      tl.add(() => {
-        if (bloomRef.current) {
-          bloomRef.current.style.animationName = 'amberBloom'
-          bloomRef.current.style.animationDuration = '1.8s'
-          bloomRef.current.style.animationTimingFunction = 'ease-in-out'
-          bloomRef.current.style.animationFillMode = 'both'
-        }
-      }, 0.5)
+      // t=0.5 bloom in
+      tl.fromTo(
+        bloomRef.current,
+        { opacity: 0, scale: 0.8 },
+        { opacity: 0.35, scale: 1.2, duration: 0.9, ease: 'power2.inOut' },
+        0.5
+      )
+      // bloom out
+      tl.to(bloomRef.current, { opacity: 0, scale: 1.5, duration: 0.9 })
 
-      // t=1.2s — text fade in + letter spacing expand
+      // t=1.2 text letter-spacing expand
       tl.fromTo(
         textRef.current,
         { opacity: 0, letterSpacing: '0.08em' },
-        { opacity: 1, letterSpacing: '0.25em', duration: 0.8, ease: 'power2.out' },
+        { opacity: 1, letterSpacing: '0.22em', duration: 0.8, ease: 'power2.out' },
         1.2
       )
 
-      // t=3.2s — entire preloader fades out
-      tl.to(containerRef.current, { opacity: 0, duration: 0.5, ease: 'power2.in' }, 3.2)
+      // t=3.2 container fade out
+      tl.to(containerRef.current, { opacity: 0, duration: 0.5 }, 3.2)
     },
-    { scope: containerRef, dependencies: [phase] }
+    { scope: containerRef, dependencies: [skip] }
   )
 
-  // 'done' — unmount cleanly
-  if (phase === 'done') return null
+  // null during SSR and while checking sessionStorage.
+  // Must not reference document.body above this guard — server render returns null here.
+  if (skip === null || skip === true) return null
 
-  return (
+  return createPortal(
     <div
       ref={containerRef}
       style={{
@@ -86,34 +84,35 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '1.5rem',
       }}
     >
-      {/* Amber bloom — absolutely positioned behind logo */}
+      {/* Amber bloom — absolutely centered */}
       <div
         ref={bloomRef}
         style={{
           position: 'absolute',
-          width: 220,
-          height: 220,
+          width: 500,
+          height: 500,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, var(--amber) 0%, transparent 70%)',
+          background:
+            'radial-gradient(circle, rgba(212,120,26,0.35) 0%, transparent 70%)',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
           opacity: 0,
           pointerEvents: 'none',
         }}
       />
 
-      {/* Logo — wrapped so GSAP can target the div for opacity/scale */}
-      <div
-        ref={logoWrapRef}
-        style={{ position: 'relative', zIndex: 1, opacity: 0 }}
-      >
+      {/* Logo */}
+      <div ref={logoRef} style={{ opacity: 0, position: 'relative', zIndex: 1 }}>
         <Image
           src="/images/logo_se.png"
           alt="Southern Edge"
           width={80}
           height={80}
           priority
+          style={{ objectFit: 'contain' }}
         />
       </div>
 
@@ -122,11 +121,10 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         ref={textRef}
         style={{
           fontFamily: 'var(--font-dm-sans), sans-serif',
-          fontWeight: 500,
           fontSize: '11px',
           letterSpacing: '0.08em',
           color: 'var(--silver)',
-          fontVariant: 'small-caps',
+          marginTop: '20px',
           textTransform: 'uppercase',
           opacity: 0,
           position: 'relative',
@@ -135,6 +133,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       >
         Southern Edge Fine Spirits
       </p>
-    </div>
+    </div>,
+    document.body,
   )
 }
