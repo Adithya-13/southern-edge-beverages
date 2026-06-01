@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
-import { FRAME_URLS, FRAME_COUNT, frameCache, preloadAllAssets } from '@/lib/preload'
+import { FRAME_COUNT, frameCache, preloadAllAssets } from '@/lib/preload'
 
 interface HeroProps {
   isVisible: boolean
@@ -48,7 +48,7 @@ const STORY_BEATS: StoryBeat[] = [
 
 export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
-  const frameRef = useRef<HTMLImageElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const revealedRef = useRef(false)
   const onRevealedRef = useRef(onRevealed)
   onRevealedRef.current = onRevealed
@@ -94,6 +94,22 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
       }
 
+      // Render frames into a canvas via drawImage (synchronous from decoded images).
+      // Avoids <img>.src coalescing + async decode that stalls fast scroll.
+      const ctx = canvasRef.current?.getContext('2d', { alpha: false }) ?? null
+      const drawFrame = (idx: number) => {
+        const img = frameCache[idx]
+        if (ctx && img && img.complete && img.naturalWidth > 0) {
+          ctx.drawImage(img, 0, 0, 960, 720)
+        }
+      }
+      // Paint frame 0 immediately (or as soon as it loads) so the canvas is never blank pre-scroll.
+      const first = frameCache[0]
+      if (first) {
+        if (first.complete && first.naturalWidth) drawFrame(0)
+        else first.addEventListener('load', () => drawFrame(0), { once: true })
+      }
+
       const mm = gsap.matchMedia()
 
       // ── DESKTOP: pinned scroll + dwell ──────────────────────────────────
@@ -121,11 +137,11 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           onUpdate: (self) => {
             const p = self.progress
 
-            // Frame swap — clamp to frame range only
-            if (frameRef.current) {
+            // Frame draw — clamp to frame range only
+            if (canvasRef.current) {
               const frameP = Math.min(p / FRAME_END_P, 1)
               const idx = Math.min(Math.round(frameP * 191), 191)
-              frameRef.current.src = FRAME_URLS[idx]
+              drawFrame(idx)
               warmDecodeWindow(idx)
             }
 
@@ -152,7 +168,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             if (p >= REVEAL_START_P) {
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
-              if (frameRef.current) frameRef.current.style.opacity = String(1 - eased)
+              if (canvasRef.current) canvasRef.current.style.opacity = String(1 - eased)
               if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
               if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = String(eased)
@@ -160,7 +176,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = String(eased)
             } else {
               // Still in frame phase — keep environment hidden
-              if (frameRef.current) frameRef.current.style.opacity = '1'
+              if (canvasRef.current) canvasRef.current.style.opacity = '1'
               if (videoRef.current) videoRef.current.style.opacity = '0'
               if (overlayRef.current) overlayRef.current.style.opacity = '0'
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
@@ -241,9 +257,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           onUpdate: (self) => {
             const p = self.progress
 
-            if (frameRef.current) {
+            if (canvasRef.current) {
               const idx = Math.min(Math.round(p * 191), 191)
-              frameRef.current.src = FRAME_URLS[idx]
+              drawFrame(idx)
               warmDecodeWindow(idx)
             }
 
@@ -266,14 +282,14 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             if (p >= REVEAL_START_P) {
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
-              if (frameRef.current) frameRef.current.style.opacity = String(1 - eased)
+              if (canvasRef.current) canvasRef.current.style.opacity = String(1 - eased)
               if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
               if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = String(eased)
               if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
               if (textRef.current) textRef.current.style.opacity = String(eased)
             } else {
-              if (frameRef.current) frameRef.current.style.opacity = '1'
+              if (canvasRef.current) canvasRef.current.style.opacity = '1'
               if (videoRef.current) videoRef.current.style.opacity = '0'
               if (overlayRef.current) overlayRef.current.style.opacity = '0'
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
@@ -345,18 +361,22 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         <source src="/videos/bourbon_bar.mp4" type="video/mp4" />
       </video>
 
-      {/* L1 — Frame sequencer */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={frameRef}
-        src="/images/frames/frame_001.webp"
-        alt=""
+      {/* L1 — Frame sequencer.
+          CSS poster (frame_001) backs the canvas so it's never blank/opaque-black
+          before drawFrame(0) decodes — restores the old <img> pre-paint behavior. */}
+      <canvas
+        ref={canvasRef}
+        width={960}
+        height={720}
         style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
+          backgroundImage: 'url(/images/frames/frame_001.webp)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           zIndex: 1,
         }}
       />
