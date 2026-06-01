@@ -93,19 +93,22 @@ export default function Recipes() {
     >
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 64 }}>
-        <p
+        <span className="amber-rule" />
+        <span
           style={{
             fontFamily: 'var(--font-dm-sans)',
             fontWeight: 500,
-            fontSize: 11,
-            letterSpacing: '0.2em',
+            fontSize: 10,
+            letterSpacing: '0.3em',
+            color: 'var(--amber)',
             textTransform: 'uppercase',
-            color: 'var(--silver)',
+            display: 'block',
             marginBottom: 16,
+            textAlign: 'center',
           }}
         >
-          Cocktail Recipes
-        </p>
+          COCKTAIL RECIPES
+        </span>
         <h2
           style={{
             fontFamily: 'var(--font-cormorant)',

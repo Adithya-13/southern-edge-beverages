@@ -48,22 +48,21 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
       {/* Image area */}
       <div
         style={{
-          height: 220,
+          height: 240,
           position: 'relative',
-          overflow: 'hidden',
-          background: `linear-gradient(135deg, var(--bg-deep) 0%, ${recipe.accent}22 100%)`,
+          background: `linear-gradient(160deg, var(--bg-void) 0%, ${recipe.accent}33 60%, ${recipe.accent}55 100%)`,
         }}
       >
         {/* Decorative spirit name watermark */}
         <span
           style={{
             position: 'absolute',
-            bottom: 12,
-            left: 16,
+            top: 12,
+            right: 16,
             fontFamily: 'var(--font-vibes)',
-            fontSize: 56,
+            fontSize: 80,
             color: recipe.accent,
-            opacity: 0.12,
+            opacity: 0.2,
             pointerEvents: 'none',
             userSelect: 'none',
             lineHeight: 1,
@@ -80,15 +79,17 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
+            overflow: 'visible',
+            marginTop: -20,
           }}
         >
           <Image
             src={recipe.bottle}
             alt={recipe.spirit}
             width={80}
-            height={170}
+            height={195}
             style={{
-              height: 170,
+              height: 195,
               width: 'auto',
               objectFit: 'contain',
             }}
@@ -102,7 +103,8 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
           style={{
             fontFamily: 'var(--font-cormorant)',
             fontWeight: 500,
-            fontSize: '1.4rem',
+            fontSize: '1.6rem',
+            letterSpacing: '-0.01em',
             color: 'var(--cream)',
             marginBottom: 12,
           }}
@@ -114,8 +116,9 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
         <span
           style={{
             display: 'inline-block',
-            background: recipe.accent,
-            color: 'var(--bg-void)',
+            background: `${recipe.accent}18`,
+            border: `1px solid ${recipe.accent}66`,
+            color: recipe.accent,
             fontFamily: 'var(--font-dm-sans)',
             fontWeight: 500,
             fontSize: 10,
@@ -133,19 +136,33 @@ export default function RecipeCard({ recipe, cardRef }: Props) {
         <button
           onClick={toggleOpen}
           style={{
-            fontFamily: 'var(--font-dm-sans)',
-            fontWeight: 400,
-            fontSize: 13,
-            color: 'var(--silver)',
-            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            marginTop: 12,
             background: 'none',
             border: 'none',
-            padding: 0,
-            marginTop: 4,
-            display: 'block',
+            padding: '8px 0',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-dm-sans)',
+            fontWeight: 500,
+            fontSize: 11,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: open ? 'var(--amber)' : 'var(--silver)',
+            transition: 'color 0.2s',
           }}
         >
-          {open ? 'Close ↑' : 'View Recipe ↓'}
+          <span style={{
+            display: 'inline-block',
+            width: 16,
+            height: 1,
+            background: open ? 'var(--amber)' : 'var(--silver)',
+            transition: 'background 0.2s',
+            flexShrink: 0,
+          }} />
+          {open ? 'Close' : 'View Recipe'}
+          <span style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', display: 'inline-block', fontSize: 10 }}>▾</span>
         </button>
 
         {/* Expandable content — initial height 0 */}
