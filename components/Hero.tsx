@@ -74,7 +74,18 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
       // ── DESKTOP: pinned scroll + dwell ──────────────────────────────────
       mm.add('(min-width: 769px)', () => {
-        let parallaxActive = false
+        // Once the reveal is done (dwell phase reached), lock final state permanently.
+        // This prevents the scrub from rewinding the reveal when scrolling back up.
+        let revealDone = false
+
+        const setFinalState = () => {
+          if (frameRef.current) frameRef.current.style.opacity = '0'
+          if (videoRef.current) videoRef.current.style.opacity = '0.75'
+          if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
+          if (glowRef.current) glowRef.current.style.opacity = '0.3'
+          if (textRef.current) textRef.current.style.opacity = '1'
+          if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
+        }
 
         const st = ScrollTrigger.create({
           trigger: sectionRef.current,
@@ -83,6 +94,12 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           pin: true,
           scrub: 0.5,
           onUpdate: (self) => {
+            // Once reveal is done, lock final state — scrubbing back never rewinds it
+            if (revealDone) {
+              setFinalState()
+              return
+            }
+
             const p = self.progress
 
             // Frame swap — clamp to frame range only
@@ -92,60 +109,41 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               frameRef.current.src = frameUrls[idx]
             }
 
-            // Scroll prompt fades out immediately (gone by first ~1.7% of total scroll)
+            // Scroll prompt fades out immediately
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(
                 Math.max(0, 1 - p * 60),
               )
             }
 
-            // Fire onRevealed once when reveal starts
+            // Fire onRevealed callback once
             if (p >= REVEAL_START_P && !revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
             }
 
-            // Phase 3: frame fades OUT, bottle + video + text fade IN
-            if (p >= REVEAL_START_P && p <= FRAME_END_P + 0.01) {
+            // Phase 3: frame fades OUT, environment fades IN
+            if (p >= REVEAL_START_P) {
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
-              const eased =
-                phase < 0.5
-                  ? 2 * phase * phase
-                  : -1 + (4 - 2 * phase) * phase
-
-              // Frame fades OUT
-              if (frameRef.current)
-                frameRef.current.style.opacity = String(1 - eased)
-
-              if (videoRef.current)
-                videoRef.current.style.opacity = String(eased * 0.75)
-              if (bottleOuterRef.current)
-                bottleOuterRef.current.style.opacity = String(eased)
-              if (glowRef.current)
-                glowRef.current.style.opacity = String(eased * 0.3)
-              if (textRef.current)
-                textRef.current.style.opacity = String(eased)
-            } else if (p < REVEAL_START_P) {
-              // Reset when scrolled back into frame phase
+              const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
+              if (frameRef.current) frameRef.current.style.opacity = String(1 - eased)
+              if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
+              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = String(eased)
+              if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
+              if (textRef.current) textRef.current.style.opacity = String(eased)
+            } else {
+              // Still in frame phase — keep environment hidden
               if (frameRef.current) frameRef.current.style.opacity = '1'
               if (videoRef.current) videoRef.current.style.opacity = '0'
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
               if (glowRef.current) glowRef.current.style.opacity = '0'
               if (textRef.current) textRef.current.style.opacity = '0'
-              parallaxActive = false
             }
 
-            // Dwell phase (p > FRAME_END_P): hold everything fully visible,
-            // activate mouse parallax
-            if (p > FRAME_END_P && !parallaxActive) {
-              parallaxActive = true
-              // Frame is fully gone in dwell
-              if (frameRef.current) frameRef.current.style.opacity = '0'
-              // Ensure everything else is fully visible
-              if (videoRef.current) videoRef.current.style.opacity = '0.75'
-              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
-              if (glowRef.current) glowRef.current.style.opacity = '0.3'
-              if (textRef.current) textRef.current.style.opacity = '1'
+            // Dwell phase reached — lock reveal permanently
+            if (p >= FRAME_END_P) {
+              revealDone = true
+              setFinalState()
             }
           },
         })
@@ -163,9 +161,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
         window.addEventListener('mousemove', onMouseMove)
 
-        // After pin releases: bottle drifts up, text fades
-        // Target the outer wrapper (centering preserved; only y and opacity change)
-        gsap.to([bottleOuterRef.current, textRef.current], {
+        // After pin releases: bottle inner wrapper drifts up, text fades
+        // Target bottleInnerRef (not outer) so flexbox centering is never touched
+        gsap.to([bottleInnerRef.current, textRef.current], {
           y: -60,
           opacity: 0,
           scrollTrigger: {
@@ -271,14 +269,15 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }}
       />
 
-      {/* L3 — Bottle: outer centers it, inner is parallax target */}
+      {/* L3 — Bottle: flexbox centering (avoids transform conflict with GSAP scroll-out) */}
       <div
         ref={bottleOuterRef}
         style={{
           position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           opacity: 0,
           zIndex: 3,
           pointerEvents: 'none',
