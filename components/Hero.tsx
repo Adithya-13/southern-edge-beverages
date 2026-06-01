@@ -4,17 +4,12 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
+import { FRAME_URLS, FRAME_COUNT, frameCache, preloadAllAssets } from '@/lib/preload'
 
 interface HeroProps {
   isVisible: boolean
   onRevealed?: () => void
 }
-
-const FRAME_COUNT = 192
-const frameUrls = Array.from(
-  { length: FRAME_COUNT },
-  (_, i) => `/images/frames/frame_${String(i + 1).padStart(3, '0')}.webp`,
-)
 
 // Pin distance: 2000px drives the full frame sequence.
 // No dwell phase — pin releases immediately when reveal completes.
@@ -69,25 +64,34 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const beat0Ref = useRef<HTMLDivElement | null>(null)
   const beat1Ref = useRef<HTMLDivElement | null>(null)
   const beat2Ref = useRef<HTMLDivElement | null>(null)
-  // Persistent store of preloaded frame images — keeping references prevents GC,
-  // so decoded frames stay warm and scrubbing back up never re-decodes (no lag).
-  const framesRef = useRef<HTMLImageElement[]>([])
 
   useGSAP(
     () => {
       if (!isVisible) return
 
-      // Preload ALL frames into a persistent array. Keeping the references prevents the
-      // browser from GC'ing the decoded bitmaps, so scrubbing back up (or any direction)
-      // never triggers a re-decode — fixes the frame lag/skip on scroll-up.
-      if (framesRef.current.length === 0) {
-        frameUrls.forEach((url, i) => {
-          const img = new window.Image()
-          img.src = url
-          // decode() warms the bitmap so the first paint of each frame is instant
-          if (img.decode) img.decode().catch(() => {})
-          framesRef.current[i] = img
-        })
+      // Frames come from the shared preload module (frameCache). The loader normally
+      // warms all 192 before Hero mounts. If it was bypassed, kick the module once as
+      // a safety net so scrubbing stays warm in every direction.
+      if (frameCache.length !== FRAME_COUNT) {
+        preloadAllAssets(() => {})
+      }
+
+      const reduced =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      // Only the first DECODE_AHEAD frames are decode-warm from the loader; the rest
+      // warm only the HTTP cache and decode on demand mid-scroll (flicker). Decode a
+      // bounded sliding window ahead of the scrub head so the next frames are bitmap-
+      // ready without ever decoding all 192 at once (that ≈530MB RGBA OOMs mobile).
+      const DECODE_WINDOW = 6
+      let decodeHead = -1
+      const warmDecodeWindow = (idx: number) => {
+        if (idx === decodeHead) return
+        decodeHead = idx
+        for (let i = idx; i < idx + DECODE_WINDOW && i < FRAME_COUNT; i++) {
+          frameCache[i]?.decode().catch(() => {})
+        }
       }
 
       const mm = gsap.matchMedia()
@@ -96,14 +100,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       mm.add('(min-width: 769px)', () => {
         // Reveal is fully scrub-bound both directions — scrolling back up replays/reverses it.
 
-        // Infinite bob on the scroll arrow
-        gsap.to(scrollPromptRef.current, {
-          y: 10,
-          repeat: -1,
-          yoyo: true,
-          duration: 0.9,
-          ease: 'sine.inOut',
-        })
+        // Infinite bob on the scroll arrow (skip for reduced-motion users)
+        if (!reduced) {
+          gsap.to(scrollPromptRef.current, {
+            y: 10,
+            repeat: -1,
+            yoyo: true,
+            duration: 0.9,
+            ease: 'sine.inOut',
+          })
+        }
 
         let st: ScrollTrigger
         st = ScrollTrigger.create({
@@ -119,7 +125,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             if (frameRef.current) {
               const frameP = Math.min(p / FRAME_END_P, 1)
               const idx = Math.min(Math.round(frameP * 191), 191)
-              frameRef.current.src = frameUrls[idx]
+              frameRef.current.src = FRAME_URLS[idx]
+              warmDecodeWindow(idx)
             }
 
             // Scroll prompt fades out immediately
@@ -183,7 +190,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           },
         })
 
-        // Mouse parallax — only affects the inner bottle wrapper and glow
+        // Mouse parallax — only affects the inner bottle wrapper and glow.
+        // Skipped entirely for reduced-motion users (autonomous-feel motion).
         function onMouseMove(e: MouseEvent) {
           const x = (e.clientX / window.innerWidth - 0.5) * 2
           const y = (e.clientY / window.innerHeight - 0.5) * 2
@@ -194,7 +202,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             gsap.to(glowRef.current, { x: x * 10, y: y * 10, duration: 0.9, ease: 'power2.out' })
           }
         }
-        window.addEventListener('mousemove', onMouseMove)
+        if (!reduced) {
+          window.addEventListener('mousemove', onMouseMove)
+        }
 
         ScrollTrigger.refresh()
 
@@ -210,14 +220,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
         // Reveal is fully scrub-bound both directions — scrolling back up replays/reverses it.
 
-        // Nudge animation
-        gsap.to(scrollPromptRef.current, {
-          y: 10,
-          repeat: -1,
-          yoyo: true,
-          duration: 0.9,
-          ease: 'sine.inOut',
-        })
+        // Nudge animation (skip for reduced-motion users)
+        if (!reduced) {
+          gsap.to(scrollPromptRef.current, {
+            y: 10,
+            repeat: -1,
+            yoyo: true,
+            duration: 0.9,
+            ease: 'sine.inOut',
+          })
+        }
 
         let stMobile: ScrollTrigger
         stMobile = ScrollTrigger.create({
@@ -231,7 +243,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
             if (frameRef.current) {
               const idx = Math.min(Math.round(p * 191), 191)
-              frameRef.current.src = frameUrls[idx]
+              frameRef.current.src = FRAME_URLS[idx]
+              warmDecodeWindow(idx)
             }
 
             if (scrollPromptRef.current) {
@@ -318,7 +331,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         muted
         loop
         playsInline
-        preload="none"
+        preload="auto"
         style={{
           position: 'absolute',
           inset: 0,
