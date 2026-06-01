@@ -46,6 +46,16 @@ export default function ProductCard({ product, index, cardRef }: Props) {
     }
   }
 
+  const spiritTypeStyle = {
+    fontFamily: 'var(--font-dm-sans)',
+    fontWeight: 500,
+    fontSize: 10,
+    letterSpacing: '0.2em',
+    textTransform: 'uppercase' as const,
+    color: 'var(--silver)',
+    display: 'block',
+  }
+
   return (
     <div
       ref={cardRef}
@@ -54,13 +64,26 @@ export default function ProductCard({ product, index, cardRef }: Props) {
       style={{
         position: 'relative',
         background: 'var(--bg-surface)',
-        borderRadius: 12,
+        borderRadius: 4,
         border: '1px solid rgba(240,228,204,0.06)',
         overflow: 'hidden',
         flex: 1,
         minWidth: 0,
       }}
     >
+      {/* Top accent stripe */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 1,
+          background: `${product.accent}4d`,
+          zIndex: 2,
+        }}
+      />
+
       {/* Image area */}
       <div
         style={{
@@ -77,7 +100,7 @@ export default function ProductCard({ product, index, cardRef }: Props) {
           style={{
             position: 'absolute',
             inset: 0,
-            background: `radial-gradient(circle at center, ${product.accent}22 0%, transparent 70%)`,
+            background: `linear-gradient(160deg, transparent 30%, ${product.accent}18 100%)`,
             opacity: 0.15,
             zIndex: 0,
           }}
@@ -102,28 +125,19 @@ export default function ProductCard({ product, index, cardRef }: Props) {
 
       {/* Content */}
       <div style={{ padding: '24px 28px 28px' }}>
-        <span
-          style={{
-            fontFamily: 'var(--font-dm-sans)',
-            fontWeight: 500,
-            fontSize: 10,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'var(--silver)',
-            display: 'block',
-            marginBottom: 8,
-          }}
-        >
-          {product.spiritType}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{ display: 'block', width: 16, height: 1, background: product.accent, flexShrink: 0 }} />
+          <span style={{ ...spiritTypeStyle }}>
+            {product.spiritType}
+          </span>
+        </div>
 
         <h3
           style={{
             fontFamily: 'var(--font-cormorant)',
-            fontWeight: 400,
-            fontSize: 'clamp(1.3rem, 2vw, 1.8rem)',
+            fontWeight: 500,
+            fontSize: 'clamp(1.4rem, 2.2vw, 2rem)',
             color: 'var(--cream)',
-            marginBottom: 12,
             lineHeight: 1.2,
             margin: '0 0 12px',
           }}
@@ -139,41 +153,28 @@ export default function ProductCard({ product, index, cardRef }: Props) {
             color: 'rgba(240,228,204,0.6)',
             lineHeight: 1.6,
             fontStyle: 'italic',
-            marginBottom: 16,
             margin: '0 0 16px',
           }}
         >
           {product.tagline}
         </p>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
           {product.notes.map((note, i) => (
-            <span
-              key={i}
-              style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontSize: 11,
-                color: 'rgba(240,228,204,0.5)',
-              }}
-            >
-              {'· '}{note}
+            <span key={i} style={{ display: 'contents' }}>
+              {i > 0 && <span style={{ color: 'var(--amber)', opacity: 0.5, margin: '0 4px' }}>·</span>}
+              <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 11, color: 'rgba(240,228,204,0.6)' }}>{note}</span>
             </span>
           ))}
         </div>
 
         {product.award && (
-          <p
-            style={{
-              marginTop: 16,
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
-              fontSize: 11,
-              color: 'rgba(200,200,200,0.5)',
-              margin: '16px 0 0',
-            }}
-          >
-            {product.award}
-          </p>
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(240,228,204,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: 'var(--gold)', fontSize: 14 }}>🥈</span>
+            <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 400, fontSize: 11, color: 'var(--amber)', letterSpacing: '0.05em' }}>
+              {product.award}
+            </span>
+          </div>
         )}
       </div>
 
