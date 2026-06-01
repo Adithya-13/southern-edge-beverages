@@ -70,7 +70,7 @@ export default function Footer() {
         <div className="footer-cols">
           {/* Col 1 — Brand */}
           <div>
-            <Image src="/images/logo_se.png" alt="Southern Edge Fine Spirits" width={56} height={56} style={{ width: 56, height: 56, objectFit: 'contain', marginBottom: 16 }} />
+            <Image src="/images/logo_se_circle.png" alt="Southern Edge Fine Spirits" width={56} height={56} style={{ width: 56, height: 56, objectFit: 'contain', marginBottom: 16 }} />
             <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 18, color: 'var(--cream)', display: 'block', letterSpacing: '0.08em', lineHeight: 1, marginBottom: 8 }}>
               SOUTHERN EDGE
             </span>

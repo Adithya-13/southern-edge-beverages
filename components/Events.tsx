@@ -59,11 +59,23 @@ export default function Events() {
             UPCOMING EVENTS
           </p>
 
-          <div style={{ marginBottom: 48 }}>
-            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 'clamp(60px, 8vw, 100px)', color: 'var(--amber)', opacity: 0.15, lineHeight: 1, display: 'block' }}>
+          <div style={{ marginBottom: 48, position: 'relative' }}>
+            <span style={{
+              fontFamily: 'var(--font-bebas)',
+              fontSize: 'clamp(80px, 10vw, 140px)',
+              color: 'var(--amber)',
+              opacity: 0.10,
+              lineHeight: 1,
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}>
               2024
             </span>
-            <div style={{ display: 'flex', gap: 32, marginTop: 8 }}>
+            <div style={{ display: 'flex', gap: 32, paddingTop: 8, position: 'relative', zIndex: 1 }}>
               <div>
                 <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1 }}>2</span>
                 <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 10, letterSpacing: '0.2em', color: 'var(--silver)', textTransform: 'uppercase' }}>Silver Medals</span>
@@ -144,6 +156,7 @@ export default function Events() {
                     badge.style.borderLeftColor = '#F0C040'
                     badge.style.transform = 'scale(1.02)'
                     badge.style.background = 'linear-gradient(135deg, var(--bg-surface) 0%, rgba(240,192,64,0.06) 50%, var(--bg-surface) 100%)'
+                    badge.style.boxShadow = '0 0 24px rgba(212,120,26,0.12)'
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -152,6 +165,7 @@ export default function Events() {
                     badge.style.borderLeftColor = 'var(--gold)'
                     badge.style.transform = 'scale(1)'
                     badge.style.background = 'var(--bg-surface)'
+                    badge.style.boxShadow = 'none'
                   }
                 }}
               >
@@ -164,7 +178,8 @@ export default function Events() {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 4,
-                    transition: 'border-color 0.2s, transform 0.2s, background 0.4s',
+                    backdropFilter: 'blur(4px)',
+                    transition: 'border-color 0.2s, transform 0.2s, background 0.4s, box-shadow 0.2s',
                   }}
                 >
                   <Award size={18} color="var(--gold)" style={{ marginBottom: 4 }} />
@@ -221,8 +236,9 @@ export default function Events() {
                 style={{
                   background: 'transparent',
                   border: '1px solid var(--smoke)',
+                  borderLeft: '2px solid var(--amber)',
                   borderRadius: 8,
-                  padding: '20px 24px',
+                  padding: '20px 24px 20px 16px',
                 }}
               >
                 <p
@@ -280,6 +296,20 @@ export default function Events() {
           grid-template-columns: 40% 60%;
           gap: 60px;
           align-items: start;
+          position: relative;
+        }
+        @media (min-width: 768px) {
+          .events-layout::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: calc(40% + 30px);
+            width: 1px;
+            background: var(--amber);
+            opacity: 0.20;
+            pointer-events: none;
+          }
         }
         @media (max-width: 767px) {
           .events-layout {
