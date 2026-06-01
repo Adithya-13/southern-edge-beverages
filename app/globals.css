@@ -58,6 +58,17 @@ body {
   }
 }
 
+.watermark-spin {
+  animation: slowSpin 20s linear infinite;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: 0.04;
+  pointer-events: none;
+  width: 600px;
+  height: auto;
+}
+
 /* Marquee */
 @keyframes marqueeScroll {
   from {
