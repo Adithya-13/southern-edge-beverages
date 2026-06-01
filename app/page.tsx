@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Preloader from '@/components/Preloader'
 import AgeGate from '@/components/AgeGate'
+import Hero from '@/components/Hero'
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
@@ -14,19 +15,7 @@ export default function Home() {
       {preloaderDone && !ageVerified && <AgeGate onVerified={() => setAgeVerified(true)} />}
       {ageVerified && (
         <main>
-          <div
-            style={{
-              background: '#080604',
-              minHeight: '100vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <p style={{ color: '#F0E4CC', fontFamily: 'sans-serif', fontSize: '14px' }}>
-              Sections loading...
-            </p>
-          </div>
+          <Hero isVisible={ageVerified} />
         </main>
       )}
     </>
