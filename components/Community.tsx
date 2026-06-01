@@ -108,7 +108,14 @@ export default function Community() {
             textAlign: 'center',
           }}
         >
-          @southernedgebeverages
+          <a
+            href="https://www.instagram.com/southernedgebeverages/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--amber)', textDecoration: 'none' }}
+          >
+            @southernedgebeverages ↗
+          </a>
         </span>
       </div>
 

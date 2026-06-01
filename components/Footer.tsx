@@ -99,52 +99,23 @@ export default function Footer() {
           {/* Col 3 — Connect */}
           <div>
             <span style={LABEL_STYLE}>Connect</span>
-            <a
-              href="https://linktr.ee/southernedgebeverages"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={LINK_STYLE}
-              onMouseEnter={hoverIn}
-              onMouseLeave={hoverOut}
-            >
-              Linktree ↗
+            <a href="https://www.instagram.com/southernedgebeverages/" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+              Instagram ↗
             </a>
-            <a
-              href="https://linktr.ee/southernedgebeverages"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={LINK_STYLE}
-              onMouseEnter={hoverIn}
-              onMouseLeave={hoverOut}
-            >
-              @southernedgebeverages
-            </a>
-            <a
-              href="https://www.facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={LINK_STYLE}
-              onMouseEnter={hoverIn}
-              onMouseLeave={hoverOut}
-            >
+            <a href="https://web.facebook.com/SouthernEdgeBeverages" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               Facebook ↗
             </a>
-            <div
-              style={{
-                borderTop: '1px solid var(--smoke)',
-                marginTop: '20px',
-                paddingTop: '20px',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontWeight: 300,
-                  fontSize: '12px',
-                  color: 'rgba(200,200,200,0.3)',
-                  letterSpacing: '0.05em',
-                }}
-              >
+            <a href="https://www.tiktok.com/@southernedgebeverages" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+              TikTok ↗
+            </a>
+            <a href="https://linktr.ee/southernedgebeverages" target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+              Linktree ↗
+            </a>
+            <a href="mailto:contact@southernedgespirits.com" style={{ ...LINK_STYLE, marginTop: 4 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
+              contact@southernedgespirits.com
+            </a>
+            <div style={{ borderTop: '1px solid var(--smoke)', marginTop: '20px', paddingTop: '20px' }}>
+              <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: '12px', color: 'rgba(200,200,200,0.3)', letterSpacing: '0.05em' }}>
                 #TasteTheEdge&nbsp;&nbsp;#SavorYourExperience
               </span>
             </div>
