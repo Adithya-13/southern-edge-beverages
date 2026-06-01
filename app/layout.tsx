@@ -3,8 +3,6 @@ import { Bebas_Neue, Cormorant_Garamond, Great_Vibes, DM_Sans } from 'next/font/
 import './globals.css'
 import ScrollSmootherProvider from '@/components/ScrollSmootherProvider'
 import Navbar from '@/components/Navbar'
-import Preloader from '@/components/Preloader'
-import AgeGate from '@/components/AgeGate'
 
 const bebasNeue = Bebas_Neue({
   weight: '400',
@@ -52,11 +50,12 @@ export default function RootLayout({
       className={`${bebasNeue.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${dmSans.variable}`}
     >
       <body>
-        {/* Fixed overlays render OUTSIDE smooth wrapper so position:fixed works correctly */}
-        <Preloader />
-        <AgeGate />
+        {/*
+          Navbar renders OUTSIDE #smooth-content so position:fixed works correctly.
+          ScrollSmoother applies transform:translateY to #smooth-content — any fixed
+          element inside a transformed ancestor loses fixed behaviour and scrolls with content.
+        */}
         <Navbar />
-        {/* Scroll-driven content inside ScrollSmoother */}
         <ScrollSmootherProvider>{children}</ScrollSmootherProvider>
       </body>
     </html>

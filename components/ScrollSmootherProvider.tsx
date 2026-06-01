@@ -18,13 +18,13 @@ export default function ScrollSmootherProvider({
 
   useGSAP(
     () => {
-      // Only init ScrollSmoother on desktop
+      // Only init ScrollSmoother on desktop; matchMedia cleanup kills the instance on resize
       const mm = gsap.matchMedia()
       mm.add('(min-width: 769px)', () => {
         ScrollSmoother.create({
           wrapper: wrapperRef.current!,
           content: contentRef.current!,
-          smooth: 1.2,
+          smooth: 1.5,
           effects: true,
         })
         return () => {

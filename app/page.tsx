@@ -1,36 +1,34 @@
+'use client'
+
+import { useState } from 'react'
+import Preloader from '@/components/Preloader'
+import AgeGate from '@/components/AgeGate'
+
 export default function Home() {
+  const [preloaderDone, setPreloaderDone] = useState(false)
+  const [ageVerified, setAgeVerified] = useState(false)
+
   return (
-    <main
-      id="hero"
-      style={{
-        minHeight: '300vh',
-        paddingTop: '6rem',
-        background: 'var(--bg-void)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '2rem',
-      }}
-    >
-      {/* Placeholder — sections will be built in subsequent phases */}
-      <p
-        className="font-cormorant"
-        style={{
-          color: 'var(--cream)',
-          fontSize: 'clamp(1.5rem, 4vw, 3rem)',
-          marginTop: '30vh',
-          opacity: 0.4,
-          letterSpacing: '0.05em',
-        }}
-      >
-        Southern Edge Fine Spirits
-      </p>
-      <p
-        className="font-sans"
-        style={{ color: 'var(--silver)', fontSize: '0.85rem', opacity: 0.4 }}
-      >
-        Scroll to test Navbar · Sections coming next phase
-      </p>
-    </main>
+    <>
+      {!preloaderDone && <Preloader onComplete={() => setPreloaderDone(true)} />}
+      {preloaderDone && !ageVerified && <AgeGate onVerified={() => setAgeVerified(true)} />}
+      {ageVerified && (
+        <main>
+          <div
+            style={{
+              background: '#080604',
+              minHeight: '100vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <p style={{ color: '#F0E4CC', fontFamily: 'sans-serif', fontSize: '14px' }}>
+              Sections loading...
+            </p>
+          </div>
+        </main>
+      )}
+    </>
   )
 }
