@@ -109,8 +109,11 @@ export default function Hero({ isVisible }: HeroProps) {
           scrub: 1,
           onUpdate: (self) => {
             if (!frameRef.current) return
-            const idx = Math.round(self.progress * 119)
+            const progress = self.progress
+            const idx = Math.round(progress * 119)
             frameRef.current.src = `/images/frames/frame_${String(idx + 1).padStart(3, '0')}.webp`
+            // fade in frame layer: 0→0.7 over first 5% of scroll
+            frameRef.current.style.opacity = String(Math.min(progress * 20, 0.7))
           },
         })
         return () => {}
@@ -217,7 +220,7 @@ export default function Hero({ isVisible }: HeroProps) {
           height: '100%',
           objectFit: 'cover',
           mixBlendMode: 'screen',
-          opacity: 0.7,
+          opacity: 0,
           zIndex: 2,
         }}
       />

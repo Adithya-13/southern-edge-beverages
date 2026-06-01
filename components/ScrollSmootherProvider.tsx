@@ -27,6 +27,9 @@ export default function ScrollSmootherProvider({
           smooth: 1.5,
           effects: true,
         })
+        // Force all registered ScrollTrigger instances to recalibrate
+        // against ScrollSmoother's scroll proxy
+        ScrollTrigger.refresh()
         return () => {
           ScrollSmoother.get()?.kill()
         }
