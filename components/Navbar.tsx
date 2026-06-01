@@ -16,7 +16,11 @@ const NAV_LINKS = [
   { label: 'Community', href: '#community' },
 ]
 
-export default function Navbar() {
+interface NavbarProps {
+  visible?: boolean
+}
+
+export default function Navbar({ visible = false }: NavbarProps) {
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -61,7 +65,9 @@ export default function Navbar() {
           right: 0,
           zIndex: 50,
           backgroundColor: 'rgba(0,0,0,0)',
-          transition: 'none',
+          transition: 'opacity 0.8s ease',
+          opacity: visible ? 1 : 0,
+          pointerEvents: visible ? 'auto' : 'none',
         }}
         className="px-6 md:px-12 py-4 flex items-center justify-between"
       >

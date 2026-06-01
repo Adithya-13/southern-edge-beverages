@@ -15,6 +15,7 @@ import Footer from '@/components/Footer'
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
   const [ageVerified, setAgeVerified] = useState(false)
+  const [heroRevealed, setHeroRevealed] = useState(false)
 
   return (
     <>
@@ -22,8 +23,8 @@ export default function Home() {
       {preloaderDone && !ageVerified && <AgeGate onVerified={() => setAgeVerified(true)} />}
       {ageVerified && (
         <main>
-          <Navbar />
-          <Hero isVisible={ageVerified} />
+          <Navbar visible={heroRevealed} />
+          <Hero isVisible={ageVerified} onRevealed={() => setHeroRevealed(true)} />
           <Manifesto />
           <Products />
           <Recipes />

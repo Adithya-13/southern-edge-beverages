@@ -10,6 +10,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 interface HeroProps {
   isVisible: boolean
+  onRevealed?: () => void
 }
 
 const FRAME_COUNT = 120
@@ -32,9 +33,12 @@ const FRAME_END_P = FRAME_SCROLL / TOTAL_SCROLL // ≈ 0.667
 const REVEAL_START_P = 0.88 * FRAME_END_P // ≈ 0.587
 const REVEAL_END_P = FRAME_END_P // ≈ 0.667
 
-export default function Hero({ isVisible }: HeroProps) {
+export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const frameRef = useRef<HTMLImageElement | null>(null)
+  const revealedRef = useRef(false)
+  const onRevealedRef = useRef(onRevealed)
+  onRevealedRef.current = onRevealed
   const videoRef = useRef<HTMLVideoElement | null>(null)
   // Outer wrapper: centering (transform: translate(-50%,-50%))
   const bottleOuterRef = useRef<HTMLDivElement | null>(null)
@@ -95,13 +99,23 @@ export default function Hero({ isVisible }: HeroProps) {
               )
             }
 
-            // Phase 3: bottle + video + text reveal (within frame range, last 12%)
+            // Fire onRevealed once when reveal starts
+            if (p >= REVEAL_START_P && !revealedRef.current) {
+              revealedRef.current = true
+              onRevealedRef.current?.()
+            }
+
+            // Phase 3: frame fades OUT, bottle + video + text fade IN
             if (p >= REVEAL_START_P && p <= FRAME_END_P + 0.01) {
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased =
                 phase < 0.5
                   ? 2 * phase * phase
                   : -1 + (4 - 2 * phase) * phase
+
+              // Frame fades OUT
+              if (frameRef.current)
+                frameRef.current.style.opacity = String(1 - eased)
 
               if (videoRef.current)
                 videoRef.current.style.opacity = String(eased * 0.75)
@@ -113,6 +127,7 @@ export default function Hero({ isVisible }: HeroProps) {
                 textRef.current.style.opacity = String(eased)
             } else if (p < REVEAL_START_P) {
               // Reset when scrolled back into frame phase
+              if (frameRef.current) frameRef.current.style.opacity = '1'
               if (videoRef.current) videoRef.current.style.opacity = '0'
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
               if (glowRef.current) glowRef.current.style.opacity = '0'
@@ -124,7 +139,9 @@ export default function Hero({ isVisible }: HeroProps) {
             // activate mouse parallax
             if (p > FRAME_END_P && !parallaxActive) {
               parallaxActive = true
-              // Ensure everything is fully visible at the dwell
+              // Frame is fully gone in dwell
+              if (frameRef.current) frameRef.current.style.opacity = '0'
+              // Ensure everything else is fully visible
               if (videoRef.current) videoRef.current.style.opacity = '0.75'
               if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
               if (glowRef.current) glowRef.current.style.opacity = '0.3'
