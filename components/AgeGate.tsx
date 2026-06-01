@@ -96,7 +96,7 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
       ) : (
         <>
           <Image
-            src="/images/logo_se.png"
+            src="/images/logo_se_circle.png"
             alt="Southern Edge"
             height={48}
             width={48}

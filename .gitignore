@@ -19,5 +19,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# workflow/agent throwaway verification scripts
+verify-*.mjs
+debug-*.mjs
+check-*.mjs
+final-qa.mjs
+manifesto-check.mjs
+scroll-check.mjs
+visual-check.mjs
+
 # vercel
 .vercel

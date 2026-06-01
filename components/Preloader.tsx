@@ -107,7 +107,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       {/* Logo */}
       <div ref={logoRef} style={{ opacity: 0, position: 'relative', zIndex: 1 }}>
         <Image
-          src="/images/logo_se.png"
+          src="/images/logo_se_circle.png"
           alt="Southern Edge"
           width={80}
           height={80}

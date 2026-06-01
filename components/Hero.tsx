@@ -196,29 +196,24 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (!revealedRef.current) {
                 revealedRef.current = true
                 onRevealedRef.current?.()
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('hero-revealed'))
+                }
               }
             }
           },
-          // Pin releases here — kill it so back-scroll is a normal 100vh pass
+          // Pin stays alive — DON'T kill it (killing + scrollTo(0) caused the blink/jump).
+          // revealDone locks the final state, so scrubbing back up never replays the reveal.
+          // The pin releases naturally at the end of its scroll distance into the next section.
           onLeave: () => {
             revealDone = true
             setFinalState()
             if (!revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
-            }
-            st.kill()
-            ScrollTrigger.refresh()
-            // Reset to 0: back-scroll through hero is just one natural 100vh pass
-            const smoother = ScrollSmoother.get()
-            if (smoother) {
-              smoother.scrollTo(0, false)
-            } else {
-              window.scrollTo(0, 0)
-            }
-            // Notify outside-ScrollSmoother components (Navbar lives outside the transform)
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('hero-revealed'))
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('hero-revealed'))
+              }
             }
           },
         })
@@ -332,21 +327,22 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (!revealedRef.current) {
                 revealedRef.current = true
                 onRevealedRef.current?.()
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('hero-revealed'))
+                }
               }
             }
           },
+          // Pin stays alive — DON'T kill it (killing + scrollTo(0) caused the blink/jump).
           onLeave: () => {
             revealDone = true
             setFinalStateMobile()
             if (!revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
-            }
-            stMobile.kill()
-            ScrollTrigger.refresh()
-            window.scrollTo(0, 0)
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('hero-revealed'))
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('hero-revealed'))
+              }
             }
           },
         })
@@ -388,6 +384,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
+          // Zoom in slightly — crops ~6% off each edge to hide the AI watermark at bottom-right
+          transform: 'scale(1.12)',
+          transformOrigin: 'center',
           opacity: 0,
           zIndex: 0,
         }}
