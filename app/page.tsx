@@ -6,6 +6,7 @@ import AgeGate from '@/components/AgeGate'
 import Hero from '@/components/Hero'
 import Manifesto from '@/components/Manifesto'
 import Products from '@/components/Products'
+import Recipes from '@/components/Recipes'
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
@@ -20,6 +21,7 @@ export default function Home() {
           <Hero isVisible={ageVerified} />
           <Manifesto />
           <Products />
+          <Recipes />
         </main>
       )}
     </>
