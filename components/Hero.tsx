@@ -18,11 +18,28 @@ const frameUrls = Array.from(
   (_, i) => `/images/frames/frame_${String(i + 1).padStart(3, '0')}.webp`,
 )
 
+// Total pin distance (scroll units)
+// First 3000px drive the frames; remaining 1500px are a "dwell" hold
+// for mouse interaction before the pin releases
+const FRAME_SCROLL = 3000
+const DWELL_SCROLL = 1500
+const TOTAL_SCROLL = FRAME_SCROLL + DWELL_SCROLL // 4500
+
+// Progress at which frames are fully revealed (p = FRAME_SCROLL / TOTAL_SCROLL)
+const FRAME_END_P = FRAME_SCROLL / TOTAL_SCROLL // ≈ 0.667
+
+// Phase 3 reveal window mapped within the frame range
+const REVEAL_START_P = 0.88 * FRAME_END_P // ≈ 0.587
+const REVEAL_END_P = FRAME_END_P // ≈ 0.667
+
 export default function Hero({ isVisible }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const frameRef = useRef<HTMLImageElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const bottleWrapRef = useRef<HTMLDivElement | null>(null)
+  // Outer wrapper: centering (transform: translate(-50%,-50%))
+  const bottleOuterRef = useRef<HTMLDivElement | null>(null)
+  // Inner wrapper: mouse parallax target (GSAP x/y — no centering conflict)
+  const bottleInnerRef = useRef<HTMLDivElement | null>(null)
   const glowRef = useRef<HTMLDivElement | null>(null)
   const textRef = useRef<HTMLDivElement | null>(null)
   const scrollPromptRef = useRef<HTMLDivElement | null>(null)
@@ -36,7 +53,7 @@ export default function Hero({ isVisible }: HeroProps) {
         const img = new window.Image()
         img.src = url
       })
-      // Progressive load remaining frames in chunks
+      // Progressive load remaining in chunks
       let loaded = 15
       const loadNext = () => {
         if (loaded >= FRAME_COUNT) return
@@ -51,34 +68,36 @@ export default function Hero({ isVisible }: HeroProps) {
 
       const mm = gsap.matchMedia()
 
-      // ── DESKTOP: pinned scroll sequence ──────────────────────────────
+      // ── DESKTOP: pinned scroll + dwell ──────────────────────────────────
       mm.add('(min-width: 769px)', () => {
+        let parallaxActive = false
+
         const st = ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=3000',
+          end: `+=${TOTAL_SCROLL}`,
           pin: true,
           scrub: 0.5,
           onUpdate: (self) => {
             const p = self.progress
 
-            // Frame swap
+            // Frame swap — clamp to frame range only
             if (frameRef.current) {
-              const idx = Math.min(Math.round(p * 119), 119)
+              const frameP = Math.min(p / FRAME_END_P, 1)
+              const idx = Math.min(Math.round(frameP * 119), 119)
               frameRef.current.src = frameUrls[idx]
             }
 
-            // Scroll prompt fades out immediately (gone by 2.5%)
+            // Scroll prompt fades out immediately (gone by first ~1.7% of total scroll)
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(
-                Math.max(0, 1 - p * 40),
+                Math.max(0, 1 - p * 60),
               )
             }
 
-            // Phase 3: reveal environment (last 12%)
-            if (p >= 0.88) {
-              const phase = (p - 0.88) / 0.12
-              // ease-in-out quadratic
+            // Phase 3: bottle + video + text reveal (within frame range, last 12%)
+            if (p >= REVEAL_START_P && p <= FRAME_END_P + 0.01) {
+              const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased =
                 phase < 0.5
                   ? 2 * phase * phase
@@ -86,26 +105,50 @@ export default function Hero({ isVisible }: HeroProps) {
 
               if (videoRef.current)
                 videoRef.current.style.opacity = String(eased * 0.75)
-              if (bottleWrapRef.current)
-                bottleWrapRef.current.style.opacity = String(eased)
+              if (bottleOuterRef.current)
+                bottleOuterRef.current.style.opacity = String(eased)
               if (glowRef.current)
                 glowRef.current.style.opacity = String(eased * 0.3)
               if (textRef.current)
                 textRef.current.style.opacity = String(eased)
-            } else {
-              // Reset when scrolled back into earlier phases
+            } else if (p < REVEAL_START_P) {
+              // Reset when scrolled back into frame phase
               if (videoRef.current) videoRef.current.style.opacity = '0'
-              if (bottleWrapRef.current)
-                bottleWrapRef.current.style.opacity = '0'
+              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
               if (glowRef.current) glowRef.current.style.opacity = '0'
               if (textRef.current) textRef.current.style.opacity = '0'
+              parallaxActive = false
+            }
+
+            // Dwell phase (p > FRAME_END_P): hold everything fully visible,
+            // activate mouse parallax
+            if (p > FRAME_END_P && !parallaxActive) {
+              parallaxActive = true
+              // Ensure everything is fully visible at the dwell
+              if (videoRef.current) videoRef.current.style.opacity = '0.75'
+              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
+              if (glowRef.current) glowRef.current.style.opacity = '0.3'
+              if (textRef.current) textRef.current.style.opacity = '1'
             }
           },
         })
 
-        // After pin releases: bottle + text scroll out
-        // Use xPercent/yPercent to keep centering intact while animating y
-        gsap.to([bottleWrapRef.current, textRef.current], {
+        // Mouse parallax — only affects the inner bottle wrapper and glow
+        function onMouseMove(e: MouseEvent) {
+          const x = (e.clientX / window.innerWidth - 0.5) * 2
+          const y = (e.clientY / window.innerHeight - 0.5) * 2
+          if (bottleInnerRef.current) {
+            gsap.to(bottleInnerRef.current, { x: x * 18, y: y * 18, duration: 0.9, ease: 'power2.out' })
+          }
+          if (glowRef.current) {
+            gsap.to(glowRef.current, { x: x * 10, y: y * 10, duration: 0.9, ease: 'power2.out' })
+          }
+        }
+        window.addEventListener('mousemove', onMouseMove)
+
+        // After pin releases: bottle drifts up, text fades
+        // Target the outer wrapper (centering preserved; only y and opacity change)
+        gsap.to([bottleOuterRef.current, textRef.current], {
           y: -60,
           opacity: 0,
           scrollTrigger: {
@@ -116,23 +159,21 @@ export default function Hero({ isVisible }: HeroProps) {
           },
         })
 
-        // Recalculate scroll positions after pin spacer is inserted
         ScrollTrigger.refresh()
 
         return () => {
           st.kill()
+          window.removeEventListener('mousemove', onMouseMove)
         }
       })
 
-      // ── MOBILE: static hero ───────────────────────────────────────────
+      // ── MOBILE: static hero ─────────────────────────────────────────────
       mm.add('(max-width: 768px)', () => {
-        // Show mid-reveal frame
         if (frameRef.current) {
           frameRef.current.src = frameUrls[59] // frame_060
           frameRef.current.style.opacity = '1'
         }
-        // Reveal bottle, glow and text immediately
-        if (bottleWrapRef.current) bottleWrapRef.current.style.opacity = '1'
+        if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
         if (glowRef.current) glowRef.current.style.opacity = '0.3'
         if (textRef.current) textRef.current.style.opacity = '1'
         if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
@@ -157,13 +198,14 @@ export default function Hero({ isVisible }: HeroProps) {
         background: '#080604',
       }}
     >
-      {/* L0 — Background video (fades in during Phase 3, behind frames) */}
+      {/* L0 — Background video (fades in during Phase 3) */}
       <video
         ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
+        preload="none"
         style={{
           position: 'absolute',
           inset: 0,
@@ -177,7 +219,7 @@ export default function Hero({ isVisible }: HeroProps) {
         <source src="/videos/hero_atmosphere.mp4" type="video/mp4" />
       </video>
 
-      {/* L1 — Frame sequencer (full-screen, no blend mode) */}
+      {/* L1 — Frame sequencer */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         ref={frameRef}
@@ -193,7 +235,7 @@ export default function Hero({ isVisible }: HeroProps) {
         }}
       />
 
-      {/* L2 — Amber glow behind bottle */}
+      {/* L2 — Amber glow (also mouse-parallaxed) */}
       <div
         ref={glowRef}
         style={{
@@ -212,9 +254,9 @@ export default function Hero({ isVisible }: HeroProps) {
         }}
       />
 
-      {/* L3 — Real labeled bottle */}
+      {/* L3 — Bottle: outer centers it, inner is parallax target */}
       <div
-        ref={bottleWrapRef}
+        ref={bottleOuterRef}
         style={{
           position: 'absolute',
           left: '50%',
@@ -225,18 +267,20 @@ export default function Hero({ isVisible }: HeroProps) {
           pointerEvents: 'none',
         }}
       >
-        <Image
-          src="/images/bottle_caramel.png"
-          alt="Southern Edge Salted Caramel Whiskey"
-          width={340}
-          height={580}
-          priority
-          style={{
-            objectFit: 'contain',
-            maxHeight: '70vh',
-            width: 'auto',
-          }}
-        />
+        <div ref={bottleInnerRef}>
+          <Image
+            src="/images/bottle_caramel.png"
+            alt="Southern Edge Salted Caramel Whiskey"
+            width={340}
+            height={580}
+            priority
+            style={{
+              objectFit: 'contain',
+              maxHeight: '70vh',
+              width: 'auto',
+            }}
+          />
+        </div>
       </div>
 
       {/* L4 — Text overlay */}
@@ -250,7 +294,6 @@ export default function Hero({ isVisible }: HeroProps) {
           pointerEvents: 'none',
         }}
       >
-        {/* Top-left brand mark */}
         <span
           style={{
             position: 'absolute',
@@ -266,7 +309,6 @@ export default function Hero({ isVisible }: HeroProps) {
           Southern Edge Fine Spirits
         </span>
 
-        {/* Center headline */}
         <div
           style={{
             position: 'absolute',
@@ -301,7 +343,7 @@ export default function Hero({ isVisible }: HeroProps) {
         </div>
       </div>
 
-      {/* L5 — Scroll prompt (fades out on scroll start) */}
+      {/* L5 — Scroll prompt */}
       <div
         ref={scrollPromptRef}
         style={{
