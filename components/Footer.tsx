@@ -41,6 +41,7 @@ export default function Footer() {
   return (
     <footer
       style={{
+        position: 'relative',
         background: 'var(--bg-void)',
         borderTop: '1px solid var(--smoke)',
         paddingTop: 'clamp(60px,8vw,80px)',
@@ -49,18 +50,19 @@ export default function Footer() {
         paddingRight: 'clamp(20px,5vw,40px)',
       }}
     >
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, var(--amber), transparent)', opacity: 0.3 }} />
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Three-column grid — Tailwind responsive */}
         <div className="footer-cols">
           {/* Col 1 — Brand */}
           <div>
-            <Image
-              src="/images/logo_lockup_hd.png"
-              alt="Southern Edge Fine Spirits"
-              width={200}
-              height={80}
-              style={{ height: '80px', width: 'auto', objectFit: 'contain' }}
-            />
+            <Image src="/images/logo_se.png" alt="Southern Edge Fine Spirits" width={56} height={56} style={{ width: 56, height: 56, objectFit: 'contain', marginBottom: 16 }} />
+            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 18, color: 'var(--cream)', display: 'block', letterSpacing: '0.08em', lineHeight: 1, marginBottom: 8 }}>
+              SOUTHERN EDGE
+            </span>
+            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 14, color: 'var(--silver)', display: 'block', letterSpacing: '0.12em', opacity: 0.6, marginBottom: 16 }}>
+              FINE SPIRITS
+            </span>
             <span
               style={{
                 fontFamily: 'var(--font-dm-sans)',
@@ -72,6 +74,9 @@ export default function Footer() {
               }}
             >
               southernedgespirits.com
+            </span>
+            <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: 11, color: 'rgba(200,200,200,0.25)', display: 'block', marginTop: 8, letterSpacing: '0.08em' }}>
+              Crafted in South Carolina.
             </span>
           </div>
 
@@ -104,18 +109,16 @@ export default function Footer() {
             >
               Linktree ↗
             </a>
-            <span
-              style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontWeight: 300,
-                fontSize: '14px',
-                color: 'rgba(240,228,204,0.55)',
-                display: 'block',
-                marginBottom: '12px',
-              }}
+            <a
+              href="https://linktr.ee/southernedgebeverages"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={LINK_STYLE}
+              onMouseEnter={hoverIn}
+              onMouseLeave={hoverOut}
             >
               @southernedgebeverages
-            </span>
+            </a>
             <a
               href="https://www.facebook.com"
               target="_blank"

@@ -59,6 +59,22 @@ export default function Events() {
             UPCOMING EVENTS
           </p>
 
+          <div style={{ marginBottom: 48 }}>
+            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 'clamp(60px, 8vw, 100px)', color: 'var(--amber)', opacity: 0.15, lineHeight: 1, display: 'block' }}>
+              2024
+            </span>
+            <div style={{ display: 'flex', gap: 32, marginTop: 8 }}>
+              <div>
+                <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1 }}>2</span>
+                <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 10, letterSpacing: '0.2em', color: 'var(--silver)', textTransform: 'uppercase' }}>Silver Medals</span>
+              </div>
+              <div>
+                <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1 }}>3+</span>
+                <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 10, letterSpacing: '0.2em', color: 'var(--silver)', textTransform: 'uppercase' }}>Events This Year</span>
+              </div>
+            </div>
+          </div>
+
           <div
             style={{
               overflow: 'hidden',
@@ -78,8 +94,8 @@ export default function Events() {
                 style={{
                   fontFamily: 'var(--font-dm-sans)',
                   fontWeight: 300,
-                  fontSize: 15,
-                  color: 'rgba(240,228,204,0.55)',
+                  fontSize: 14,
+                  color: 'rgba(240,228,204,0.7)',
                   letterSpacing: '0.05em',
                 }}
               >
@@ -92,6 +108,7 @@ export default function Events() {
 
         {/* RIGHT — Recognition */}
         <div>
+          <span style={{ display: 'block', width: 32, height: 1, background: 'var(--amber)', marginBottom: 16, opacity: 0.6 }} />
           <h2
             style={{
               fontFamily: 'var(--font-cormorant)',
@@ -126,6 +143,7 @@ export default function Events() {
                   if (badge) {
                     badge.style.borderLeftColor = '#F0C040'
                     badge.style.transform = 'scale(1.02)'
+                    badge.style.background = 'linear-gradient(135deg, var(--bg-surface) 0%, rgba(240,192,64,0.06) 50%, var(--bg-surface) 100%)'
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -133,6 +151,7 @@ export default function Events() {
                   if (badge) {
                     badge.style.borderLeftColor = 'var(--gold)'
                     badge.style.transform = 'scale(1)'
+                    badge.style.background = 'var(--bg-surface)'
                   }
                 }}
               >
@@ -145,7 +164,7 @@ export default function Events() {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 4,
-                    transition: 'border-color 0.2s, transform 0.2s',
+                    transition: 'border-color 0.2s, transform 0.2s, background 0.4s',
                   }}
                 >
                   <Award size={18} color="var(--gold)" style={{ marginBottom: 4 }} />
