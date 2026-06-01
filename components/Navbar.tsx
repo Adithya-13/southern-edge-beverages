@@ -1,9 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
-import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollSmoother } from 'gsap/ScrollSmoother'
@@ -40,32 +38,6 @@ export default function Navbar() {
     return () => window.removeEventListener('hero-revealed', handler)
   }, [])
 
-  useGSAP(
-    () => {
-      ScrollTrigger.create({
-        start: 'top -50',
-        end: 'max',
-        onEnter: () => {
-          gsap.to(navRef.current, {
-            backgroundColor: 'rgba(16,13,9,0.92)',
-            backdropFilter: 'blur(12px)',
-            duration: 0.4,
-            ease: 'power2.out',
-          })
-        },
-        onLeaveBack: () => {
-          gsap.to(navRef.current, {
-            backgroundColor: 'rgba(0,0,0,0)',
-            backdropFilter: 'blur(0px)',
-            duration: 0.4,
-            ease: 'power2.out',
-          })
-        },
-      })
-    },
-    { scope: navRef },
-  )
-
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setMenuOpen(false)
@@ -94,15 +66,16 @@ export default function Navbar() {
           aria-label="Southern Edge home"
           className="flex-shrink-0"
           onClick={(e) => handleLinkClick(e, '#hero')}
+          style={{
+            fontFamily: 'var(--font-bebas)',
+            fontSize: '20px',
+            letterSpacing: '0.14em',
+            color: 'var(--cream)',
+            textDecoration: 'none',
+            lineHeight: 1,
+          }}
         >
-          <Image
-            src="/images/logo_se_circle.png"
-            alt="Southern Edge"
-            width={36}
-            height={36}
-            style={{ width: 'auto', height: '36px' }}
-            priority
-          />
+          SOUTHERN EDGE
         </a>
 
         <ul className="hidden md:flex items-center gap-8">
