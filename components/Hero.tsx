@@ -69,28 +69,26 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const beat0Ref = useRef<HTMLDivElement | null>(null)
   const beat1Ref = useRef<HTMLDivElement | null>(null)
   const beat2Ref = useRef<HTMLDivElement | null>(null)
+  // Persistent store of preloaded frame images — keeping references prevents GC,
+  // so decoded frames stay warm and scrubbing back up never re-decodes (no lag).
+  const framesRef = useRef<HTMLImageElement[]>([])
 
   useGSAP(
     () => {
       if (!isVisible) return
 
-      // Eager-load first 15 frames
-      frameUrls.slice(0, 15).forEach((url) => {
-        const img = new window.Image()
-        img.src = url
-      })
-      // Progressive load remaining in chunks
-      let loaded = 15
-      const loadNext = () => {
-        if (loaded >= FRAME_COUNT) return
-        frameUrls.slice(loaded, loaded + 10).forEach((url) => {
+      // Preload ALL frames into a persistent array. Keeping the references prevents the
+      // browser from GC'ing the decoded bitmaps, so scrubbing back up (or any direction)
+      // never triggers a re-decode — fixes the frame lag/skip on scroll-up.
+      if (framesRef.current.length === 0) {
+        frameUrls.forEach((url, i) => {
           const img = new window.Image()
           img.src = url
+          // decode() warms the bitmap so the first paint of each frame is instant
+          if (img.decode) img.decode().catch(() => {})
+          framesRef.current[i] = img
         })
-        loaded += 10
-        setTimeout(loadNext, 400)
       }
-      setTimeout(loadNext, 800)
 
       const mm = gsap.matchMedia()
 
