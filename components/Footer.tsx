@@ -44,7 +44,8 @@ export default function Footer() {
             <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 14, color: 'var(--silver)', display: 'block', letterSpacing: '0.12em', opacity: 0.6, marginBottom: 16 }}>
               FINE SPIRITS
             </span>
-            <span
+            <a
+              href={`mailto:${SOCIAL.email}`}
               style={{
                 fontFamily: 'var(--font-dm-sans)',
                 fontWeight: 300,
@@ -52,10 +53,13 @@ export default function Footer() {
                 color: 'rgba(200,200,200,0.5)',
                 marginTop: '16px',
                 display: 'block',
+                textDecoration: 'none',
               }}
+              onMouseEnter={hoverIn}
+              onMouseLeave={hoverOut}
             >
-              southernedgespirits.com
-            </span>
+              contact@southernedgespirits.com
+            </a>
             <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: 11, color: 'rgba(200,200,200,0.25)', display: 'block', marginTop: 8, letterSpacing: '0.08em' }}>
               Crafted in South Carolina.
             </span>
@@ -92,9 +96,6 @@ export default function Footer() {
             </a>
             <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               Linktree ↗
-            </a>
-            <a href={`mailto:${SOCIAL.email}`} style={{ ...LINK_STYLE, marginTop: 4 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-              contact@southernedgespirits.com
             </a>
             <div style={{ borderTop: '1px solid var(--smoke)', marginTop: '20px', paddingTop: '20px' }}>
               <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: '12px', color: 'rgba(200,200,200,0.3)', letterSpacing: '0.05em' }}>
