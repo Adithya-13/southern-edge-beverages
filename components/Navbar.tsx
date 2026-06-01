@@ -2,19 +2,8 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
-import { ScrollSmoother } from '@/lib/gsap'
 import { NAV_LINKS } from '@/lib/constants'
-
-function scrollToSection(href: string) {
-  const target = document.querySelector(href)
-  if (!target) return
-  const smoother = ScrollSmoother.get()
-  if (smoother) {
-    smoother.scrollTo(target, true, 'top top+=80')
-  } else {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-}
+import { smoothScrollTo } from '@/lib/scroll'
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null)
@@ -31,7 +20,7 @@ export default function Navbar() {
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setMenuOpen(false)
-    scrollToSection(href)
+    smoothScrollTo(href)
   }
 
   return (

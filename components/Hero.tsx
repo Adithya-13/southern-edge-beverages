@@ -10,7 +10,7 @@ interface HeroProps {
   onRevealed?: () => void
 }
 
-const FRAME_COUNT = 120
+const FRAME_COUNT = 192
 const frameUrls = Array.from(
   { length: FRAME_COUNT },
   (_, i) => `/images/frames/frame_${String(i + 1).padStart(3, '0')}.webp`,
@@ -120,7 +120,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             // Frame swap — clamp to frame range only
             if (frameRef.current) {
               const frameP = Math.min(p / FRAME_END_P, 1)
-              const idx = Math.min(Math.round(frameP * 119), 119)
+              const idx = Math.min(Math.round(frameP * 191), 191)
               frameRef.current.src = frameUrls[idx]
             }
 
@@ -232,7 +232,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             const p = self.progress
 
             if (frameRef.current) {
-              const idx = Math.min(Math.round(p * 119), 119)
+              const idx = Math.min(Math.round(p * 191), 191)
               frameRef.current.src = frameUrls[idx]
             }
 
@@ -327,14 +327,11 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          // Zoom in — crops ~11% off each edge to fully hide the AI watermark at bottom-right
-          transform: 'scale(1.22)',
-          transformOrigin: 'center',
           opacity: 0,
           zIndex: 0,
         }}
       >
-        <source src="/videos/hero_atmosphere.mp4" type="video/mp4" />
+        <source src="/videos/bourbon_bar.mp4" type="video/mp4" />
       </video>
 
       {/* L1 — Frame sequencer */}

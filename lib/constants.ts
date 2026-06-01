@@ -256,7 +256,7 @@ export const SOCIAL = {
 
 // Navigation links — verbatim from Navbar.tsx NAV_LINKS (Footer EXPLORE_LINKS is byte-identical, reuse this).
 export const NAV_LINKS = [
-  { label: 'Our Story', href: '#manifesto' },
+  { label: 'Our Story', href: '#story' },
   { label: 'The Pour', href: '#thepour' },
   { label: 'Community', href: '#community' },
 ]

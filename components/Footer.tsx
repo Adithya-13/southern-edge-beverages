@@ -1,9 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { ScrollSmoother } from 'gsap/ScrollSmoother'
 import { NAV_LINKS, SOCIAL } from '@/lib/constants'
 import { LABEL_STYLE, LINK_STYLE } from '@/lib/styles'
+import { smoothScrollTo } from '@/lib/scroll'
 
 function hoverIn(e: React.MouseEvent<HTMLAnchorElement>) {
   e.currentTarget.style.color = 'var(--cream)'
@@ -15,14 +15,7 @@ function hoverOut(e: React.MouseEvent<HTMLAnchorElement>) {
 function handleSectionClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
   if (!href.startsWith('#')) return
   e.preventDefault()
-  const target = document.querySelector(href)
-  if (!target) return
-  const smoother = ScrollSmoother.get()
-  if (smoother) {
-    smoother.scrollTo(target, true, 'top top+=80')
-  } else {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  smoothScrollTo(href)
 }
 
 export default function Footer() {
