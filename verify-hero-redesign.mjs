@@ -6,67 +6,86 @@ const browser = await chromium.launch({ headless: true })
 const page = await browser.newPage()
 await page.setViewportSize({ width: 1440, height: 900 })
 
-// Set age-gate cookie then load
+// Load page first to establish origin context
 await page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded', timeout: 30000 })
-await page.context().addCookies([{ name: 'age_verified', value: 'true', domain: 'localhost', path: '/' }])
-await page.evaluate(() => { sessionStorage.setItem('preloaderShown', 'true') })
+
+// Set both bypass mechanisms
+await page.evaluate(() => {
+  sessionStorage.setItem('preloaderShown', 'true')
+  document.cookie = 'age_verified=true; path=/'
+})
+
+// Reload with bypasses active
 await page.goto('http://localhost:3000', { waitUntil: 'networkidle', timeout: 30000 })
-await page.waitForTimeout(2000)
+await page.waitForTimeout(2500)
 
-// PHASE 1 — scroll=0: should be pure black + frame_001, no text, no video, scroll prompt visible
-await page.screenshot({ path: '/tmp/hero_desktop_0pct.png', fullPage: false })
-console.log('[desktop] Phase 1 (scroll=0) screenshot saved')
-
-const phase1State = await page.evaluate(() => {
-  const frame = document.querySelector('#hero img')
-  const video = document.querySelector('#hero video')
-  const bottleWrap = document.querySelector('#hero img[alt*="Southern"]')?.parentElement
+// Confirm hero is visible
+const heroVisible = await page.evaluate(() => {
+  const hero = document.getElementById('hero')
   return {
-    frameSrc: frame?.src?.split('/').pop(),
-    videoOpacity: video ? getComputedStyle(video).opacity : null,
-    bottleOpacity: bottleWrap ? bottleWrap.style.opacity || getComputedStyle(bottleWrap).opacity : null,
+    exists: !!hero,
+    height: hero?.offsetHeight,
+    bg: hero ? getComputedStyle(hero).background : null,
   }
 })
-console.log('[desktop] Phase 1 state:', JSON.stringify(phase1State))
+console.log('[desktop] Hero state at load:', JSON.stringify(heroVisible))
 
-// PHASE 2 — scroll to 1500px (50% of pin): mid-reveal frames, no text
-await page.evaluate(() => window.scrollTo(0, 1500))
-await page.waitForTimeout(2500) // wait for scrub + ScrollSmoother settle
-await page.screenshot({ path: '/tmp/hero_desktop_50pct.png', fullPage: false })
-console.log('[desktop] Phase 2 (scroll=1500) screenshot saved')
+// PHASE 1 — scroll=0: pure black, frame_001 visible, scroll prompt visible, no bottle/text
+await page.screenshot({ path: '/tmp/hero_desktop_0pct.png', fullPage: false })
+console.log('[desktop] Phase 1 screenshot saved')
 
-const phase2State = await page.evaluate(() => {
-  const frame = document.querySelector('#hero img')
-  const bottleWrap = document.querySelector('#hero img[alt*="Southern"]')?.parentElement
-  const textOverlay = document.querySelector('#hero div[style*="zIndex: 4"]')
+const p1 = await page.evaluate(() => {
+  const hero = document.getElementById('hero')
+  if (!hero) return { error: 'no hero' }
+  const imgs = [...hero.querySelectorAll('img')]
+  const video = hero.querySelector('video')
   return {
-    frameSrc: frame?.src?.split('/').pop(),
-    bottleOpacity: bottleWrap?.style.opacity,
-    textOpacity: textOverlay?.style.opacity,
+    frameImg: imgs[0]?.src?.split('/').pop(),
+    frameOpacity: imgs[0] ? getComputedStyle(imgs[0]).opacity : null,
+    videoOpacity: video?.style.opacity,
+    bottleImg: imgs[1]?.src?.split('/').pop(),
+    bottleOpacity: imgs[1]?.parentElement?.style.opacity,
+  }
+})
+console.log('[desktop] Phase 1 DOM state:', JSON.stringify(p1))
+
+// PHASE 2 — scroll to 1500px (50% pin): mid-reveal frame, no text visible
+await page.evaluate(() => window.scrollTo(0, 1500))
+await page.waitForTimeout(2500)
+await page.screenshot({ path: '/tmp/hero_desktop_50pct.png', fullPage: false })
+console.log('[desktop] Phase 2 screenshot saved (scroll=1500)')
+
+const p2 = await page.evaluate(() => {
+  const hero = document.getElementById('hero')
+  if (!hero) return { error: 'no hero' }
+  const imgs = [...hero.querySelectorAll('img')]
+  return {
+    frameImg: imgs[0]?.src?.split('/').pop(),
+    bottleOpacity: imgs[1]?.parentElement?.style.opacity,
     scrollY: window.scrollY,
   }
 })
-console.log('[desktop] Phase 2 state:', JSON.stringify(phase2State))
+console.log('[desktop] Phase 2 DOM state:', JSON.stringify(p2))
 
-// PHASE 3 — scroll to 2850px (95% of pin): video, bottle, text should appear
+// PHASE 3 — scroll to 2850px (95% pin): video, bottle, text faded in
 await page.evaluate(() => window.scrollTo(0, 2850))
 await page.waitForTimeout(2500)
 await page.screenshot({ path: '/tmp/hero_desktop_95pct.png', fullPage: false })
-console.log('[desktop] Phase 3 (scroll=2850) screenshot saved')
+console.log('[desktop] Phase 3 screenshot saved (scroll=2850)')
 
-const phase3State = await page.evaluate(() => {
-  const video = document.querySelector('#hero video')
-  const bottleWrap = document.querySelector('#hero img[alt*="Southern"]')?.parentElement
-  const frame = document.querySelector('#hero img')
+const p3 = await page.evaluate(() => {
+  const hero = document.getElementById('hero')
+  if (!hero) return { error: 'no hero' }
+  const imgs = [...hero.querySelectorAll('img')]
+  const video = hero.querySelector('video')
   return {
-    frameSrc: frame?.src?.split('/').pop(),
+    frameImg: imgs[0]?.src?.split('/').pop(),
     videoOpacity: video?.style.opacity,
-    bottleOpacity: bottleWrap?.style.opacity,
+    bottleOpacity: imgs[1]?.parentElement?.style.opacity,
     scrollY: window.scrollY,
   }
 })
-console.log('[desktop] Phase 3 state:', JSON.stringify(phase3State))
-
+console.log('[desktop] Phase 3 DOM state:', JSON.stringify(p3))
 await page.close()
 
 // ── Mobile 375px verification ─────────────────────────────────────────────────
@@ -74,8 +93,10 @@ const mobile = await browser.newPage()
 await mobile.setViewportSize({ width: 375, height: 812 })
 
 await mobile.goto('http://localhost:3000', { waitUntil: 'domcontentloaded', timeout: 30000 })
-await mobile.context().addCookies([{ name: 'age_verified', value: 'true', domain: 'localhost', path: '/' }])
-await mobile.evaluate(() => { sessionStorage.setItem('preloaderShown', 'true') })
+await mobile.evaluate(() => {
+  sessionStorage.setItem('preloaderShown', 'true')
+  document.cookie = 'age_verified=true; path=/'
+})
 await mobile.goto('http://localhost:3000', { waitUntil: 'networkidle', timeout: 30000 })
 await mobile.waitForTimeout(2000)
 
@@ -84,18 +105,19 @@ console.log('[mobile] 375px screenshot saved')
 
 const mobileState = await mobile.evaluate(() => {
   const hero = document.getElementById('hero')
-  const frame = document.querySelector('#hero img')
-  const bottleWrap = document.querySelector('#hero img[alt*="Southern"]')?.parentElement
+  const imgs = hero ? [...hero.querySelectorAll('img')] : []
   return {
     heroHeight: hero?.offsetHeight,
-    heroOverflow: hero ? getComputedStyle(hero).overflow : null,
-    frameSrc: frame?.src?.split('/').pop(),
-    bottleOpacity: bottleWrap?.style.opacity,
+    frameImg: imgs[0]?.src?.split('/').pop(),
+    frameOpacity: imgs[0] ? getComputedStyle(imgs[0]).opacity : null,
+    bottleOpacity: imgs[1]?.parentElement?.style.opacity,
     hasHorizontalOverflow: document.body.scrollWidth > window.innerWidth,
+    bodyWidth: document.body.scrollWidth,
+    windowWidth: window.innerWidth,
   }
 })
 console.log('[mobile] state:', JSON.stringify(mobileState))
 
 await mobile.close()
 await browser.close()
-console.log('\nAll screenshots saved to /tmp/hero_desktop_*.png and /tmp/hero_mobile_375.png')
+console.log('\nAll screenshots saved to /tmp/')

@@ -83,3 +83,16 @@ body {
   0%, 100% { transform: translateX(-10px); }
   50% { transform: translateX(10px); }
 }
+
+/* Footer responsive grid */
+.footer-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+@media (min-width: 768px) {
+  .footer-cols {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
