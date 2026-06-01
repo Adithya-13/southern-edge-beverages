@@ -14,8 +14,9 @@ export default function Manifesto() {
   const sectionRef = useRef<HTMLElement>(null)
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([])
   const subRef = useRef<HTMLParagraphElement>(null)
-  const factsRef = useRef<HTMLParagraphElement>(null)
+  const factsRef = useRef<HTMLDivElement>(null)
 
+  const FACTS = ['6× Distilled', '60 Proof', 'Natural Ingredients', 'Gluten Free']
   const words = QUOTE.split(' ')
 
   useGSAP(
@@ -110,26 +111,51 @@ export default function Manifesto() {
           maxWidth: 960,
         }}
       >
-        <p
-          style={{
-            fontFamily: 'var(--font-cormorant)',
-            fontWeight: 300,
-            fontSize: 'clamp(1.8rem,3.5vw,3.5rem)',
-            color: 'var(--cream)',
-            lineHeight: 1.4,
-            fontStyle: 'italic',
-          }}
-        >
-          {words.map((word, i) => (
-            <span
-              key={i}
-              ref={(el) => { wordRefs.current[i] = el }}
-              style={{ display: 'inline-block', marginRight: '0.3em' }}
-            >
-              {word}
-            </span>
-          ))}
-        </p>
+        {/* Section label */}
+        <span className="amber-rule" />
+        <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 500, fontSize: 10, letterSpacing: '0.3em', color: 'var(--amber)', textTransform: 'uppercase', display: 'block', marginBottom: 32, textAlign: 'center' }}>
+          OUR STORY
+        </span>
+
+        {/* Quote with decorative mark */}
+        <div style={{ position: 'relative' }}>
+          <span style={{
+            position: 'absolute',
+            top: '-20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontFamily: 'var(--font-vibes)',
+            fontSize: 'clamp(120px, 15vw, 200px)',
+            color: 'var(--amber)',
+            opacity: 0.08,
+            lineHeight: 1,
+            pointerEvents: 'none',
+            userSelect: 'none',
+            display: 'block',
+          }}>
+            &ldquo;
+          </span>
+          <p
+            style={{
+              fontFamily: 'var(--font-cormorant)',
+              fontWeight: 300,
+              fontSize: 'clamp(1.8rem,3.5vw,3.5rem)',
+              color: 'var(--cream)',
+              lineHeight: 1.4,
+              fontStyle: 'italic',
+            }}
+          >
+            {words.map((word, i) => (
+              <span
+                key={i}
+                ref={(el) => { wordRefs.current[i] = el }}
+                style={{ display: 'inline-block', marginRight: '0.3em' }}
+              >
+                {word}
+              </span>
+            ))}
+          </p>
+        </div>
 
         <p
           ref={subRef}
@@ -148,20 +174,32 @@ export default function Manifesto() {
           We invite you to experience the essence of the South in every drop of Southern Edge.
         </p>
 
-        <p
+        {/* Signature tagline */}
+        <span style={{ fontFamily: 'var(--font-vibes)', fontSize: 28, color: 'var(--amber)', opacity: 0.7, display: 'block', marginTop: 24, textAlign: 'center' }}>
+          — Southern Edge Fine Spirits
+        </span>
+
+        {/* Facts bar */}
+        <span style={{ display: 'block', width: 40, height: 1, background: 'var(--amber)', margin: '40px auto 32px', opacity: 0.5 }} />
+        <div
           ref={factsRef}
           style={{
-            fontFamily: 'var(--font-dm-sans)',
-            fontWeight: 500,
-            fontSize: 12,
-            letterSpacing: '0.2em',
-            color: 'var(--silver)',
-            marginTop: 48,
-            textTransform: 'uppercase',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 0,
           }}
         >
-          6&times; DISTILLED &nbsp;&middot;&nbsp; 60 PROOF &nbsp;&middot;&nbsp; NATURAL INGREDIENTS &nbsp;&middot;&nbsp; GLUTEN FREE
-        </p>
+          {FACTS.map((fact, i) => (
+            <span key={fact} style={{ display: 'contents' }}>
+              <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 500, fontSize: 12, letterSpacing: '0.2em', color: 'var(--silver)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{fact}</span>
+              {i < FACTS.length - 1 && (
+                <span style={{ color: 'var(--amber)', margin: '0 16px', opacity: 0.6 }}>·</span>
+              )}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   )
