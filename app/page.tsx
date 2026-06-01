@@ -1,16 +1,35 @@
 export default function Home() {
   return (
     <main
+      id="hero"
       style={{
-        background: '#080604',
-        minHeight: '100vh',
+        minHeight: '300vh',
+        paddingTop: '6rem',
+        background: 'var(--bg-void)',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        gap: '2rem',
       }}
     >
-      <p style={{ color: '#F0E4CC', fontFamily: 'sans-serif' }}>
-        Southern Edge — Coming Soon
+      {/* Placeholder — sections will be built in subsequent phases */}
+      <p
+        className="font-cormorant"
+        style={{
+          color: 'var(--cream)',
+          fontSize: 'clamp(1.5rem, 4vw, 3rem)',
+          marginTop: '30vh',
+          opacity: 0.4,
+          letterSpacing: '0.05em',
+        }}
+      >
+        Southern Edge Fine Spirits
+      </p>
+      <p
+        className="font-sans"
+        style={{ color: 'var(--silver)', fontSize: '0.85rem', opacity: 0.4 }}
+      >
+        Scroll to test Navbar · Sections coming next phase
       </p>
     </main>
   )

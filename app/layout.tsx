@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import { Bebas_Neue, Cormorant_Garamond, Great_Vibes, DM_Sans } from 'next/font/google'
 import './globals.css'
+import ScrollSmootherProvider from '@/components/ScrollSmootherProvider'
+import Navbar from '@/components/Navbar'
+import Preloader from '@/components/Preloader'
+import AgeGate from '@/components/AgeGate'
 
 const bebasNeue = Bebas_Neue({
   weight: '400',
@@ -47,7 +51,14 @@ export default function RootLayout({
       lang="en"
       className={`${bebasNeue.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${dmSans.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {/* Fixed overlays render OUTSIDE smooth wrapper so position:fixed works correctly */}
+        <Preloader />
+        <AgeGate />
+        <Navbar />
+        {/* Scroll-driven content inside ScrollSmoother */}
+        <ScrollSmootherProvider>{children}</ScrollSmootherProvider>
+      </body>
     </html>
   )
 }
