@@ -100,22 +100,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
       // ── DESKTOP: pinned scroll + dwell ──────────────────────────────────
       mm.add('(min-width: 769px)', () => {
-        // Once the reveal is done (dwell phase reached), lock final state permanently.
-        // This prevents the scrub from rewinding the reveal when scrolling back up.
-        let revealDone = false
-
-        const setFinalState = () => {
-          if (frameRef.current) frameRef.current.style.opacity = '0'
-          if (videoRef.current) videoRef.current.style.opacity = '0.75'
-          if (overlayRef.current) overlayRef.current.style.opacity = '1'
-          if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
-          if (glowRef.current) glowRef.current.style.opacity = '0.3'
-          if (textRef.current) textRef.current.style.opacity = '1'
-          if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
-          if (beat0Ref.current) beat0Ref.current.style.opacity = '0'
-          if (beat1Ref.current) beat1Ref.current.style.opacity = '0'
-          if (beat2Ref.current) beat2Ref.current.style.opacity = '0'
-        }
+        // Reveal is fully scrub-bound both directions — scrolling back up replays/reverses it.
 
         // Infinite bob on the scroll arrow
         gsap.to(scrollPromptRef.current, {
@@ -134,12 +119,6 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           pin: true,
           scrub: 0.5,
           onUpdate: (self) => {
-            // Once reveal is done, lock final state — scrubbing back never rewinds it
-            if (revealDone) {
-              setFinalState()
-              return
-            }
-
             const p = self.progress
 
             // Frame swap — clamp to frame range only
@@ -188,26 +167,18 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
-            // Reveal fully complete — lock state and show navbar
-            if (p >= FRAME_END_P - 0.01) {
-              revealDone = true
-              setFinalState()
-              // Fire navbar callback only when reveal is 100% done
-              if (!revealedRef.current) {
-                revealedRef.current = true
-                onRevealedRef.current?.()
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('hero-revealed'))
-                }
+            // Reveal fully complete — show navbar (fires once, never un-fires)
+            if (p >= FRAME_END_P - 0.01 && !revealedRef.current) {
+              revealedRef.current = true
+              onRevealedRef.current?.()
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('hero-revealed'))
               }
             }
           },
-          // Pin stays alive — DON'T kill it (killing + scrollTo(0) caused the blink/jump).
-          // revealDone locks the final state, so scrubbing back up never replays the reveal.
-          // The pin releases naturally at the end of its scroll distance into the next section.
+          // Pin stays alive — reveal is scrub-bound both ways so the user can scroll
+          // back up and replay it. Just ensure the navbar fires once on first forward exit.
           onLeave: () => {
-            revealDone = true
-            setFinalState()
             if (!revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
@@ -231,11 +202,6 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
         window.addEventListener('mousemove', onMouseMove)
 
-        // Scroll-out tween intentionally removed.
-        // With scroll reset to 0 after pin kill, textRef's GSAP FROM state is opacity:0
-        // (its JSX initial value), so a scrub would restore it to 0 at scroll=0 — overriding
-        // setFinalState(). The hero exits naturally as the user scrolls into the next section.
-
         ScrollTrigger.refresh()
 
         return () => {
@@ -247,20 +213,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       // ── MOBILE: scroll-driven reveal (mirrors desktop, shorter pin distance) ──
       mm.add('(max-width: 768px)', () => {
         const TOTAL_SCROLL_MOBILE = 1200
-        let revealDone = false
 
-        const setFinalStateMobile = () => {
-          if (frameRef.current) frameRef.current.style.opacity = '0'
-          if (videoRef.current) videoRef.current.style.opacity = '0.75'
-          if (overlayRef.current) overlayRef.current.style.opacity = '1'
-          if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '1'
-          if (glowRef.current) glowRef.current.style.opacity = '0.3'
-          if (textRef.current) textRef.current.style.opacity = '1'
-          if (scrollPromptRef.current) scrollPromptRef.current.style.opacity = '0'
-          if (beat0Ref.current) beat0Ref.current.style.opacity = '0'
-          if (beat1Ref.current) beat1Ref.current.style.opacity = '0'
-          if (beat2Ref.current) beat2Ref.current.style.opacity = '0'
-        }
+        // Reveal is fully scrub-bound both directions — scrolling back up replays/reverses it.
 
         // Nudge animation
         gsap.to(scrollPromptRef.current, {
@@ -279,7 +233,6 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           pin: true,
           scrub: 0.5,
           onUpdate: (self) => {
-            if (revealDone) { setFinalStateMobile(); return }
             const p = self.progress
 
             if (frameRef.current) {
@@ -321,22 +274,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
-            if (p >= FRAME_END_P - 0.01) {
-              revealDone = true
-              setFinalStateMobile()
-              if (!revealedRef.current) {
-                revealedRef.current = true
-                onRevealedRef.current?.()
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('hero-revealed'))
-                }
+            if (p >= FRAME_END_P - 0.01 && !revealedRef.current) {
+              revealedRef.current = true
+              onRevealedRef.current?.()
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('hero-revealed'))
               }
             }
           },
-          // Pin stays alive — DON'T kill it (killing + scrollTo(0) caused the blink/jump).
+          // Pin stays alive — reveal is scrub-bound both ways so the user can replay it.
           onLeave: () => {
-            revealDone = true
-            setFinalStateMobile()
             if (!revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
@@ -384,8 +331,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          // Zoom in slightly — crops ~6% off each edge to hide the AI watermark at bottom-right
-          transform: 'scale(1.12)',
+          // Zoom in — crops ~11% off each edge to fully hide the AI watermark at bottom-right
+          transform: 'scale(1.22)',
           transformOrigin: 'center',
           opacity: 0,
           zIndex: 0,
@@ -528,20 +475,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           pointerEvents: 'none',
         }}
       >
-        <span
-          style={{
-            position: 'absolute',
-            top: 24,
-            left: 40,
-            fontFamily: 'var(--font-dm-sans)',
-            fontSize: 11,
-            letterSpacing: '0.25em',
-            color: 'var(--silver)',
-            textTransform: 'uppercase',
-          }}
-        >
-          Southern Edge Fine Spirits
-        </span>
+        {/* Brand label removed — navbar wordmark covers this role post-reveal (was doubling) */}
 
         <div
           style={{
