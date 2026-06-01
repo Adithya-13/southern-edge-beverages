@@ -6,8 +6,7 @@ import AgeGate from '@/components/AgeGate'
 import Hero from '@/components/Hero'
 import Manifesto from '@/components/Manifesto'
 import ScrollRibbon from '@/components/ScrollRibbon'
-import Products from '@/components/Products'
-import Recipes from '@/components/Recipes'
+import ThePour from '@/components/ThePour'
 import Community from '@/components/Community'
 import Events from '@/components/Events'
 import Footer from '@/components/Footer'
@@ -25,8 +24,7 @@ export default function Home() {
           <Hero isVisible={ageVerified} />
           <Manifesto />
           <ScrollRibbon />
-          <Products />
-          <Recipes />
+          <ThePour />
           <Community />
           <Events />
           <Footer />

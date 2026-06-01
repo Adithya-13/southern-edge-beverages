@@ -26,8 +26,7 @@ const LINK_STYLE: React.CSSProperties = {
 
 const EXPLORE_LINKS = [
   { label: 'Our Story', href: '#story' },
-  { label: 'Products', href: '#products' },
-  { label: 'Cocktail Recipes', href: '#cocktails' },
+  { label: 'The Pour', href: '#thepour' },
   { label: 'Community', href: '#community' },
 ]
 

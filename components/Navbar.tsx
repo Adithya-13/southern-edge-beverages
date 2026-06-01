@@ -10,8 +10,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
 
 const NAV_LINKS = [
   { label: 'Our Story', href: '#manifesto' },
-  { label: 'Products', href: '#products' },
-  { label: 'Cocktails', href: '#cocktails' },
+  { label: 'The Pour', href: '#thepour' },
   { label: 'Community', href: '#community' },
 ]
 
