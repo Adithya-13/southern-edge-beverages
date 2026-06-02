@@ -34,10 +34,10 @@ const POURS: Pour[] = PRODUCTS.map((p) => ({
 }))
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-dm-sans)',
+  fontFamily: 'var(--font-body)',
   fontWeight: 500,
   fontSize: 11,
-  letterSpacing: '0.25em',
+  letterSpacing: 'var(--track-eyebrow)',
   textTransform: 'uppercase',
 }
 
@@ -117,7 +117,7 @@ export default function ThePour() {
       ref={sectionRef}
       style={{
         background: 'var(--bg-deep)',
-        padding: 'clamp(80px, 10vw, 120px) clamp(20px, 4vw, 56px)',
+        padding: 'clamp(96px, 10vw, 140px) clamp(20px, 4vw, 56px)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -129,11 +129,11 @@ export default function ThePour() {
         </span>
         <h2
           style={{
-            fontFamily: 'var(--font-bebas)',
-            fontSize: 'clamp(56px, 9vw, 120px)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(48px, 7vw, 96px)',
             color: 'var(--cream)',
-            letterSpacing: '0.02em',
-            lineHeight: 1,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.05,
             margin: 0,
           }}
         >
@@ -169,9 +169,9 @@ export default function ThePour() {
               >
                 <span
                   style={{
-                    fontFamily: 'var(--font-dm-sans)',
+                    fontFamily: 'var(--font-body)',
                     fontSize: 12,
-                    letterSpacing: '0.15em',
+                    letterSpacing: 'var(--track-data)',
                     opacity: 0.8,
                   }}
                 >
@@ -179,9 +179,9 @@ export default function ThePour() {
                 </span>
                 <span
                   style={{
-                    fontFamily: 'var(--font-bebas)',
+                    fontFamily: 'var(--font-display)',
                     fontSize: 'clamp(22px, 2.4vw, 34px)',
-                    letterSpacing: '0.03em',
+                    letterSpacing: 0,
                     lineHeight: 1.05,
                   }}
                 >
@@ -264,7 +264,7 @@ export default function ThePour() {
           <p
             className="pour-cocktail-name"
             style={{
-              fontFamily: 'var(--font-cormorant)',
+              fontFamily: 'var(--font-accent)',
               fontStyle: 'italic',
               fontSize: 'clamp(24px, 3vw, 40px)',
               color: 'var(--cream)',
@@ -289,7 +289,7 @@ export default function ThePour() {
                 <span
                   className="draw-text"
                   style={{
-                    fontFamily: 'var(--font-cormorant)',
+                    fontFamily: 'var(--font-accent)',
                     fontSize: 18,
                     color: 'var(--cream)',
                     display: 'block',
@@ -325,8 +325,8 @@ export default function ThePour() {
                   />
                   <span
                     style={{
-                      fontFamily: 'var(--font-dm-sans)',
-                      fontWeight: 300,
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 400,
                       fontSize: 14,
                       letterSpacing: '0.02em',
                       color: 'var(--cream)',

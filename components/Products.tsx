@@ -62,33 +62,41 @@ export default function Products() {
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--bg-void)',
-        padding: 'clamp(80px,8vw,120px) clamp(20px,5vw,60px)',
+        padding: 'clamp(96px,9vw,140px) clamp(20px,5vw,60px)',
       }}
     >
+      {/* Ghosted oversized wordmark behind the header (type-as-texture) */}
+      <span
+        className="ghost-word"
+        aria-hidden
+        style={{ top: '4%', left: '50%', transform: 'translateX(-50%)' }}
+      >
+        SPIRITS
+      </span>
+
       <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,6vw,80px)' }}>
-          <span className="amber-rule" />
           <span
             style={{
               display: 'block',
-              fontFamily: 'var(--font-dm-sans)',
-              fontSize: 11,
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--fs-eyebrow)',
               fontWeight: 500,
-              letterSpacing: '0.3em',
+              letterSpacing: 'var(--track-eyebrow)',
               textTransform: 'uppercase',
               color: 'var(--amber)',
               marginBottom: 20,
             }}
           >
-            Our Premium Collection
+            Our Spirits
           </span>
           <h2
             style={{
-              fontFamily: 'var(--font-bebas)',
-              fontSize: 'clamp(48px,8vw,88px)',
-              lineHeight: 0.95,
-              letterSpacing: '0.01em',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h1)',
+              lineHeight: 'var(--lh-h1)',
+              letterSpacing: '-0.01em',
               color: 'var(--cream)',
               margin: '0 0 24px',
             }}
@@ -97,7 +105,8 @@ export default function Products() {
           </h2>
           <p
             style={{
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
               fontSize: 'clamp(15px,1.5vw,17px)',
               lineHeight: 1.7,
               color: 'rgba(240,228,204,0.6)',
@@ -173,10 +182,10 @@ export default function Products() {
               {/* Type label */}
               <span
                 style={{
-                  fontFamily: 'var(--font-dm-sans)',
+                  fontFamily: 'var(--font-body)',
                   fontSize: 10,
                   fontWeight: 600,
-                  letterSpacing: '0.28em',
+                  letterSpacing: 'var(--track-eyebrow)',
                   textTransform: 'uppercase',
                   color: product.accentColor,
                   marginBottom: 10,
@@ -188,10 +197,10 @@ export default function Products() {
               {/* Name */}
               <h3
                 style={{
-                  fontFamily: 'var(--font-bebas)',
+                  fontFamily: 'var(--font-display)',
                   fontSize: 'clamp(28px,3vw,36px)',
-                  lineHeight: 1,
-                  letterSpacing: '0.02em',
+                  lineHeight: 1.05,
+                  letterSpacing: '0',
                   color: 'var(--cream)',
                   margin: '0 0 18px',
                 }}
@@ -202,7 +211,8 @@ export default function Products() {
               {/* Description */}
               <p
                 style={{
-                  fontFamily: 'var(--font-dm-sans)',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 400,
                   fontSize: 14,
                   lineHeight: 1.7,
                   color: 'rgba(240,228,204,0.62)',

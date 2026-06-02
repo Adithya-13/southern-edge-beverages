@@ -64,9 +64,10 @@ export default function Navbar() {
           />
           <span
             style={{
-              fontFamily: 'var(--font-bebas)',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 500,
               fontSize: '20px',
-              letterSpacing: '0.14em',
+              letterSpacing: '0.22em',
               color: 'var(--cream)',
             }}
           >
@@ -130,7 +131,12 @@ export default function Navbar() {
             href={link.href}
             onClick={(e) => handleLinkClick(e, link.href)}
             className="font-bebas text-4xl tracking-widest"
-            style={{ color: 'var(--cream)', textDecoration: 'none' }}
+            style={{
+              fontFamily: 'var(--font-display)',
+              letterSpacing: '0.02em',
+              color: 'var(--cream)',
+              textDecoration: 'none',
+            }}
           >
             {link.label}
           </a>

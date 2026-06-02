@@ -60,15 +60,25 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '24px',
+        overflow: 'hidden',
       }}
     >
+      <span
+        className="ghost-word"
+        aria-hidden
+        style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+      >
+        SOUTHERN EDGE
+      </span>
+
       {declined ? (
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <p
             style={{
-              fontFamily: 'var(--font-cormorant)',
-              fontWeight: 300,
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
               fontSize: '1.5rem',
+              lineHeight: 1.15,
               color: 'var(--cream)',
               margin: 0,
             }}
@@ -80,7 +90,7 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
             style={{
               display: 'inline-block',
               marginTop: '24px',
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontSize: '13px',
               color: 'var(--silver)',
               background: 'transparent',
@@ -93,7 +103,19 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
           </button>
         </div>
       ) : (
-        <>
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <span className="eyebrow eyebrow--muted" style={{ marginBottom: 32 }}>
+            Est. South Carolina · Fine Spirits
+          </span>
+
           <Image
             src="/images/logo_se_circle_white.png"
             alt="Southern Edge"
@@ -105,9 +127,11 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
 
           <h1
             style={{
-              fontFamily: 'var(--font-cormorant)',
-              fontWeight: 300,
-              fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
+              fontSize: 'clamp(1.8rem, 3.4vw, 2.8rem)',
+              lineHeight: 1.12,
+              letterSpacing: '-0.005em',
               color: 'var(--cream)',
               textAlign: 'center',
               margin: 0,
@@ -118,7 +142,7 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
 
           <p
             style={{
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontSize: '14px',
               color: 'var(--silver)',
               marginTop: '8px',
@@ -144,7 +168,7 @@ export default function AgeGate({ onVerified }: AgeGateProps) {
             <YesButton onClick={handleYes} />
             <NoButton onClick={handleNo} />
           </div>
-        </>
+        </div>
       )}
     </div>,
     document.body,
@@ -170,7 +194,7 @@ function YesButton({ onClick }: { onClick: () => void }) {
       style={{
         background: 'var(--amber)',
         color: 'var(--bg-void)',
-        fontFamily: 'var(--font-dm-sans)',
+        fontFamily: 'var(--font-body)',
         fontWeight: 500,
         fontSize: '13px',
         letterSpacing: '0.15em',
@@ -208,7 +232,7 @@ function NoButton({ onClick }: { onClick: () => void }) {
         background: 'transparent',
         border: '1px solid rgba(200,200,200,0.3)',
         color: 'var(--silver)',
-        fontFamily: 'var(--font-dm-sans)',
+        fontFamily: 'var(--font-body)',
         fontWeight: 500,
         fontSize: '13px',
         letterSpacing: '0.15em',

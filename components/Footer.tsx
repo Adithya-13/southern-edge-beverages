@@ -38,10 +38,10 @@ export default function Footer() {
           {/* Col 1 — Brand */}
           <div>
             <Image src="/images/logo_se_circle_white.png" alt="Southern Edge Fine Spirits" width={56} height={56} style={{ width: 56, height: 56, objectFit: 'contain', marginBottom: 16 }} />
-            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 18, color: 'var(--cream)', display: 'block', letterSpacing: '0.08em', lineHeight: 1, marginBottom: 8 }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 18, color: 'var(--cream)', display: 'block', letterSpacing: '0.2em', lineHeight: 1, marginBottom: 8 }}>
               SOUTHERN EDGE
             </span>
-            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 14, color: 'var(--silver)', display: 'block', letterSpacing: '0.12em', opacity: 0.6, marginBottom: 16 }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--silver)', display: 'block', letterSpacing: '0.24em', opacity: 0.6, marginBottom: 16 }}>
               FINE SPIRITS
             </span>
             <a

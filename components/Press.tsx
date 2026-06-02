@@ -45,48 +45,42 @@ export default function Press() {
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--bg-void)',
-        padding: 'clamp(80px,8vw,120px) clamp(20px,5vw,60px)',
+        padding: 'clamp(84px,8vw,116px) clamp(20px,5vw,60px)',
       }}
     >
+      {/* Ghosted oversized wordmark behind the header (type-as-texture) */}
+      <span className="ghost-word" aria-hidden style={{ top: '-2%', left: '-2%' }}>
+        PRESS
+      </span>
+
       <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,6vw,72px)' }}>
-          <span className="amber-rule" />
-          <p
-            style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              color: 'var(--amber)',
-              margin: 0,
-            }}
-          >
+        <div style={{ textAlign: 'left', maxWidth: 720, marginBottom: 'clamp(48px,6vw,72px)' }}>
+          <p className="eyebrow" style={{ margin: 0 }}>
             Press
           </p>
           <h2
             style={{
-              fontFamily: 'var(--font-bebas)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 400,
-              fontSize: 'clamp(3rem,6vw,5.5rem)',
-              lineHeight: 0.95,
-              letterSpacing: '0.01em',
+              fontSize: 'var(--fs-h1)',
+              lineHeight: 'var(--lh-h1)',
+              letterSpacing: '-0.01em',
               color: 'var(--cream)',
-              margin: '14px 0 0',
+              margin: '22px 0 0',
             }}
           >
             Press Center
           </h2>
           <p
+            className="measure"
             style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
-              fontSize: 'clamp(15px,1.4vw,17px)',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
+              fontSize: 'var(--fs-lead)',
               lineHeight: 1.6,
-              color: 'rgba(240,228,204,0.62)',
-              maxWidth: 560,
-              margin: '18px auto 0',
+              color: 'rgba(240,228,204,0.72)',
+              margin: '18px 0 0',
             }}
           >
             Latest news, press releases, and media resources for SE Beverages.
@@ -96,12 +90,12 @@ export default function Press() {
         {/* Featured Articles subheading */}
         <h3
           style={{
-            fontFamily: 'var(--font-cormorant)',
-            fontWeight: 300,
+            fontFamily: 'var(--font-accent)',
+            fontWeight: 400,
             fontStyle: 'italic',
-            fontSize: 'clamp(1.5rem,2.6vw,2rem)',
+            fontSize: 'var(--fs-h3)',
             color: 'var(--cream)',
-            textAlign: 'center',
+            textAlign: 'left',
             margin: '0 0 clamp(32px,4vw,48px)',
           }}
         >
@@ -169,7 +163,7 @@ export default function Press() {
                 <p
                   className="press-title"
                   style={{
-                    fontFamily: 'var(--font-cormorant)',
+                    fontFamily: 'var(--font-accent)',
                     fontWeight: 500,
                     fontSize: '1.05rem',
                     lineHeight: 1.4,
@@ -181,10 +175,10 @@ export default function Press() {
                 </p>
                 <span
                   style={{
-                    fontFamily: 'var(--font-dm-sans)',
+                    fontFamily: 'var(--font-body)',
                     fontWeight: 500,
                     fontSize: 13,
-                    letterSpacing: '0.04em',
+                    letterSpacing: 'var(--track-data)',
                     color: 'var(--amber)',
                     marginTop: 'auto',
                   }}

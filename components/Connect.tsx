@@ -6,10 +6,10 @@ import { useGSAP } from '@gsap/react'
 import { CONNECT } from '@/lib/constants'
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-dm-sans)',
+  fontFamily: 'var(--font-body)',
   fontWeight: 500,
   fontSize: 10,
-  letterSpacing: '0.2em',
+  letterSpacing: 'var(--track-eyebrow-sm)',
   textTransform: 'uppercase',
   color: 'var(--silver)',
   display: 'block',
@@ -71,34 +71,29 @@ export default function Connect() {
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--bg-deep)',
-        padding: 'clamp(80px,8vw,120px) clamp(20px,5vw,60px)',
+        padding: 'clamp(96px,10vw,140px) clamp(20px,5vw,60px)',
       }}
     >
+      <span className="ghost-word" aria-hidden style={{ top: '-2%', left: '-2%' }}>
+        CONNECT
+      </span>
+
       <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
-        <div ref={headerRef} style={{ textAlign: 'center', marginBottom: 'clamp(48px,6vw,72px)' }}>
-          <span className="amber-rule" />
-          <span
-            style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              color: 'var(--amber)',
-              display: 'block',
-              marginBottom: 20,
-            }}
-          >
+        <div
+          ref={headerRef}
+          style={{ textAlign: 'left', maxWidth: 720, marginBottom: 'clamp(48px,6vw,72px)' }}
+        >
+          <span className="eyebrow" style={{ marginBottom: 22 }}>
             {CONNECT.eyebrow}
           </span>
           <h2
             style={{
-              fontFamily: 'var(--font-bebas)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 400,
-              fontSize: 'clamp(3rem,7vw,6rem)',
-              lineHeight: 0.95,
-              letterSpacing: '0.01em',
+              fontSize: 'var(--fs-h1)',
+              lineHeight: 'var(--lh-h1)',
+              letterSpacing: '-0.01em',
               color: 'var(--cream)',
               margin: 0,
             }}
@@ -106,14 +101,14 @@ export default function Connect() {
             {CONNECT.headline}
           </h2>
           <p
+            className="measure"
             style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
-              fontSize: 16,
-              lineHeight: 1.7,
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
+              fontSize: 'var(--fs-body)',
+              lineHeight: 'var(--lh-body)',
               color: 'rgba(240,228,204,0.7)',
-              maxWidth: 560,
-              margin: '24px auto 0',
+              margin: '24px 0 0',
             }}
           >
             {CONNECT.sub}
@@ -127,8 +122,8 @@ export default function Connect() {
             <span className="amber-rule-left" />
             <p
               style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontWeight: 300,
+                fontFamily: 'var(--font-body)',
+                fontWeight: 400,
                 fontSize: 16,
                 lineHeight: 1.8,
                 color: 'rgba(240,228,204,0.8)',
@@ -139,8 +134,8 @@ export default function Connect() {
             </p>
             <p
               style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontWeight: 300,
+                fontFamily: 'var(--font-body)',
+                fontWeight: 400,
                 fontSize: 15,
                 lineHeight: 1.8,
                 color: 'rgba(240,228,204,0.6)',
@@ -155,7 +150,7 @@ export default function Connect() {
                 href={`mailto:${CONNECT.email}`}
                 className="underline-hover"
                 style={{
-                  fontFamily: 'var(--font-cormorant)',
+                  fontFamily: 'var(--font-accent)',
                   fontStyle: 'italic',
                   fontWeight: 400,
                   fontSize: 'clamp(1.4rem,2.4vw,1.9rem)',
@@ -180,10 +175,11 @@ export default function Connect() {
           >
             <h3
               style={{
-                fontFamily: 'var(--font-bebas)',
+                fontFamily: 'var(--font-display)',
                 fontWeight: 400,
                 fontSize: 'clamp(1.6rem,3vw,2.2rem)',
-                letterSpacing: '0.04em',
+                lineHeight: 1.1,
+                letterSpacing: '0',
                 color: 'var(--cream)',
                 margin: '0 0 24px',
               }}
@@ -278,8 +274,8 @@ export default function Connect() {
 
               <p
                 style={{
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontWeight: 300,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 400,
                   fontSize: 12,
                   lineHeight: 1.6,
                   color: 'rgba(240,228,204,0.45)',
@@ -311,9 +307,9 @@ export default function Connect() {
           background: rgba(255,255,255,0.03);
           border: 1px solid var(--smoke);
           border-radius: 8px;
-          padding: 12px 14px;
+          padding: 12px 16px;
           color: var(--cream);
-          font-family: var(--font-dm-sans);
+          font-family: var(--font-body);
           font-size: 15px;
           font-weight: 300;
           transition: border-color 0.25s ease, background 0.25s ease;
@@ -339,7 +335,7 @@ export default function Connect() {
           border: none;
           border-radius: 8px;
           padding: 14px 24px;
-          font-family: var(--font-dm-sans);
+          font-family: var(--font-body);
           font-weight: 600;
           font-size: 13px;
           letter-spacing: 0.15em;

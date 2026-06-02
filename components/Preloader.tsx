@@ -290,12 +290,12 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           opacity: 0,
           position: 'relative',
           zIndex: 2,
-          fontFamily: 'var(--font-bebas), sans-serif',
+          fontFamily: 'var(--font-body), sans-serif',
           fontSize: 'clamp(26px, 4.5vw, 40px)',
-          letterSpacing: '0.34em',
+          letterSpacing: '0.28em',
           color: 'var(--cream)',
           lineHeight: 1,
-          textIndent: '0.34em',
+          textIndent: '0.28em',
           marginBottom: 38,
         }}
       >
@@ -311,7 +311,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           zIndex: 2,
           display: 'flex',
           alignItems: 'flex-start',
-          fontFamily: 'var(--font-bebas), sans-serif',
+          fontFamily: 'var(--font-display), serif',
           lineHeight: 0.82,
           color: 'var(--cream)',
         }}
@@ -374,7 +374,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           opacity: 0,
           position: 'relative',
           zIndex: 2,
-          fontFamily: 'var(--font-dm-sans), sans-serif',
+          fontFamily: 'var(--font-body), sans-serif',
           fontSize: 10,
           letterSpacing: '0.42em',
           color: 'var(--silver)',

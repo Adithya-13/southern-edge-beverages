@@ -56,18 +56,25 @@ export default function Community() {
       id="community"
       ref={sectionRef}
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         background: 'var(--bg-void)',
-        padding: 'clamp(80px,10vw,120px) clamp(20px,5vw,40px)',
+        padding: 'clamp(88px,10vw,120px) clamp(20px,5vw,40px)',
       }}
     >
+      {/* Ghosted oversized wordmark (type-as-texture) */}
+      <span className="ghost-word" aria-hidden style={{ top: '6%', left: '50%', transform: 'translateX(-50%)' }}>
+        EDGE
+      </span>
+
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 64 }}>
+      <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', marginBottom: 64 }}>
         <p
           style={{
-            fontFamily: 'var(--font-dm-sans)',
+            fontFamily: 'var(--font-body)',
             fontWeight: 500,
             fontSize: 11,
-            letterSpacing: '0.2em',
+            letterSpacing: 'var(--track-eyebrow)',
             textTransform: 'uppercase',
             color: 'var(--silver)',
             marginBottom: 16,
@@ -77,10 +84,11 @@ export default function Community() {
         </p>
         <h2
           style={{
-            fontFamily: 'var(--font-cormorant)',
+            fontFamily: 'var(--font-accent)',
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: 'clamp(2.5rem,5vw,5rem)',
+            lineHeight: 1.1,
             color: 'var(--cream)',
           }}
         >
@@ -88,8 +96,8 @@ export default function Community() {
         </h2>
         <p
           style={{
-            fontFamily: 'var(--font-dm-sans)',
-            fontWeight: 300,
+            fontFamily: 'var(--font-body)',
+            fontWeight: 400,
             fontSize: 16,
             color: 'rgba(240,228,204,0.6)',
             maxWidth: 480,
@@ -103,9 +111,10 @@ export default function Community() {
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            fontFamily: 'var(--font-dm-sans)',
+            fontFamily: 'var(--font-body)',
             fontWeight: 500,
             fontSize: 14,
+            letterSpacing: 'var(--track-data)',
             color: 'var(--amber)',
             marginTop: 16,
             display: 'inline-block',
@@ -117,7 +126,7 @@ export default function Community() {
       </div>
 
       {/* Masonry Grid */}
-      <div className="community-grid" style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div className="community-grid" style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto' }}>
         {COLUMNS.map((itemIndices, colIdx) => (
           <div key={colIdx} ref={colRefs[colIdx]} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {itemIndices.map((itemIdx) => {

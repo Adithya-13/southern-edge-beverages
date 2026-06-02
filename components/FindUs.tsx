@@ -54,19 +54,28 @@ export default function FindUs() {
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--bg-deep)',
-        padding: 'clamp(80px,8vw,120px) clamp(20px,5vw,60px)',
+        padding: 'clamp(80px,8vw,112px) clamp(20px,5vw,60px)',
       }}
     >
+      {/* Ghosted oversized wordmark behind the header (type-as-texture) — OUTSIDE headerRef */}
+      <span
+        className="ghost-word"
+        aria-hidden
+        style={{ top: '4%', left: '50%', transform: 'translateX(-50%)' }}
+      >
+        FIND US
+      </span>
+
       <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div ref={headerRef} style={{ textAlign: 'center', marginBottom: 'clamp(40px,5vw,56px)' }}>
           <span className="amber-rule" />
           <p
             style={{
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
+              fontSize: 'var(--fs-eyebrow)',
+              letterSpacing: 'var(--track-eyebrow)',
               textTransform: 'uppercase',
               color: 'var(--amber)',
               margin: '0 0 18px',
@@ -76,11 +85,11 @@ export default function FindUs() {
           </p>
           <h2
             style={{
-              fontFamily: 'var(--font-bebas)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 400,
-              fontSize: 'clamp(2.75rem,6vw,5.5rem)',
-              lineHeight: 0.95,
-              letterSpacing: '0.01em',
+              fontSize: 'var(--fs-h1)',
+              lineHeight: 'var(--lh-h1)',
+              letterSpacing: '-0.01em',
               color: 'var(--cream)',
               margin: '0 0 20px',
             }}
@@ -89,10 +98,10 @@ export default function FindUs() {
           </h2>
           <p
             style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
-              fontSize: 'clamp(15px,1.6vw,18px)',
-              lineHeight: 1.6,
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
+              fontSize: 'var(--fs-lead)',
+              lineHeight: 'var(--lh-body)',
               color: 'rgba(240,228,204,0.7)',
               maxWidth: 560,
               margin: '0 auto',
@@ -123,10 +132,10 @@ export default function FindUs() {
                   borderRadius: 999,
                   background: 'var(--bg-surface)',
                   border: '1px solid var(--smoke)',
-                  fontFamily: 'var(--font-dm-sans)',
+                  fontFamily: 'var(--font-body)',
                   fontWeight: 400,
                   fontSize: 13,
-                  letterSpacing: '0.03em',
+                  letterSpacing: 'var(--track-data)',
                   color: 'var(--cream)',
                   whiteSpace: 'nowrap',
                 }}
@@ -153,10 +162,10 @@ export default function FindUs() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 500,
               fontSize: 14,
-              letterSpacing: '0.04em',
+              letterSpacing: 'var(--track-data)',
               color: 'var(--amber)',
               margin: '28px 0 0',
             }}

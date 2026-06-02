@@ -43,7 +43,7 @@ function CocktailRow({ cocktail, accentColor }: { cocktail: Cocktail; accentColo
       >
         <span
           style={{
-            fontFamily: 'var(--font-dm-sans)',
+            fontFamily: 'var(--font-body)',
             fontWeight: 500,
             fontSize: 15,
             letterSpacing: '0.01em',
@@ -75,10 +75,10 @@ function CocktailRow({ cocktail, accentColor }: { cocktail: Cocktail; accentColo
           <span
             style={{
               display: 'block',
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 600,
               fontSize: 10,
-              letterSpacing: '0.25em',
+              letterSpacing: 'var(--track-eyebrow-sm)',
               textTransform: 'uppercase',
               color: accentColor,
               marginBottom: 12,
@@ -94,8 +94,8 @@ function CocktailRow({ cocktail, accentColor }: { cocktail: Cocktail; accentColo
                   position: 'relative',
                   paddingLeft: 18,
                   marginBottom: 8,
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontWeight: 300,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 400,
                   fontSize: 14,
                   lineHeight: 1.5,
                   color: 'rgba(240,228,204,0.78)',
@@ -120,10 +120,10 @@ function CocktailRow({ cocktail, accentColor }: { cocktail: Cocktail; accentColo
           <span
             style={{
               display: 'block',
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 600,
               fontSize: 10,
-              letterSpacing: '0.25em',
+              letterSpacing: 'var(--track-eyebrow-sm)',
               textTransform: 'uppercase',
               color: accentColor,
               marginBottom: 12,
@@ -134,7 +134,7 @@ function CocktailRow({ cocktail, accentColor }: { cocktail: Cocktail; accentColo
           <p
             style={{
               margin: 0,
-              fontFamily: 'var(--font-cormorant)',
+              fontFamily: 'var(--font-accent)',
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: 17,
@@ -195,10 +195,10 @@ function CocktailColumn({
         <span
           style={{
             display: 'block',
-            fontFamily: 'var(--font-dm-sans)',
+            fontFamily: 'var(--font-body)',
             fontWeight: 500,
             fontSize: 9,
-            letterSpacing: '0.32em',
+            letterSpacing: 'var(--track-eyebrow-sm)',
             textTransform: 'uppercase',
             color: 'var(--silver)',
             marginBottom: 8,
@@ -209,11 +209,11 @@ function CocktailColumn({
         <h3
           style={{
             margin: 0,
-            fontFamily: 'var(--font-bebas)',
+            fontFamily: 'var(--font-display)',
             fontWeight: 400,
             fontSize: 'clamp(1.8rem,2.6vw,2.4rem)',
-            letterSpacing: '0.02em',
-            lineHeight: 1.05,
+            letterSpacing: '0',
+            lineHeight: 1.1,
             color: group.accentColor,
           }}
         >
@@ -242,7 +242,7 @@ function CocktailColumn({
           <p
             style={{
               margin: 0,
-              fontFamily: 'var(--font-cormorant)',
+              fontFamily: 'var(--font-accent)',
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: 'clamp(1.4rem,2vw,1.7rem)',
@@ -257,8 +257,8 @@ function CocktailColumn({
             style={{
               margin: 0,
               maxWidth: 260,
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
               fontSize: 13,
               lineHeight: 1.6,
               color: 'rgba(240,228,204,0.6)',
@@ -268,7 +268,8 @@ function CocktailColumn({
           </p>
           <span
             style={{
-              fontFamily: 'var(--font-vibes)',
+              fontFamily: 'var(--font-accent)',
+              fontStyle: 'italic',
               fontSize: 26,
               color: group.accentColor,
               opacity: 0.85,
@@ -343,20 +344,19 @@ export default function Cocktails() {
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--bg-void)',
-        padding: 'clamp(80px,8vw,120px) clamp(20px,5vw,60px)',
+        padding: 'clamp(88px,9vw,130px) clamp(20px,5vw,60px)',
       }}
     >
       <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div ref={headerRef} style={{ textAlign: 'center', marginBottom: 'clamp(56px,6vw,80px)' }}>
-          <span className="amber-rule" />
           <span
             style={{
               display: 'block',
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
+              fontSize: 'var(--fs-eyebrow)',
+              letterSpacing: 'var(--track-eyebrow)',
               textTransform: 'uppercase',
               color: 'var(--amber)',
               marginBottom: 18,
@@ -367,11 +367,11 @@ export default function Cocktails() {
           <h2
             style={{
               margin: 0,
-              fontFamily: 'var(--font-bebas)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 400,
-              fontSize: 'clamp(3rem,7vw,6rem)',
-              letterSpacing: '0.01em',
-              lineHeight: 0.95,
+              fontSize: 'var(--fs-h1)',
+              letterSpacing: '-0.01em',
+              lineHeight: 'var(--lh-h1)',
               color: 'var(--cream)',
               marginBottom: 24,
             }}
@@ -382,8 +382,8 @@ export default function Cocktails() {
             style={{
               margin: '0 auto',
               maxWidth: 620,
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
               fontSize: 15,
               lineHeight: 1.7,
               color: 'rgba(240,228,204,0.65)',

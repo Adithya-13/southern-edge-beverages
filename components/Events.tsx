@@ -9,7 +9,7 @@ export default function Events() {
       id="events"
       style={{
         background: 'var(--bg-deep)',
-        padding: 'clamp(80px,8vw,100px) clamp(20px,5vw,40px)',
+        padding: 'clamp(56px,6vw,84px) clamp(20px,5vw,40px)',
       }}
     >
       <div className="events-layout" style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -17,10 +17,10 @@ export default function Events() {
         <div>
           <p
             style={{
-              fontFamily: 'var(--font-dm-sans)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 500,
               fontSize: 11,
-              letterSpacing: '0.2em',
+              letterSpacing: 'var(--track-eyebrow)',
               textTransform: 'uppercase',
               color: 'var(--silver)',
               marginBottom: 24,
@@ -31,7 +31,7 @@ export default function Events() {
 
           <div style={{ marginBottom: 48, position: 'relative' }}>
             <span style={{
-              fontFamily: 'var(--font-bebas)',
+              fontFamily: 'var(--font-display)',
               fontSize: 'clamp(80px, 10vw, 140px)',
               color: 'var(--amber)',
               opacity: 0.10,
@@ -47,12 +47,12 @@ export default function Events() {
             </span>
             <div style={{ display: 'flex', gap: 32, paddingTop: 8, position: 'relative', zIndex: 1 }}>
               <div>
-                <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1 }}>2</span>
-                <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 10, letterSpacing: '0.2em', color: 'var(--silver)', textTransform: 'uppercase' }}>Silver Medals</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1, letterSpacing: 0 }}>2</span>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 'var(--track-data)', color: 'var(--silver)', textTransform: 'uppercase' }}>Silver Medals</span>
               </div>
               <div>
-                <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1 }}>3+</span>
-                <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 10, letterSpacing: '0.2em', color: 'var(--silver)', textTransform: 'uppercase' }}>Events This Year</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 40, color: 'var(--cream)', display: 'block', lineHeight: 1, letterSpacing: 0 }}>3+</span>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 'var(--track-data)', color: 'var(--silver)', textTransform: 'uppercase' }}>Events This Year</span>
               </div>
             </div>
           </div>
@@ -74,8 +74,8 @@ export default function Events() {
               {/* Doubled for seamless loop */}
               <span
                 style={{
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontWeight: 300,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 400,
                   fontSize: 14,
                   color: 'rgba(240,228,204,0.7)',
                   letterSpacing: '0.05em',
@@ -93,9 +93,11 @@ export default function Events() {
           <span style={{ display: 'block', width: 32, height: 1, background: 'var(--amber)', marginBottom: 16, opacity: 0.6 }} />
           <h2
             style={{
-              fontFamily: 'var(--font-cormorant)',
-              fontWeight: 300,
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
               fontSize: '2rem',
+              lineHeight: 1.05,
+              letterSpacing: '-0.01em',
               color: 'var(--cream)',
               marginBottom: 40,
             }}
@@ -155,7 +157,7 @@ export default function Events() {
                   <Award size={18} color="var(--gold)" style={{ marginBottom: 4 }} />
                   <span
                     style={{
-                      fontFamily: 'var(--font-cormorant)',
+                      fontFamily: 'var(--font-accent)',
                       fontWeight: 500,
                       fontSize: '1rem',
                       color: 'var(--cream)',
@@ -165,8 +167,8 @@ export default function Events() {
                   </span>
                   <span
                     style={{
-                      fontFamily: 'var(--font-dm-sans)',
-                      fontWeight: 300,
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 400,
                       fontSize: 12,
                       color: 'var(--silver)',
                     }}
@@ -175,7 +177,7 @@ export default function Events() {
                   </span>
                   <span
                     style={{
-                      fontFamily: 'var(--font-dm-sans)',
+                      fontFamily: 'var(--font-body)',
                       fontWeight: 400,
                       fontSize: 13,
                       color: 'var(--amber)',
@@ -185,8 +187,8 @@ export default function Events() {
                   </span>
                   <span
                     style={{
-                      fontFamily: 'var(--font-dm-sans)',
-                      fontWeight: 300,
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 400,
                       fontSize: 11,
                       color: 'rgba(200,200,200,0.5)',
                     }}

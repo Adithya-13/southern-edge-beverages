@@ -65,7 +65,8 @@ export default function ScrollRibbon() {
             <span
               key={i}
               style={{
-                fontFamily: 'var(--font-bebas)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
                 fontSize: '18px',
                 letterSpacing: '0.15em',
                 color: '#080604',
