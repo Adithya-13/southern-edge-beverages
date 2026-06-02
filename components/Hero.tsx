@@ -53,6 +53,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const onRevealedRef = useRef(onRevealed)
   onRevealedRef.current = onRevealed
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  // Lazy video load: the bg video (~2MB) only appears late in the reveal, so it is
+  // not loaded at page load (preload="none", no autoPlay). Fetched once the scrub
+  // approaches the reveal so it's buffered by the time it fades in.
+  const videoStartedRef = useRef(false)
   // Outer wrapper: centering (transform: translate(-50%,-50%))
   const bottleOuterRef = useRef<HTMLDivElement | null>(null)
   // Inner wrapper: mouse parallax target (GSAP x/y — no centering conflict)
@@ -110,6 +114,21 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         else first.addEventListener('load', () => drawFrame(0), { once: true })
       }
 
+      // Kick the (preload="none") bg video once, as the scrub nears the reveal.
+      const startVideo = () => {
+        if (videoStartedRef.current) return
+        const v = videoRef.current
+        if (!v) return
+        videoStartedRef.current = true
+        try {
+          v.load()
+          const pr = v.play()
+          if (pr && typeof pr.catch === 'function') pr.catch(() => {})
+        } catch {
+          /* ignore */
+        }
+      }
+
       const mm = gsap.matchMedia()
 
       // ── DESKTOP: pinned scroll + dwell ──────────────────────────────────
@@ -144,6 +163,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               drawFrame(idx)
               warmDecodeWindow(idx)
             }
+
+            // Lazy-load the bg video as the scrub approaches the reveal
+            if (p > 0.45) startVideo()
 
             // Scroll prompt fades out immediately
             if (scrollPromptRef.current) {
@@ -263,6 +285,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               warmDecodeWindow(idx)
             }
 
+            // Lazy-load the bg video as the scrub approaches the reveal
+            if (p > 0.45) startVideo()
+
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(Math.max(0, 1 - p * 60))
             }
@@ -343,11 +368,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       {/* L0 — Background video (fades in during Phase 3) */}
       <video
         ref={videoRef}
-        autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload="none"
         style={{
           position: 'absolute',
           inset: 0,

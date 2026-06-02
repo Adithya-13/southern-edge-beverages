@@ -11,21 +11,17 @@ export const FRAME_URLS: string[] = Array.from(
 // alive prevents GC, so the Hero's scrubbing stays warm (no re-fetch/re-decode).
 export const frameCache: HTMLImageElement[] = []
 
-const PREWARM_IMAGES = [
-  '/images/bottle_caramel.png',
-  '/images/bottle_sweettea.png',
-  '/images/bottle_limon.png',
-  '/images/logo_se_circle_white.png',
-]
-const PREWARM_VIDEO = '/videos/bourbon_bar.mp4'
+// Only the SE mark is needed immediately (nav + footer). Bottle images are served
+// optimized + lazy by next/image when their sections scroll into view, so they are
+// NOT prewarmed here (raw PNGs are far larger than the next/image WebP variants).
+const PREWARM_IMAGES = ['/images/logo_se_circle_white.png']
 
+// The loader blocks only on the first CRITICAL_FRAMES (enough to begin the reveal);
+// the remaining frames stream in the background so the site appears far sooner.
+const CRITICAL_FRAMES = 60
 // Force-decode only the first N frames so the reveal starts instantly. Decoding
 // all 192 (≈530MB of RGBA on mobile) would crash; the rest just warm the HTTP cache.
 const DECODE_AHEAD = 24
-// Video is large — weight it heavier than a single frame/image.
-const VIDEO_WEIGHT = 24
-// Don't let a slow video block the whole loader.
-const VIDEO_TIMEOUT_MS = 6000
 // Bound every frame/image load so a stalled connection (load/error never firing)
 // can't hang Promise.allSettled and freeze the loader forever.
 const ASSET_TIMEOUT_MS = 8000
@@ -81,43 +77,17 @@ function loadImage(url: string, bump: () => void): Promise<void> {
   })
 }
 
-function loadVideo(url: string, bump: () => void): Promise<void> {
-  return new Promise<void>((resolve) => {
-    const video = document.createElement('video')
-    video.muted = true
-    video.playsInline = true
-    video.preload = 'auto'
-
-    let settled = false
-    let timer: ReturnType<typeof setTimeout> | null = null
-    const done = () => {
-      if (settled) return
-      settled = true
-      if (timer) clearTimeout(timer)
-      bump()
-      resolve()
-    }
-
-    // Gate on 'loadeddata' (first frame ready) not 'canplaythrough' (whole clip
-    // buffered): the video isn't revealed until 70% into the hero pin, so blocking
-    // the loader on full playability needlessly parks the counter at ~89%. preload
-    // ='auto' keeps buffering in the background after the curtain lifts.
-    video.addEventListener('loadeddata', done, { once: true })
-    video.addEventListener('error', done, { once: true })
-    timer = setTimeout(done, VIDEO_TIMEOUT_MS)
-
-    video.src = url
-    video.load()
-  })
-}
-
 export function preloadAllAssets(
   onProgress: (fraction: number) => void,
 ): Promise<void> {
   if (started && cached) return cached
   started = true
 
-  const totalWeight = FRAME_COUNT + PREWARM_IMAGES.length + VIDEO_WEIGHT
+  const criticalCount = Math.min(CRITICAL_FRAMES, FRAME_COUNT)
+  // The loader only waits on (and reports progress for) the critical frames + the
+  // SE mark. The video is no longer preloaded (loads lazily in the Hero), and the
+  // frame tail streams in the background below.
+  const totalWeight = criticalCount + PREWARM_IMAGES.length
   let loadedWeight = 0
 
   const report = (delta: number) => {
@@ -127,10 +97,18 @@ export function preloadAllAssets(
   }
 
   const tasks: Promise<void>[] = [
-    ...FRAME_URLS.map((url, i) => loadFrame(url, i, () => report(1))),
+    ...FRAME_URLS.slice(0, criticalCount).map((url, i) =>
+      loadFrame(url, i, () => report(1)),
+    ),
     ...PREWARM_IMAGES.map((url) => loadImage(url, () => report(1))),
-    loadVideo(PREWARM_VIDEO, () => report(VIDEO_WEIGHT)),
   ]
+
+  // Frame tail — fetch in the background (no await, no progress weight). These still
+  // populate frameCache; the Hero's drawFrame guards on img.complete, so any frame
+  // not yet arrived simply holds the last painted frame until it streams in.
+  FRAME_URLS.slice(criticalCount).forEach((url, i) =>
+    loadFrame(url, criticalCount + i, () => {}),
+  )
 
   cached = Promise.allSettled(tasks).then(() => {})
   return cached
