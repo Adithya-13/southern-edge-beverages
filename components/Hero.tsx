@@ -129,6 +129,24 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
       }
 
+      // Bottle reveal sizing — start the fading-in PNG at the apparent size of the
+      // bottle in the final reveal frame (cover-fit 4:3 canvas), then settle it down
+      // to its resting size, so the frame→bottle handoff has no size "pop".
+      // 0.78 = bottle height as a fraction of the frame; 0.475 = its vertical center.
+      const reveal = { scale: 1.45, y: -22, ready: false }
+      const computeReveal = () => {
+        if (typeof window === 'undefined') return
+        const img = bottleInnerRef.current?.querySelector('img')
+        const bh = img ? img.getBoundingClientRect().height : window.innerHeight * 0.6
+        if (!bh) return
+        const coverScale = Math.max(window.innerWidth / 960, window.innerHeight / 720)
+        const frameH = 720 * coverScale
+        reveal.scale = Math.min(2.6, Math.max(1, (0.78 * frameH) / bh))
+        reveal.y = -(0.5 - 0.475) * frameH
+      }
+      computeReveal()
+      if (typeof window !== 'undefined') window.addEventListener('resize', computeReveal)
+
       const mm = gsap.matchMedia()
 
       // ── DESKTOP: pinned scroll + dwell ──────────────────────────────────
@@ -188,20 +206,33 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
             // Phase 3: frame fades OUT, environment fades IN
             if (p >= REVEAL_START_P) {
+              if (!reveal.ready) { computeReveal(); reveal.ready = true }
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
-              if (canvasRef.current) canvasRef.current.style.opacity = String(1 - eased)
+              // Bottle crossfades in over the first 60% at the frame's size, then settles
+              // to its resting size over the last 40% — seamless frame→bottle handoff.
+              const fade = Math.min(phase / 0.6, 1)
+              const sr = Math.max(0, (phase - 0.6) / 0.4)
+              const settle = sr < 0.5 ? 2 * sr * sr : -1 + (4 - 2 * sr) * sr
+              if (canvasRef.current) canvasRef.current.style.opacity = String(1 - fade)
               if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
               if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
-              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = String(eased)
+              if (bottleOuterRef.current) {
+                bottleOuterRef.current.style.opacity = String(fade)
+                const s = reveal.scale + (1 - reveal.scale) * settle
+                bottleOuterRef.current.style.transform = `translateY(${reveal.y * (1 - settle)}px) scale(${s})`
+              }
               if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
               if (textRef.current) textRef.current.style.opacity = String(eased)
             } else {
-              // Still in frame phase — keep environment hidden
+              // Still in frame phase — keep environment hidden, bottle primed at frame size
               if (canvasRef.current) canvasRef.current.style.opacity = '1'
               if (videoRef.current) videoRef.current.style.opacity = '0'
               if (overlayRef.current) overlayRef.current.style.opacity = '0'
-              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
+              if (bottleOuterRef.current) {
+                bottleOuterRef.current.style.opacity = '0'
+                bottleOuterRef.current.style.transform = `translateY(${reveal.y}px) scale(${reveal.scale})`
+              }
               if (glowRef.current) glowRef.current.style.opacity = '0'
               if (textRef.current) textRef.current.style.opacity = '0'
             }
@@ -305,19 +336,30 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             })
 
             if (p >= REVEAL_START_P) {
+              if (!reveal.ready) { computeReveal(); reveal.ready = true }
               const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
-              if (canvasRef.current) canvasRef.current.style.opacity = String(1 - eased)
+              const fade = Math.min(phase / 0.6, 1)
+              const sr = Math.max(0, (phase - 0.6) / 0.4)
+              const settle = sr < 0.5 ? 2 * sr * sr : -1 + (4 - 2 * sr) * sr
+              if (canvasRef.current) canvasRef.current.style.opacity = String(1 - fade)
               if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
               if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
-              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = String(eased)
+              if (bottleOuterRef.current) {
+                bottleOuterRef.current.style.opacity = String(fade)
+                const s = reveal.scale + (1 - reveal.scale) * settle
+                bottleOuterRef.current.style.transform = `translateY(${reveal.y * (1 - settle)}px) scale(${s})`
+              }
               if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
               if (textRef.current) textRef.current.style.opacity = String(eased)
             } else {
               if (canvasRef.current) canvasRef.current.style.opacity = '1'
               if (videoRef.current) videoRef.current.style.opacity = '0'
               if (overlayRef.current) overlayRef.current.style.opacity = '0'
-              if (bottleOuterRef.current) bottleOuterRef.current.style.opacity = '0'
+              if (bottleOuterRef.current) {
+                bottleOuterRef.current.style.opacity = '0'
+                bottleOuterRef.current.style.transform = `translateY(${reveal.y}px) scale(${reveal.scale})`
+              }
               if (glowRef.current) glowRef.current.style.opacity = '0'
               if (textRef.current) textRef.current.style.opacity = '0'
             }
@@ -349,6 +391,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
       return () => {
         mm.revert()
+        if (typeof window !== 'undefined') window.removeEventListener('resize', computeReveal)
       }
     },
     { scope: sectionRef, dependencies: [isVisible] },
