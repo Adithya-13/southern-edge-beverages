@@ -137,7 +137,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       const computeReveal = () => {
         if (typeof window === 'undefined') return
         const img = bottleInnerRef.current?.querySelector('img')
-        const bh = img ? img.getBoundingClientRect().height : window.innerHeight * 0.6
+        // offsetHeight = untransformed layout height (getBoundingClientRect would be
+        // polluted by the scale() already applied to the outer wrapper pre-reveal).
+        const bh = img ? img.offsetHeight : window.innerHeight * 0.6
         if (!bh) return
         const coverScale = Math.max(window.innerWidth / 960, window.innerHeight / 720)
         const frameH = 720 * coverScale
