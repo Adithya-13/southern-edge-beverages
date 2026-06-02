@@ -39,23 +39,9 @@ export default function FindUs() {
         }
       )
 
-      if (mapRef.current) {
-        gsap.fromTo(
-          mapRef.current,
-          { opacity: 0, y: 36 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: mapRef.current,
-              start: 'top 85%',
-              once: true,
-            },
-          }
-        )
-      }
+      // NOTE: the map is intentionally NOT animated. A Google My Maps embed that
+      // initializes while its container is opacity:0 / transformed (mid scroll-reveal)
+      // renders permanently blank — so the map stays static and fully visible.
     },
     { scope: sectionRef }
   )
