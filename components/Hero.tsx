@@ -1,10 +1,14 @@
 'use client'
 
-import { useRef } from 'react'
-import Image from 'next/image'
+import { useRef, useState, useEffect } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
 import { FRAME_COUNT, frameCache, preloadAllAssets } from '@/lib/preload'
+import { PRODUCTS } from '@/lib/constants'
+
+// The reveal frames bake in the Salted Caramel bottle (PRODUCTS index 2) — so it
+// is the default and the revert target when the reveal plays in reverse.
+const DEFAULT_PRODUCT = 2
 
 interface HeroProps {
   isVisible: boolean
@@ -14,12 +18,18 @@ interface HeroProps {
 // Pin distance: 2000px drives the full frame sequence.
 // No dwell phase — pin releases immediately when reveal completes.
 // On the way back, onLeave kills the pin so back-scroll is one normal 100vh section.
-const TOTAL_SCROLL = 2000
+// Pin distance: the reveal occupies the first REVEAL_DONE_P of the pin; the
+// remaining tail is a DWELL where the bottle rests and auto-cycles products.
+const TOTAL_SCROLL = 2600
 
-// Frames run the entire pin distance
+// Reveal completes at this fraction of the pin; [REVEAL_DONE_P, 1] is the dwell.
+const REVEAL_DONE_P = 0.77
+
+// Frames + reveal run against rp = min(p / REVEAL_DONE_P, 1), so the reveal feel
+// is unchanged — the dwell is simply appended after.
 const FRAME_END_P = 1.0
 
-// Reveal window: last 30% of pin (progress 0.70→1.0 = 600px of transition)
+// Reveal window within rp: last 30% (rp 0.70→1.0).
 const REVEAL_START_P = 0.70
 const REVEAL_END_P = 1.0
 
@@ -68,6 +78,17 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const beat0Ref = useRef<HTMLDivElement | null>(null)
   const beat1Ref = useRef<HTMLDivElement | null>(null)
   const beat2Ref = useRef<HTMLDivElement | null>(null)
+  // Faux-3D bottle: cursor-tilt wrapper + a ref to computeReveal so the bottle
+  // <img> onLoad can re-measure (raw <img> can report 0 height before load).
+  const tiltRef = useRef<HTMLDivElement | null>(null)
+  const computeRevealRef = useRef<() => void>(() => {})
+  // Edge-tracker so onUpdate only flips the React atRest state on transitions.
+  const atRestEdgeRef = useRef(false)
+
+  // Product auto-cycle (only while the reveal is fully complete / dwelling).
+  const [productIndex, setProductIndex] = useState(DEFAULT_PRODUCT)
+  const [atRest, setAtRest] = useState(false)
+  const product = PRODUCTS[productIndex]
 
   useGSAP(
     () => {
@@ -147,6 +168,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         reveal.y = -(0.5 - 0.475) * frameH
       }
       computeReveal()
+      computeRevealRef.current = computeReveal
       if (typeof window !== 'undefined') window.addEventListener('resize', computeReveal)
 
       const mm = gsap.matchMedia()
@@ -175,22 +197,23 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           scrub: 0.5,
           onUpdate: (self) => {
             const p = self.progress
+            // Frames + reveal run on rp; [REVEAL_DONE_P, 1] of the pin is the dwell.
+            const rp = Math.min(p / REVEAL_DONE_P, 1)
 
             // Frame draw — clamp to frame range only
             if (canvasRef.current) {
-              const frameP = Math.min(p / FRAME_END_P, 1)
-              const idx = Math.min(Math.round(frameP * 191), 191)
+              const idx = Math.min(Math.round(rp * 191), 191)
               drawFrame(idx)
               warmDecodeWindow(idx)
             }
 
             // Lazy-load the bg video as the scrub approaches the reveal
-            if (p > 0.45) startVideo()
+            if (rp > 0.45) startVideo()
 
             // Scroll prompt fades out immediately
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(
-                Math.max(0, 1 - p * 60),
+                Math.max(0, 1 - rp * 60),
               )
             }
 
@@ -198,18 +221,18 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             const beatRefs = [beat0Ref, beat1Ref, beat2Ref]
             beatRefs.forEach((ref, i) => {
               if (!ref.current) return
-              if (p >= REVEAL_START_P) {
+              if (rp >= REVEAL_START_P) {
                 ref.current.style.opacity = '0'
               } else {
-                const dist = Math.abs(p - STORY_BEATS[i].peak)
+                const dist = Math.abs(rp - STORY_BEATS[i].peak)
                 ref.current.style.opacity = String(Math.max(0, 1 - dist / STORY_BEATS[i].halfWidth))
               }
             })
 
             // Phase 3: frame fades OUT, environment fades IN
-            if (p >= REVEAL_START_P) {
+            if (rp >= REVEAL_START_P) {
               if (!reveal.ready) { computeReveal(); reveal.ready = true }
-              const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
+              const phase = Math.min((rp - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
               // Bottle crossfades in over the first 60% at the frame's size, then settles
               // to its resting size over the last 40% — seamless frame→bottle handoff.
@@ -239,8 +262,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
+            // At-rest (dwell) edge → drives the React auto-cycle. Scroll back below
+            // REVEAL_DONE_P flips this false and the effect reverts to the default bottle.
+            const nowAtRest = p >= REVEAL_DONE_P
+            if (nowAtRest !== atRestEdgeRef.current) {
+              atRestEdgeRef.current = nowAtRest
+              setAtRest(nowAtRest)
+            }
+
             // Reveal fully complete — show navbar (fires once, never un-fires)
-            if (p >= FRAME_END_P - 0.01 && !revealedRef.current) {
+            if (rp >= FRAME_END_P - 0.01 && !revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
               if (typeof window !== 'undefined') {
@@ -251,6 +282,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           // Pin stays alive — reveal is scrub-bound both ways so the user can scroll
           // back up and replay it. Just ensure the navbar fires once on first forward exit.
           onLeave: () => {
+            // Scrolled past the pin — bottle is off-screen; stop cycling + reset.
+            atRestEdgeRef.current = false
+            setAtRest(false)
             if (!revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
@@ -258,6 +292,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
                 window.dispatchEvent(new CustomEvent('hero-revealed'))
               }
             }
+          },
+          onLeaveBack: () => {
+            atRestEdgeRef.current = false
+            setAtRest(false)
           },
         })
 
@@ -271,6 +309,14 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           }
           if (glowRef.current) {
             gsap.to(glowRef.current, { x: x * 10, y: y * 10, duration: 0.9, ease: 'power2.out' })
+          }
+          // Faux-3D: tilt the bottle toward the cursor + slide the glass glint
+          // (CSS vars inherit down to the masked glint child).
+          if (tiltRef.current) {
+            tiltRef.current.style.setProperty('--tiltY', `${x * 9}deg`)
+            tiltRef.current.style.setProperty('--tiltX', `${-y * 7}deg`)
+            tiltRef.current.style.setProperty('--glx', `${46 + x * 28}%`)
+            tiltRef.current.style.setProperty('--gly', `${26 + y * 18}%`)
           }
         }
         if (!reduced) {
@@ -287,7 +333,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
       // ── MOBILE: scroll-driven reveal (mirrors desktop, shorter pin distance) ──
       mm.add('(max-width: 768px)', () => {
-        const TOTAL_SCROLL_MOBILE = 1200
+        const TOTAL_SCROLL_MOBILE = 1600
 
         // Reveal is fully scrub-bound both directions — scrolling back up replays/reverses it.
 
@@ -311,15 +357,17 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           scrub: 0.5,
           onUpdate: (self) => {
             const p = self.progress
+            // Frames + reveal run on rp; [REVEAL_DONE_P, 1] of the pin is the dwell.
+            const rp = Math.min(p / REVEAL_DONE_P, 1)
 
             if (canvasRef.current) {
-              const idx = Math.min(Math.round(p * 191), 191)
+              const idx = Math.min(Math.round(rp * 191), 191)
               drawFrame(idx)
               warmDecodeWindow(idx)
             }
 
             // Lazy-load the bg video as the scrub approaches the reveal
-            if (p > 0.45) startVideo()
+            if (rp > 0.45) startVideo()
 
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(Math.max(0, 1 - p * 60))
@@ -329,17 +377,17 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             const beatRefs = [beat0Ref, beat1Ref, beat2Ref]
             beatRefs.forEach((ref, i) => {
               if (!ref.current) return
-              if (p >= REVEAL_START_P) {
+              if (rp >= REVEAL_START_P) {
                 ref.current.style.opacity = '0'
               } else {
-                const dist = Math.abs(p - STORY_BEATS[i].peak)
+                const dist = Math.abs(rp - STORY_BEATS[i].peak)
                 ref.current.style.opacity = String(Math.max(0, 1 - dist / STORY_BEATS[i].halfWidth))
               }
             })
 
-            if (p >= REVEAL_START_P) {
+            if (rp >= REVEAL_START_P) {
               if (!reveal.ready) { computeReveal(); reveal.ready = true }
-              const phase = Math.min((p - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
+              const phase = Math.min((rp - REVEAL_START_P) / (REVEAL_END_P - REVEAL_START_P), 1)
               const eased = phase < 0.5 ? 2 * phase * phase : -1 + (4 - 2 * phase) * phase
               const fade = Math.min(phase / 0.6, 1)
               const sr = Math.max(0, (phase - 0.6) / 0.4)
@@ -366,7 +414,14 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
-            if (p >= FRAME_END_P - 0.01 && !revealedRef.current) {
+            // At-rest (dwell) edge → drives the React auto-cycle (mobile).
+            const nowAtRest = p >= REVEAL_DONE_P
+            if (nowAtRest !== atRestEdgeRef.current) {
+              atRestEdgeRef.current = nowAtRest
+              setAtRest(nowAtRest)
+            }
+
+            if (rp >= FRAME_END_P - 0.01 && !revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
               if (typeof window !== 'undefined') {
@@ -376,6 +431,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           },
           // Pin stays alive — reveal is scrub-bound both ways so the user can replay it.
           onLeave: () => {
+            // Scrolled past the pin — bottle is off-screen; stop cycling + reset.
+            atRestEdgeRef.current = false
+            setAtRest(false)
             if (!revealedRef.current) {
               revealedRef.current = true
               onRevealedRef.current?.()
@@ -383,6 +441,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
                 window.dispatchEvent(new CustomEvent('hero-revealed'))
               }
             }
+          },
+          onLeaveBack: () => {
+            atRestEdgeRef.current = false
+            setAtRest(false)
           },
         })
 
@@ -398,6 +460,24 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
     },
     { scope: sectionRef, dependencies: [isVisible] },
   )
+
+  // Auto-cycle products every 5s while the reveal is at rest (dwell). When atRest
+  // flips false (scroll-back or scroll-past), this reverts to the default Salted
+  // Caramel bottle baked into the reveal frames, so the reverse reveal stays
+  // frame-perfect. Paused entirely under reduced-motion.
+  useEffect(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!atRest || reduced) {
+      setProductIndex(DEFAULT_PRODUCT)
+      return
+    }
+    const id = setInterval(() => {
+      setProductIndex((i) => (i + 1) % PRODUCTS.length)
+    }, 5000)
+    return () => clearInterval(id)
+  }, [atRest])
 
   return (
     <section
@@ -520,8 +600,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           width: 400,
           height: 400,
           borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(212,120,26,0.45) 0%, transparent 70%)',
+          background: `radial-gradient(circle, ${product.accentColor}73 0%, transparent 70%)`,
+          transition: 'background 0.6s ease',
           opacity: 0,
           zIndex: 3,
           pointerEvents: 'none',
@@ -543,18 +623,39 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }}
       >
         <div ref={bottleInnerRef}>
-          <Image
-            src="/images/bottle_caramel.png"
-            alt="Southern Edge Salted Caramel Whiskey"
-            width={340}
-            height={580}
-            priority
-            style={{
-              objectFit: 'contain',
-              maxHeight: '70vh',
-              width: 'auto',
-            }}
-          />
+          <div className="hero-bottle-float">
+            <div className="hero-bottle-persp">
+              <div ref={tiltRef} className="hero-bottle-tilt">
+                <div className="hero-bottle-stack" key={productIndex}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={product.bottleFile}
+                    alt={`Southern Edge ${product.spiritShort}`}
+                    width={340}
+                    height={580}
+                    onLoad={() => computeRevealRef.current()}
+                    className="hero-bottle-img"
+                    style={{
+                      display: 'block',
+                      objectFit: 'contain',
+                      maxHeight: '70vh',
+                      width: 'auto',
+                      height: 'auto',
+                    }}
+                  />
+                  {/* Glass glint — masked to the bottle silhouette, tracks the cursor */}
+                  <div
+                    className="hero-bottle-glint"
+                    aria-hidden
+                    style={{
+                      WebkitMaskImage: `url(${product.bottleFile})`,
+                      maskImage: `url(${product.bottleFile})`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -606,6 +707,50 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         </div>
       </div>
 
+      {/* Product name — fades in only during the dwell auto-cycle */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '15%',
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          zIndex: 6,
+          opacity: atRest ? 1 : 0,
+          transition: 'opacity 0.6s ease',
+          pointerEvents: 'none',
+        }}
+      >
+        <div key={productIndex} className="hero-prod-label">
+          <span
+            style={{
+              display: 'block',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 500,
+              fontSize: 11,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: 'var(--amber)',
+              marginBottom: 10,
+            }}
+          >
+            {product.type}
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(22px, 3vw, 38px)',
+              lineHeight: 1.05,
+              letterSpacing: '-0.01em',
+              color: 'var(--cream)',
+            }}
+          >
+            {product.spiritShort}
+          </span>
+        </div>
+      </div>
+
       {/* L7 — Scroll prompt */}
       <div
         ref={scrollPromptRef}
@@ -642,6 +787,50 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           ↓
         </span>
       </div>
+
+      <style>{`
+        .hero-bottle-float {
+          animation: heroBottleFloat 6.5s ease-in-out infinite;
+          will-change: transform;
+        }
+        .hero-bottle-persp { perspective: 1100px; }
+        .hero-bottle-tilt {
+          transform-style: preserve-3d;
+          transform: rotateX(var(--tiltX, 0deg)) rotateY(var(--tiltY, 0deg));
+          transition: transform 0.3s ease-out;
+        }
+        .hero-bottle-stack { position: relative; display: inline-block; animation: heroBottleSwap 0.55s ease; }
+        .hero-bottle-img { filter: drop-shadow(0 30px 55px rgba(0,0,0,0.6)); }
+        .hero-bottle-glint {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(140px 240px at var(--glx, 46%) var(--gly, 26%),
+            rgba(255,244,224,0.45), rgba(255,255,255,0.05) 40%, transparent 62%);
+          -webkit-mask-size: contain; mask-size: contain;
+          -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+          -webkit-mask-position: center; mask-position: center;
+          mix-blend-mode: screen;
+          pointer-events: none;
+        }
+        @keyframes heroBottleFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-12px); }
+        }
+        @keyframes heroBottleSwap {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .hero-prod-label { animation: heroLabelIn 0.6s ease; }
+        @keyframes heroLabelIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-bottle-float { animation: none; }
+          .hero-bottle-tilt { transition: none; }
+          .hero-bottle-stack, .hero-prod-label { animation: none; }
+        }
+      `}</style>
     </section>
   )
 }
