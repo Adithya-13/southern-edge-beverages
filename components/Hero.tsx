@@ -493,10 +493,11 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             }} />
             {beat.lines.map((line, li) => (
               <div key={li} style={{
-                fontFamily: beat.fontFamily ?? 'var(--font-dm-sans)',
+                fontFamily: beat.fontFamily ?? 'var(--font-body)',
                 fontWeight: beat.fontFamily ? 400 : 500,
                 fontSize: beat.fontSize ?? 'clamp(10px,1.1vw,13px)',
-                letterSpacing: beat.fontFamily ? '0.08em' : '0.25em',
+                // tracking by role: display welcome tight, data labels wider
+                letterSpacing: beat.fontFamily ? '0.04em' : 'var(--track-eyebrow)',
                 color: 'rgba(240,228,204,0.80)',
                 textTransform: 'uppercase',
                 lineHeight: 1.1,
@@ -573,30 +574,31 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         <div
           style={{
             position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            width: '100%',
+            left: 'clamp(20px, 6vw, 88px)',
+            bottom: 'clamp(64px, 12vh, 128px)',
+            textAlign: 'left',
+            maxWidth: '92vw',
           }}
         >
           <div
             style={{
-              fontFamily: 'var(--font-bebas)',
-              fontSize: 'clamp(80px, 12vw, 180px)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(60px, 10vw, 150px)',
               color: 'var(--cream)',
-              lineHeight: 0.9,
-              letterSpacing: '0.02em',
+              lineHeight: 1.0,
+              letterSpacing: '-0.01em',
             }}
           >
-            WORK HARD
+            Work Hard.
           </div>
           <div
             style={{
-              fontFamily: 'var(--font-vibes)',
-              fontSize: 'clamp(40px, 6vw, 90px)',
-              color: 'var(--gold)',
-              marginTop: -8,
+              fontFamily: 'var(--font-accent)',
+              fontStyle: 'italic',
+              fontSize: 'clamp(32px, 5.5vw, 82px)',
+              color: 'var(--amber)',
+              lineHeight: 1.05,
+              marginTop: 6,
             }}
           >
             Drink Smooth.

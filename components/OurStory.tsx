@@ -82,49 +82,45 @@ export default function OurStory() {
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--bg-deep)',
-        padding: 'clamp(80px,8vw,120px) clamp(20px,5vw,60px)',
+        padding: 'clamp(96px,11vw,150px) clamp(20px,5vw,60px)',
       }}
     >
+      {/* Ghosted oversized wordmark behind the header (type-as-texture) */}
+      <span className="ghost-word" aria-hidden style={{ top: '-2%', left: '-2%' }}>
+        STORY
+      </span>
+
       <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        {/* 1 — Header */}
-        <div ref={headerRef} style={{ textAlign: 'center', marginBottom: 'clamp(56px,7vw,88px)' }}>
-          <span className="amber-rule" />
-          <span
-            style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
-              color: 'var(--amber)',
-              textTransform: 'uppercase',
-              display: 'block',
-              marginBottom: 24,
-            }}
-          >
+        {/* 1 — Header (left-aligned, art-directed) */}
+        <div
+          ref={headerRef}
+          style={{ textAlign: 'left', maxWidth: 760, marginBottom: 'clamp(56px,7vw,88px)' }}
+        >
+          <span className="eyebrow" style={{ marginBottom: 22 }}>
             {STORY.eyebrow}
           </span>
           <h2
             style={{
-              fontFamily: 'var(--font-cormorant)',
-              fontWeight: 300,
-              fontSize: 'clamp(2.6rem,6vw,5rem)',
-              lineHeight: 1.05,
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
+              fontSize: 'var(--fs-h1)',
+              lineHeight: 'var(--lh-h1)',
               color: 'var(--cream)',
-              margin: '0 auto 24px',
+              margin: '0 0 24px',
               letterSpacing: '-0.01em',
             }}
           >
             {STORY.headline}
           </h2>
           <p
+            className="measure"
             style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 300,
-              fontSize: 'clamp(15px,1.6vw,18px)',
-              lineHeight: 1.7,
-              color: 'rgba(240,228,204,0.7)',
-              maxWidth: 580,
-              margin: '0 auto',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
+              fontSize: 'var(--fs-lead)',
+              lineHeight: 1.6,
+              color: 'rgba(240,228,204,0.72)',
+              margin: 0,
             }}
           >
             {STORY.intro}
@@ -137,36 +133,37 @@ export default function OurStory() {
             <span className="amber-rule-left" />
             <p
               style={{
-                fontFamily: 'var(--font-cormorant)',
-                fontWeight: 300,
-                fontSize: 'clamp(1.2rem,2vw,1.6rem)',
-                lineHeight: 1.7,
+                fontFamily: 'var(--font-accent)',
+                fontWeight: 400,
+                fontSize: 'clamp(1.25rem,2vw,1.6rem)',
+                lineHeight: 1.6,
                 color: 'var(--cream)',
-                margin: '0 0 28px',
+                margin: '0 0 32px',
               }}
             >
               {STORY.body}
             </p>
             <span
               style={{
-                fontFamily: 'var(--font-dm-sans)',
+                fontFamily: 'var(--font-body)',
                 fontWeight: 500,
                 fontSize: 10,
-                letterSpacing: '0.28em',
+                letterSpacing: 'var(--track-eyebrow-sm)',
                 textTransform: 'uppercase',
                 color: 'rgba(240,228,204,0.5)',
                 display: 'block',
-                marginBottom: 4,
+                marginBottom: 6,
               }}
             >
               Founders
             </span>
             <span
               style={{
-                fontFamily: 'var(--font-vibes)',
-                fontSize: 'clamp(2rem,4vw,2.8rem)',
+                fontFamily: 'var(--font-accent)',
+                fontStyle: 'italic',
+                fontSize: 'clamp(1.9rem,3.4vw,2.6rem)',
                 color: 'var(--amber)',
-                lineHeight: 1.1,
+                lineHeight: 1.15,
                 display: 'block',
               }}
             >
@@ -209,18 +206,7 @@ export default function OurStory() {
 
         {/* 3 — Founder interview */}
         <div style={{ margin: 'clamp(72px,9vw,120px) 0 0' }}>
-          <span
-            style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
-              color: 'var(--amber)',
-              textTransform: 'uppercase',
-              display: 'block',
-              marginBottom: 28,
-            }}
-          >
+          <span className="eyebrow" style={{ marginBottom: 28 }}>
             In Their Words
           </span>
 
@@ -305,18 +291,7 @@ export default function OurStory() {
 
         {/* 4 — Our Values */}
         <div style={{ margin: 'clamp(72px,9vw,120px) 0 0' }}>
-          <span
-            style={{
-              fontFamily: 'var(--font-dm-sans)',
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.3em',
-              color: 'var(--amber)',
-              textTransform: 'uppercase',
-              display: 'block',
-              marginBottom: 'clamp(28px,3.5vw,44px)',
-            }}
-          >
+          <span className="eyebrow" style={{ marginBottom: 'clamp(28px,3.5vw,44px)' }}>
             Our Values
           </span>
 
@@ -326,10 +301,11 @@ export default function OurStory() {
                 <span className="amber-rule-left" />
                 <h3
                   style={{
-                    fontFamily: 'var(--font-bebas)',
+                    fontFamily: 'var(--font-display)',
                     fontWeight: 400,
-                    fontSize: 'clamp(1.7rem,2.6vw,2.4rem)',
-                    letterSpacing: '0.04em',
+                    fontSize: 'var(--fs-h3)',
+                    lineHeight: 1.1,
+                    letterSpacing: '0',
                     color: 'var(--cream)',
                     margin: '0 0 14px',
                   }}
@@ -338,9 +314,9 @@ export default function OurStory() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: 'var(--font-dm-sans)',
-                    fontWeight: 300,
-                    fontSize: 'clamp(14px,1.4vw,15px)',
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: 400,
+                    fontSize: 'var(--fs-small)',
                     lineHeight: 1.75,
                     color: 'rgba(240,228,204,0.68)',
                     margin: 0,

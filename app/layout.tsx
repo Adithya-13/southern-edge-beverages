@@ -1,35 +1,38 @@
 import type { Metadata } from 'next'
-import { Bebas_Neue, Cormorant_Garamond, Great_Vibes, DM_Sans } from 'next/font/google'
+import {
+  Libre_Caslon_Display,
+  Libre_Caslon_Text,
+  Hanken_Grotesk,
+} from 'next/font/google'
 import './globals.css'
 import ScrollSmootherProvider from '@/components/ScrollSmootherProvider'
 import Navbar from '@/components/Navbar'
 
-const bebasNeue = Bebas_Neue({
+// Display — classical wide Caslon revival. Roman-only on Google Fonts (no italic),
+// so italic accents come from Libre Caslon Text below.
+const caslonDisplay = Libre_Caslon_Display({
   weight: '400',
   subsets: ['latin'],
-  variable: '--font-bebas',
+  variable: '--font-display',
   display: 'swap',
 })
 
-const cormorantGaramond = Cormorant_Garamond({
-  weight: ['300', '400', '500', '600'],
+// Accent — Caslon text cut, carries the italic register (replaces the old script slot).
+const caslonText = Libre_Caslon_Text({
+  weight: ['400', '700'],
   style: ['normal', 'italic'],
   subsets: ['latin'],
-  variable: '--font-cormorant',
+  variable: '--font-accent',
   display: 'swap',
 })
 
-const greatVibes = Great_Vibes({
-  weight: '400',
+// Body / UI — warm humanist grotesque. Also used (wide-tracked) for the brand
+// wordmark, which is a thin geometric sans in the real identity.
+const hankenGrotesk = Hanken_Grotesk({
+  weight: ['300', '400', '500', '700'],
+  style: ['normal', 'italic'],
   subsets: ['latin'],
-  variable: '--font-vibes',
-  display: 'swap',
-})
-
-const dmSans = DM_Sans({
-  weight: ['300', '400', '500'],
-  subsets: ['latin'],
-  variable: '--font-dm-sans',
+  variable: '--font-body',
   display: 'swap',
 })
 
@@ -47,7 +50,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bebasNeue.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${dmSans.variable}`}
+      className={`${caslonDisplay.variable} ${caslonText.variable} ${hankenGrotesk.variable}`}
     >
       <body>
         {/*

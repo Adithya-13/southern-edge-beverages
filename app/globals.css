@@ -14,6 +14,66 @@
   --cream: #F0E4CC;
   --silver: #C8C8C8;
   --smoke: rgba(240, 228, 204, 0.06);
+
+  /* ── Font aliases ──────────────────────────────────────────────────────
+     Legacy variable names remap onto the new families so existing components
+     swap fonts with zero churn. New code uses the semantic names directly.
+       display = Libre Caslon Display (headlines)
+       body    = Hanken Grotesk (body/UI, + wide-tracked wordmark)
+       accent  = Libre Caslon Text (italic accent; replaces the script slot) */
+  --font-bebas: var(--font-display);
+  --font-dm-sans: var(--font-body);
+  --font-cormorant: var(--font-accent);
+  --font-vibes: var(--font-accent);
+
+  /* ── Modular type scale ────────────────────────────────────────────────
+     Fixed steps (not one universal clamp) so sizes read intentional. Only the
+     hero breaks out with a fluid size. Mobile values overridden below. */
+  --fs-hero: clamp(64px, 11vw, 168px);
+  --fs-h1: 64px;
+  --fs-h2: 46px;
+  --fs-h3: 30px;
+  --fs-lead: 20px;
+  --fs-body: 16px;
+  --fs-small: 14px;
+  --fs-eyebrow: 12px;
+
+  /* Leading — Caslon (serif) display needs to breathe; body stays generous. */
+  --lh-display: 1.08;
+  --lh-h1: 1.06;
+  --lh-body: 1.6;
+
+  /* Eyebrow tracking by role (kills the uniform 0.3em). */
+  --track-eyebrow: 0.2em;
+  --track-eyebrow-sm: 0.14em;
+  --track-data: 0.1em;
+
+  /* 8px baseline spacing scale. */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
+  --space-15: 120px;
+  --space-18: 144px;
+  --space-20: 160px;
+
+  /* Body copy measure cap + art-direction column indent. */
+  --measure: 64ch;
+  --accent-indent: 8%;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --fs-h1: 40px;
+    --fs-h2: 30px;
+    --fs-h3: 24px;
+    --fs-lead: 18px;
+  }
 }
 
 * {
@@ -30,6 +90,7 @@ body {
   background-color: var(--bg-void);
   color: var(--cream);
   overflow-x: hidden;
+  font-family: var(--font-body), system-ui, sans-serif;
 }
 
 body::after {
@@ -79,6 +140,64 @@ body::after {
   height: 1px;
   background: var(--amber);
   margin: 0 0 24px;
+}
+
+/* ── Eyebrow ────────────────────────────────────────────────────────────
+   Left-aligned eyebrow with an inline leading rule — the art-directed default
+   that replaces the centered stacked rule + label. Tracking is role-based. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 500;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--amber);
+  line-height: 1;
+}
+.eyebrow::before {
+  content: '';
+  width: 34px;
+  height: 1px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.eyebrow--sm {
+  font-size: 11px;
+  letter-spacing: var(--track-eyebrow-sm);
+}
+.eyebrow--muted {
+  color: var(--silver);
+}
+
+/* ── Ghosted oversized wordmark (type-as-texture behind a headline).
+   Parent MUST be position:relative + overflow:hidden. Scales down on mobile. */
+.ghost-word {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  color: var(--cream);
+  opacity: 0.04;
+  letter-spacing: 0;
+  line-height: 0.8;
+  z-index: 0;
+  font-size: clamp(120px, 20vw, 300px);
+}
+@media (max-width: 768px) {
+  .ghost-word {
+    font-size: 26vw;
+    opacity: 0.05;
+  }
+}
+
+/* Body-copy measure cap (stops auto-margined lines running too wide). */
+.measure {
+  max-width: var(--measure);
 }
 
 /* Hover underline utility */
