@@ -123,7 +123,7 @@ export default function Footer() {
               display: 'block',
             }}
           >
-            &copy; 2026 Southern Edge Beverage Company. All rights reserved.
+            &copy; 2026 The Southern Edge Beverage Company, LLC. All rights reserved.
           </span>
           <span
             style={{

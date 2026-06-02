@@ -1,7 +1,7 @@
 'use client'
 
 import { Award } from 'lucide-react'
-import { MARQUEE_TEXT, AWARDS, PRESS } from '@/lib/constants'
+import { MARQUEE_TEXT, AWARDS } from '@/lib/constants'
 
 export default function Events() {
   return (
@@ -195,66 +195,6 @@ export default function Events() {
                   </span>
                 </div>
               </a>
-            ))}
-          </div>
-
-          {/* Press Cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {PRESS.map((item) => (
-              <div
-                key={item.pub}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid var(--smoke)',
-                  borderLeft: '2px solid var(--amber)',
-                  borderRadius: 8,
-                  padding: '20px 24px 20px 16px',
-                }}
-              >
-                <p
-                  style={{
-                    fontFamily: 'var(--font-dm-sans)',
-                    fontWeight: 500,
-                    fontSize: 10,
-                    color: 'var(--silver)',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    marginBottom: 8,
-                  }}
-                >
-                  {item.pub}
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-cormorant)',
-                    fontWeight: 300,
-                    fontStyle: 'italic',
-                    fontSize: '1rem',
-                    color: 'var(--cream)',
-                    lineHeight: 1.5,
-                    marginBottom: 12,
-                  }}
-                >
-                  {item.quote}
-                </p>
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontFamily: 'var(--font-dm-sans)',
-                    fontWeight: 400,
-                    fontSize: 12,
-                    color: 'var(--amber)',
-                    textDecoration: 'none',
-                    transition: 'opacity 0.2s',
-                  }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.7')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}
-                >
-                  Read Article →
-                </a>
-              </div>
             ))}
           </div>
         </div>

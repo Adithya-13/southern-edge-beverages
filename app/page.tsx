@@ -4,10 +4,15 @@ import { useState } from 'react'
 import Preloader from '@/components/Preloader'
 import AgeGate from '@/components/AgeGate'
 import Hero from '@/components/Hero'
-import Manifesto from '@/components/Manifesto'
+import Products from '@/components/Products'
 import ScrollRibbon from '@/components/ScrollRibbon'
+import OurStory from '@/components/OurStory'
 import ThePour from '@/components/ThePour'
+import Cocktails from '@/components/Cocktails'
+import FindUs from '@/components/FindUs'
+import Press from '@/components/Press'
 import Community from '@/components/Community'
+import Connect from '@/components/Connect'
 import Events from '@/components/Events'
 import Footer from '@/components/Footer'
 
@@ -22,10 +27,15 @@ export default function Home() {
       {ageVerified && (
         <main>
           <Hero isVisible={ageVerified} />
-          <Manifesto />
+          <Products />
           <ScrollRibbon />
+          <OurStory />
           <ThePour />
+          <Cocktails />
+          <FindUs />
+          <Press />
           <Community />
+          <Connect />
           <Events />
           <Footer />
         </main>

@@ -1,6 +1,6 @@
 // Single source of truth for all site data + copy.
-// Every rendered string here is copied byte-for-byte from the component that renders it.
-// Where a component value diverged from prior constants, the component value wins.
+// Content aligned to the brand's live site (see southern-edge-live-content.md).
+// Product lineup: Sweet Tea Vodka · Passionberry Tequila · Salted Caramel Whiskey.
 
 export type Product = {
   id: string
@@ -38,10 +38,11 @@ export type Event = {
   venue: string
 }
 
-// Shape matches the rendered Events.tsx PRESS literal.
-export type PressItem = {
+export type PressArticle = {
   pub: string
-  quote: string
+  title: string
+  logo: string
+  photo: string
   url: string
 }
 
@@ -54,6 +55,7 @@ export type Award = {
   url: string
 }
 
+// Real product copy verbatim from the live site (southernedge "Our Premium Collection").
 export const PRODUCTS: Product[] = [
   {
     id: 'sweettea',
@@ -63,7 +65,7 @@ export const PRODUCTS: Product[] = [
     accentColor: '#C23B22',
     accentVar: '--coral',
     description:
-      'Made with succulent corn, authentic black tea, and juicy sugar cane.',
+      'Made with succulent corn, authentic black tea, and juicy sugar cane, our vodka is crafted with the finest natural ingredients to provide a satisfying experience with every sip. The taste is smooth and refreshing without the harsh, slow burn that is typically associated with drinking vodka.',
     aroma: 'Robust, warm undertones of earth & raw sugar cane',
     taste: 'Smooth & enriching palate',
     officialNotes:
@@ -72,11 +74,36 @@ export const PRODUCTS: Product[] = [
     notesShort: ['Green tea nose', 'Sweet inviting palate', 'Delightful finish'],
     tastingNotes: ['Green tea nose', 'Sweet, inviting palate', 'Short, delightful finish'],
     award: 'Silver Medal — USA Spirits Ratings 2024 — 83pts',
+    // Real signature cocktail (live Cocktails page).
     pourCocktail: {
-      name: 'Spiked Peach Tea',
-      ingredients: ['2 oz SE Sweet Tea Vodka', 'Peach purée', 'Splash of sour mix', 'Peach garnish'],
+      name: 'It Takes Tea to Mango',
+      ingredients: ['SE Sweet Tea Flavored Vodka', 'Triple Sec', 'Mango Nectar', 'Mango chunks + cherry to garnish'],
     },
     bottleFile: '/images/bottle_sweettea.png',
+  },
+  {
+    id: 'passionberry',
+    name: 'Passionberry Flavored Tequila',
+    type: 'Tequila',
+    spiritShort: 'Passionberry Tequila',
+    accentColor: '#B23A6F',
+    accentVar: '--berry',
+    description:
+      "From your first sip to your last, you'll enjoy every nuance of this ultra-premium flavored Tequila. We are committed to bringing you only the best of the best of our time tested recipes so that you can sit back, kick your feet up, and enjoy.",
+    aroma: 'Bright, vibrant passion-fruit and berry',
+    taste: 'Ultra-premium, smooth and nuanced',
+    officialNotes:
+      'An ultra-premium flavored tequila built on time-tested recipes — smooth and full of nuance from the first sip to the last.',
+    shortNotes: 'Ultra-premium · Smooth & nuanced · Time-tested recipe',
+    notesShort: ['Ultra-premium', 'Smooth & nuanced', 'Time-tested recipe'],
+    tastingNotes: ['Ultra-premium flavored tequila', 'Smooth, nuanced palate', 'Time-tested recipe'],
+    award: null,
+    // Signature serve not finalized on the live site — tease only.
+    pourCocktail: {
+      name: 'Signature Serve — Coming Soon',
+      ingredients: ['Our Passionberry cocktails are in the lab', 'Best enjoyed neat or over ice for now'],
+    },
+    bottleFile: '/images/bottle_passionberry.png',
   },
   {
     id: 'caramel',
@@ -86,7 +113,7 @@ export const PRODUCTS: Product[] = [
     accentColor: '#D4781A',
     accentVar: '--amber',
     description:
-      'Aged in oak barrels, with a pleasing balance of salty and sweet that does not overpower.',
+      'Aged in oak barrels, our whiskey is the perfectly pleasing balance of salty and sweet that does not overpower the palate. This delectable combination satisfies the thirst for rich flavor that your taste buds crave even when it is enjoyed on its own.',
     aroma: 'Lightly sweet caramel, fragrant, indulgent',
     taste: 'Luscious and sweetened to perfection',
     officialNotes:
@@ -95,124 +122,208 @@ export const PRODUCTS: Product[] = [
     notesShort: ['Hazelnut nose', 'Maple & salted donut palate', 'Caramel finish'],
     tastingNotes: ['Macadamia & hazelnut nose', 'Maple & salted donut palate', 'Caramel finish'],
     award: 'Silver Medal — USA Spirits Ratings 2024 — 84pts',
+    // Real signature cocktail (live Cocktails page).
     pourCocktail: {
-      name: 'Cranberry Caramel Cooler',
-      ingredients: ['1½ oz SE Salted Caramel Whiskey', '2 oz cranberry juice', '1 oz simple syrup', 'Club soda', 'Cranberries & rosemary'],
+      name: 'SE Salty Caramel Sour',
+      ingredients: ['2 oz SE Salted Caramel Flavored Whiskey', '2 oz sour mix', 'Splash of cola', 'Fresh lemon twist'],
     },
     bottleFile: '/images/bottle_caramel.png',
   },
+]
+
+// ── COCKTAILS ────────────────────────────────────────────────────────────
+// Real recipes verbatim from the live Cocktails page (accordion content).
+// Passionberry recipes are placeholders on the live site (not finalized).
+export type Cocktail = {
+  id: string
+  name: string
+  ingredients: string[]
+  instructions: string
+}
+export type CocktailGroup = {
+  spiritId: string
+  spirit: string
+  accentColor: string
+  bottleFile: string
+  comingSoon?: boolean
+  cocktails: Cocktail[]
+}
+
+export const COCKTAIL_GROUPS: CocktailGroup[] = [
   {
-    id: 'limon',
-    name: 'Se Limón Flavored Tequila',
-    type: 'Tequila',
-    spiritShort: 'Se Limón Tequila',
-    accentColor: '#7CB342',
-    accentVar: '--lime',
-    description:
-      'Originating in Jalisco Mexico, 100% Blue Agave with refreshing citrus notes of lemon and lime.',
-    aroma: 'Fresh citrus, bright lemon and lime zest',
-    taste: 'Distilled 6 times for a smooth finish',
-    officialNotes:
-      'Originating in Jalisco Mexico, 100% Blue Agave with refreshing citrus notes of lemon and lime. Distilled 6 times.',
-    shortNotes: '100% Blue Agave · Lemon & lime citrus · 6× distilled',
-    notesShort: ['100% Blue Agave', 'Lemon & lime citrus', '6× distilled'],
-    tastingNotes: ['Fresh citrus nose', '100% Blue Agave', '6× distilled, smooth finish'],
-    award: null,
-    pourCocktail: {
-      name: 'Se Limón Paloma',
-      ingredients: ['2 oz Se Limón Tequila', 'Grapefruit soda', 'Squeeze of lime', 'Salt rim'],
-    },
-    bottleFile: '/images/bottle_limon.png',
+    spiritId: 'sweettea',
+    spirit: 'Sweet Tea Vodka',
+    accentColor: '#C23B22',
+    bottleFile: '/images/bottle_sweettea.png',
+    cocktails: [
+      {
+        id: 'it-takes-tea-to-mango',
+        name: 'It Takes Tea to Mango',
+        ingredients: ['Southern Edge Sweet Tea Flavored Vodka', 'Triple Sec', 'Mango Nectar', 'Mango chunks + cherry to garnish (optional)'],
+        instructions: 'Add all ingredients into a glass filled with ice. Gently stir and garnish with mango chunks and a cherry. Serve & Enjoy.',
+      },
+      {
+        id: 'se-moji-tea',
+        name: 'SE Moji-Tea',
+        ingredients: ['2 oz Southern Edge Sweet Tea Flavored Vodka', '4 fresh mint leaves, muddled', '1/2 oz fresh lime juice', '4 oz club soda', 'Lime wheel for garnish (optional)'],
+        instructions: 'In a tall glass, add first 4 ingredients and stir to combine. Top with lime wheel for garnish. Serve & Enjoy.',
+      },
+      {
+        id: 'quiet-on-the-green',
+        name: 'Quiet on the Green',
+        ingredients: ['1 part Southern Edge Sweet Tea Flavored Vodka', '1 part lemonade', 'Lemon wheel for garnish'],
+        instructions: 'Mix all ingredients and pour over ice. Garnish with a lemon wheel. Serve & Enjoy.',
+      },
+    ],
+  },
+  {
+    spiritId: 'passionberry',
+    spirit: 'Passionberry Tequila',
+    accentColor: '#B23A6F',
+    bottleFile: '/images/bottle_passionberry.png',
+    comingSoon: true,
+    cocktails: [],
+  },
+  {
+    spiritId: 'caramel',
+    spirit: 'Salted Caramel Whiskey',
+    accentColor: '#D4781A',
+    bottleFile: '/images/bottle_caramel.png',
+    cocktails: [
+      {
+        id: 'se-salty-caramel-sour',
+        name: 'SE Salty Caramel Sour',
+        ingredients: ['2 oz Southern Edge Salted Caramel Flavored Whiskey', '2 oz sour mix', 'Splash of cola', 'Fresh lemon twist', 'Caramel sauce for rim (optional)'],
+        instructions: 'Mix all ingredients well in a shaker with ice. Pour over fresh ice in a chilled glass. Garnish with fresh lemon twist and caramel for glass rim. Serve & Enjoy.',
+      },
+      {
+        id: 'salted-caramel-latte',
+        name: 'Salted Caramel Latte',
+        ingredients: ['1.5 oz Southern Edge Salted Caramel Flavored Whiskey', '5 oz hot milk', '3 oz espresso'],
+        instructions: 'Pour 5 oz of hot milk into latte glass. Add 3 oz of espresso and top off 1.5 oz of Salted Caramel Whiskey. Serve & Enjoy.',
+      },
+      {
+        id: 'coffee-with-an-edge',
+        name: 'Coffee with an Edge',
+        ingredients: ['1–1.5 oz Southern Edge Salted Caramel Flavored Whiskey', '8 oz coffee (hot or iced)', 'Creamer (optional)', 'Whipped topping (optional)', 'Caramel Sauce (optional)'],
+        instructions: 'Pour coffee into cup. Add Southern Edge Salted Caramel Whiskey. Add creamer and garnish with whipped cream and drizzle caramel sauce on top, if desired. Serve & Enjoy.',
+      },
+    ],
   },
 ]
 
+// Legacy RECIPES export (kept for compatibility); mirrors the first real recipe per on-market spirit.
 export const RECIPES: Recipe[] = [
   {
-    id: 'spiked-peach-tea',
-    name: 'Spiked Peach Tea',
+    id: 'it-takes-tea-to-mango',
+    name: 'It Takes Tea to Mango',
     baseSpirit: 'Sweet Tea Vodka',
     baseSpiritId: 'sweettea',
     accentColor: '#C23B22',
     bottleFile: '/images/bottle_sweettea.png',
-    ingredients: [
-      '2 oz SE Sweet Tea Vodka',
-      'Peach purée',
-      'Splash of sour mix',
-      'Peach garnish',
-    ],
-    instructions: 'Build in a glass over ice. Garnish with fresh peach.',
+    ingredients: ['Southern Edge Sweet Tea Flavored Vodka', 'Triple Sec', 'Mango Nectar', 'Mango chunks + cherry to garnish'],
+    instructions: 'Add all ingredients into a glass filled with ice. Gently stir and garnish with mango chunks and a cherry. Serve & Enjoy.',
   },
   {
-    id: 'cranberry-caramel-cooler',
-    name: 'Cranberry Caramel Cooler',
+    id: 'se-salty-caramel-sour',
+    name: 'SE Salty Caramel Sour',
     baseSpirit: 'Salted Caramel Whiskey',
     baseSpiritId: 'caramel',
     accentColor: '#D4781A',
     bottleFile: '/images/bottle_caramel.png',
-    ingredients: [
-      '1½ oz SE Salted Caramel Whiskey',
-      '2 oz cranberry juice',
-      '1 oz simple syrup',
-      'Club soda',
-      'Fresh cranberries and rosemary for garnish',
-    ],
-    instructions:
-      'Shake whiskey, juice, syrup with ice. Top with club soda. Garnish with cranberries and rosemary.',
-  },
-  {
-    id: 'pineapple-edge',
-    name: 'Pineapple Edge',
-    baseSpirit: 'Sweet Tea Vodka',
-    baseSpiritId: 'sweettea',
-    accentColor: '#C23B22',
-    bottleFile: '/images/bottle_sweettea.png',
-    ingredients: [
-      '2 oz SE Sweet Tea Vodka',
-      '2 oz pineapple juice',
-      '1 oz lemonade',
-      'Simple syrup (adjust to taste)',
-      'Pineapple slices and lemon slices for garnish',
-    ],
-    instructions: 'Pour, shake, enjoy. Garnish with pineapple and lemon slices.',
+    ingredients: ['2 oz SE Salted Caramel Whiskey', '2 oz sour mix', 'Splash of cola', 'Fresh lemon twist'],
+    instructions: 'Mix all ingredients well in a shaker with ice. Pour over fresh ice. Garnish with lemon twist and caramel rim. Serve & Enjoy.',
   },
 ]
 
+// ── OUR STORY ────────────────────────────────────────────────────────────
+// Founder narrative + interview verbatim from live /our-story (rolling out interview).
+export const STORY = {
+  eyebrow: 'Our Story',
+  intro: 'A journey of passion, craftsmanship, and dedication to creating exceptional beverages.',
+  headline: 'Where It All Began',
+  founders: 'Ashley & Bertrina Scott',
+  foundersPhoto: '/images/founders_scott.jpg',
+  body:
+    'Ashley and Trina Scott are the founders of Southern Edge Beverage Company, a Black-owned liquor brand. Southern Edge is a brand that connects with Southern hospitality and is about creating experiences for all. Trina Scott spoke with rolling out about the company.',
+  interview: [
+    {
+      q: 'Tell us about Southern Edge Beverage',
+      a: "We've been working on trying to make some flavorful combinations that a lot of people like. We've spent a significant amount of time trying to get the right thing, listening to feedback from tons of people, sometimes good, sometimes bad, and going back to the lab numerous times. We have come up with the two drinks that are currently on the market, we have a sweet tea flavored vodka, as well as a salted caramel whiskey. I love both of these drinks, and the people who work with us love them too. Otherwise, they wouldn't be working for us. If you want a cool drink, either one of those will work well for you at any time.",
+    },
+    {
+      q: 'How did the Sweet Tea Vodka come about?',
+      a: "No matter where we are, we're always going to represent the southeast. We lived in the Midwest for around 17 years, and all three of our children were born there. They are Midwesterners that have been transplanted back to the South, but we're Southerners at heart. You know you're not considered a Southerner until you sit down and drink some really good sweet tea. We wanted to have some adult drinks, so we put some vodka in it to add a little life to the party. There are a lot of recipes that come from the roots that we have in the South. How can we have Southern roots and we don't have a sweet tea? That's a necessity.",
+    },
+    {
+      q: 'What are three cocktail recipes that people can make with your liquor?',
+      a: 'My personal favorite right now is called "It Takes Tea to Mango," and it\'s our sweet tea-flavored vodka with mango nectar. The other one is a version of a John Daly which is vodka, iced tea, and lemonade, but we call it "Quiet on the Green," where we use sweet tea, vodka, and lemonade, preferably Simply Lemonade. My favorite Salted Caramel whiskey recipe is not a drink but a dessert. I make a salted caramel shake with Haagen Dazs Vanilla Bean ice cream and salted caramel whiskey. The salt enhances the sweet flavor of the caramel, so you don\'t need to add any sugar to it. You put that in a blender, and you\'ve got a boozy milkshake.',
+    },
+  ],
+}
+
+export const VALUES = [
+  { title: 'Quality', body: 'We never compromise on quality. Every ingredient is carefully selected and every process meticulously monitored.' },
+  { title: 'Tradition', body: 'Our recipes honor Southern traditions while embracing modern techniques that enhance flavor and quality.' },
+  { title: 'Community', body: 'We believe in bringing people together through exceptional beverages and shared experiences.' },
+]
+
+// ── FIND US (store locator) ──────────────────────────────────────────────
+export const FIND_US = {
+  eyebrow: 'Where to Buy',
+  headline: 'Find Us Near You',
+  sub: 'We are now in stores in South Carolina, Georgia, and Florida!',
+  cta: 'Find a store near you.',
+  states: ['South Carolina', 'Georgia', 'Florida'],
+  mapEmbed: 'https://www.google.com/maps/d/u/0/embed?mid=13W5baTb9iaJ6r1pg4eyQ4WenvFjeorg',
+}
+
+// ── PRESS (real featured articles) ───────────────────────────────────────
+export const PRESS_ARTICLES: PressArticle[] = [
+  {
+    pub: 'Cuisine Noir',
+    title: 'Southern Edge Creates Sweet Sips With Notes of Nostalgia',
+    logo: '/images/press/logo_cuisinenoir.png',
+    photo: '/images/press/photo_cuisinenoir.png',
+    url: 'https://www.cuisinenoirmag.com/southern-edge-creates-sweet-sips-with-notes-of-nostaglia/',
+  },
+  {
+    pub: 'VoyageJacksonville',
+    title: 'Community Highlights: Meet Ashley and Bertrina Scott, Pat Gantt, and Latia Ashley of Southern Edge Beverages',
+    logo: '/images/press/logo_voyage.png',
+    photo: '/images/press/photo_voyage.png',
+    url: 'https://voyagejacksonville.com/interview/community-highlights-meet-ashley-and-betrina-scott-pat-gantt-latia-ashley-of-southern-edge-beverages/',
+  },
+  {
+    pub: 'rollingout',
+    title: 'Southern Edge Beverage founders creating recipes that come from their roots',
+    logo: '/images/press/logo_rollingout.png',
+    photo: '/images/press/photo_rollingout.png',
+    url: 'https://rollingout.com/2022/07/29/southern-edge-beverage-founders-creating-recipes-that-come-from-their-roots/',
+  },
+]
+
+// ── CONNECT ──────────────────────────────────────────────────────────────
+export const CONNECT = {
+  eyebrow: 'Contact',
+  headline: "Let's Connect",
+  sub: "Get in touch with our team. We'd love to hear from you and answer any questions about our premium beverages.",
+  body:
+    'Thank you for your interest in The Southern Edge Beverage Company. Please use the provided form or contact information to get in touch and sign up for our monthly newsletters.',
+  locationsNote: 'Want to purchase Southern Edge? Visit the Find Us section to locate a retailer in your state.',
+  email: 'contact@southernedgespirits.com',
+}
+
 // Structured event data. NOTE: not rendered directly — the live UI renders MARQUEE_TEXT.
 export const EVENTS: Event[] = [
-  {
-    id: 'tega-cay',
-    name: 'Whiskey & Vodka Tasting',
-    venue: 'Tega Cay Liquors',
-  },
-  {
-    id: 'summer-sips',
-    name: 'Summer Sips',
-    venue: 'Edisto Beer Garden',
-  },
-  {
-    id: 'village-abc',
-    name: 'Vodka & Whiskey Tasting',
-    venue: 'Village ABC',
-  },
+  { id: 'tega-cay', name: 'Whiskey & Vodka Tasting', venue: 'Tega Cay Liquors' },
+  { id: 'summer-sips', name: 'Summer Sips', venue: 'Edisto Beer Garden' },
+  { id: 'village-abc', name: 'Vodka & Whiskey Tasting', venue: 'Village ABC' },
 ]
 
 // Verbatim from Events.tsx MARQUEE_TEXT (note double-space separators + trailing '  ·  ').
 export const MARQUEE_TEXT =
   'Whiskey & Vodka Tasting — Tega Cay Liquors  ·  Summer Sips — Edisto Beer Garden  ·  Vodka & Whiskey Tasting — Village ABC  ·  '
-
-// Verbatim from Events.tsx PRESS.
-export const PRESS: PressItem[] = [
-  {
-    pub: 'Cuisine Noir',
-    quote: '"Sweet Sips with Notes of Nostalgia"',
-    url: 'https://www.cuisinenoirmag.com/southern-edge-creates-sweet-sips-with-notes-of-nostaglia/',
-  },
-  {
-    pub: 'Rolling Out',
-    quote: '"Creating Recipes That Come From Their Roots"',
-    url: 'https://rollingout.com/2022/07/29/southern-edge-beverage-founders-creating-recipes-that-come-from-their-roots/',
-  },
-]
 
 // Verbatim from Events.tsx AWARDS (url is the shared href the badges link to).
 export const AWARDS: Award[] = [
@@ -232,16 +343,10 @@ export const AWARDS: Award[] = [
   },
 ]
 
-// Verbatim from Manifesto.tsx FACTS.
-export const BRAND_FACTS = [
-  '6× Distilled',
-  '60 Proof',
-  'Natural Ingredients',
-  'Gluten Free',
-]
+// Brand facts — grounded in real brand content (Black-owned, Southern roots, natural ingredients, distribution).
+export const BRAND_FACTS = ['Black-Owned', 'Southern Roots', 'Natural Ingredients', 'In SC · GA · FL']
 
-// URLs/handles verbatim from Footer.tsx + Community.tsx render sites.
-// `facebook` display name is carried from prior constants (not rendered in scope).
+// Socials. Live footer lists Facebook · Instagram · YouTube; existing handles carried over.
 export const SOCIAL = {
   instagram: '@southernedgebeverages',
   instagramUrl: 'https://www.instagram.com/southernedgebeverages/',
@@ -254,11 +359,14 @@ export const SOCIAL = {
   hashtags: ['#TasteTheEdge', '#SavorYourExperience'],
 }
 
-// Navigation links — verbatim from Navbar.tsx NAV_LINKS (Footer EXPLORE_LINKS is byte-identical, reuse this).
+// Navigation links — expanded to mirror the live site's information architecture.
 export const NAV_LINKS = [
+  { label: 'Products', href: '#products' },
   { label: 'Our Story', href: '#story' },
-  { label: 'The Pour', href: '#thepour' },
-  { label: 'Community', href: '#community' },
+  { label: 'Cocktails', href: '#cocktails' },
+  { label: 'Find Us', href: '#findus' },
+  { label: 'Press', href: '#press' },
+  { label: 'Connect', href: '#connect' },
 ]
 
 // Verbatim from ScrollRibbon.tsx ITEMS.
@@ -284,23 +392,21 @@ export const COPY = {
   taglinePrimary: 'Work Hard. Drink Smooth.',
   taglineSecondary: 'Taste The Edge.',
   taglineTertiary: '#SavorYourExperience',
-  // Hero.tsx render site.
   heroHeadline: 'WORK HARD',
   heroScript: 'Drink Smooth.',
-  // Manifesto.tsx QUOTE (rendered single-line form).
   manifesto: MANIFESTO_QUOTE,
-  // Manifesto.tsx sub paragraph (verbatim).
   manifestoSub:
     'We invite you to experience the essence of the South in every drop of Southern Edge.',
   brandIntro:
-    'Crafted with southern charm and a dedication to extraordinary taste, experience the finest flavored spirits from South Carolina.',
+    'Premium craft beverages that push the boundaries of flavor and quality. Experience the perfect blend of innovation and tradition.',
   communityHeadline: 'Taste The Edge.',
-  // Community.tsx sub paragraph (verbatim).
   communitySub:
     'Join us at tastings, events, and everywhere Southern Edge pours.',
+  legalName: 'The Southern Edge Beverage Company, LLC',
+  footerTagline:
+    'Crafting exceptional beverages with passion and precision. Experience the perfect blend of tradition and innovation in every bottle.',
   legalFooter:
-    '© 2026 Southern Edge Beverage Company. All rights reserved.\nPlease drink responsibly. Must be 21+ to consume alcohol.',
-  // AgeGate.tsx render sites — button labels are title-case in markup (CSS uppercases visually).
+    '© 2026 The Southern Edge Beverage Company, LLC. All rights reserved.\nPlease drink responsibly. Must be 21+ to consume alcohol.',
   ageGateQuestion: 'Are you of legal drinking age?',
   ageGateYes: 'Yes, I Am 21+',
   ageGateNo: 'No, I Am Not',
