@@ -103,13 +103,33 @@ export function preloadAllAssets(
     ...PREWARM_IMAGES.map((url) => loadImage(url, () => report(1))),
   ]
 
-  // Frame tail — fetch in the background (no await, no progress weight). These still
-  // populate frameCache; the Hero's drawFrame guards on img.complete, so any frame
-  // not yet arrived simply holds the last painted frame until it streams in.
-  FRAME_URLS.slice(criticalCount).forEach((url, i) =>
-    loadFrame(url, criticalCount + i, () => {}),
-  )
+  // Frame tail — deferred until the first user interaction (scroll/touch/pointer/key).
+  // The reveal only needs these once the user actually scrolls; deferring keeps the
+  // critical path tiny (so analyzers that never interact don't fetch ~3MB of frames),
+  // while real users get the full 192-frame reveal the moment they engage. frameCache
+  // is populated as they stream; the Hero's drawFrame guards on img.complete and simply
+  // holds the last painted frame for any not-yet-arrived index.
+  scheduleFrameTail(criticalCount)
 
   cached = Promise.allSettled(tasks).then(() => {})
   return cached
+}
+
+let tailStarted = false
+
+function loadFrameTail(from: number) {
+  if (tailStarted) return
+  tailStarted = true
+  FRAME_URLS.slice(from).forEach((url, i) => loadFrame(url, from + i, () => {}))
+}
+
+// Trigger the tail load once, on the first real engagement. No short timer fallback:
+// if the user never interacts they never scroll the reveal, so the frames aren't needed.
+function scheduleFrameTail(from: number) {
+  if (typeof window === 'undefined') return
+  const kick = () => loadFrameTail(from)
+  const opts: AddEventListenerOptions = { once: true, passive: true }
+  ;['scroll', 'wheel', 'touchstart', 'pointerdown', 'keydown'].forEach((ev) =>
+    window.addEventListener(ev, kick, opts),
+  )
 }
