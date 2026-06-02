@@ -134,12 +134,11 @@ function CocktailRow({ cocktail, accentColor }: { cocktail: Cocktail; accentColo
           <p
             style={{
               margin: 0,
-              fontFamily: 'var(--font-accent)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 17,
-              lineHeight: 1.6,
-              color: 'rgba(240,228,204,0.82)',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
+              fontSize: 14,
+              lineHeight: 1.7,
+              color: 'rgba(240,228,204,0.78)',
             }}
           >
             {cocktail.instructions}

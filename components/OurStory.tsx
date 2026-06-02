@@ -133,11 +133,11 @@ export default function OurStory() {
             <span className="amber-rule-left" />
             <p
               style={{
-                fontFamily: 'var(--font-accent)',
+                fontFamily: 'var(--font-body)',
                 fontWeight: 400,
-                fontSize: 'clamp(1.25rem,2vw,1.6rem)',
-                lineHeight: 1.6,
-                color: 'var(--cream)',
+                fontSize: 'var(--fs-lead)',
+                lineHeight: 1.7,
+                color: 'rgba(240,228,204,0.86)',
                 margin: '0 0 32px',
               }}
             >
@@ -268,15 +268,14 @@ export default function OurStory() {
                     <div style={{ overflow: 'hidden' }}>
                       <p
                         style={{
-                          fontFamily: 'var(--font-cormorant)',
-                          fontWeight: 300,
-                          fontStyle: 'italic',
-                          fontSize: 'clamp(1.15rem,1.8vw,1.5rem)',
+                          fontFamily: 'var(--font-body)',
+                          fontWeight: 400,
+                          fontSize: 'clamp(16px,1.4vw,18px)',
                           lineHeight: 1.75,
-                          color: 'rgba(240,228,204,0.82)',
+                          color: 'rgba(240,228,204,0.78)',
                           margin: 0,
                           padding: '0 clamp(0px,4vw,52px) clamp(26px,3vw,40px) 0',
-                          maxWidth: 860,
+                          maxWidth: 720,
                         }}
                       >
                         {item.a}
