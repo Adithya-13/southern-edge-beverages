@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import { smoothScrollTo } from '@/lib/scroll'
@@ -46,15 +47,31 @@ export default function Navbar() {
           className="flex-shrink-0"
           onClick={(e) => handleLinkClick(e, '#hero')}
           style={{
-            fontFamily: 'var(--font-bebas)',
-            fontSize: '20px',
-            letterSpacing: '0.14em',
-            color: 'var(--cream)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
             textDecoration: 'none',
             lineHeight: 1,
           }}
         >
-          SOUTHERN EDGE
+          <Image
+            src="/images/logo_se_circle_white.png"
+            alt=""
+            width={34}
+            height={34}
+            priority
+            style={{ width: 34, height: 34, objectFit: 'contain' }}
+          />
+          <span
+            style={{
+              fontFamily: 'var(--font-bebas)',
+              fontSize: '20px',
+              letterSpacing: '0.14em',
+              color: 'var(--cream)',
+            }}
+          >
+            SOUTHERN EDGE
+          </span>
         </a>
 
         <ul className="hidden md:flex items-center gap-8">

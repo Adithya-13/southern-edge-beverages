@@ -247,7 +247,9 @@ export default function ThePour() {
               position: 'absolute',
               right: '8%',
               bottom: 0,
-              height: '78%',
+              // Fixed height (not % of the center column) so the bottle stays the
+              // same size across spirits regardless of cocktail-name length/wrap.
+              height: 'clamp(300px, 42vh, 360px)',
               width: 'auto',
               opacity: 0.5,
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))',
@@ -386,9 +388,9 @@ export default function ThePour() {
             padding: 8px 0 !important;
           }
           .pour-select-row svg { display: none; }
-          .pour-center { min-height: 320px; order: 2; }
+          .pour-center { min-height: 320px; }
           .pour-glass-wrap { width: 160px; max-width: 160px; }
-          .pour-bottle { right: 2% !important; height: 60% !important; }
+          .pour-bottle { right: 2% !important; height: clamp(190px, 34vh, 250px) !important; }
         }
       `}</style>
     </section>

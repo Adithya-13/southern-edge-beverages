@@ -112,7 +112,7 @@ export default function Community() {
             textDecoration: 'none',
           }}
         >
-          @southernedgebeverages ↗
+          @southernedgebeverages
         </a>
       </div>
 
@@ -154,7 +154,7 @@ export default function Community() {
                       color: 'var(--cream)',
                       letterSpacing: '0.05em',
                     }}>
-                      {post.handle} ↗
+                      {post.handle}
                     </span>
                   </div>
                 </a>

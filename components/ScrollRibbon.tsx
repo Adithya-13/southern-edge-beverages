@@ -7,6 +7,7 @@ import { RIBBON_ITEMS } from '@/lib/constants'
 
 export default function ScrollRibbon() {
   const ribbonRef = useRef<HTMLDivElement>(null)
+  const driftRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
@@ -19,9 +20,10 @@ export default function ScrollRibbon() {
       ease: 'linear',
     })
 
-    // Scroll-driven counter-drift (ribbon shifts right as page scrolls down)
+    // Scroll-driven counter-drift applied to an INNER wrapper so the amber band
+    // itself stays full-bleed (no exposed background gap on the sides).
     gsap.fromTo(
-      ribbonRef.current,
+      driftRef.current,
       { x: 0 },
       {
         x: 40,
@@ -49,31 +51,33 @@ export default function ScrollRibbon() {
         zIndex: 1,
       }}
     >
-      <div
-        ref={trackRef}
-        style={{
-          display: 'flex',
-          gap: 0,
-          whiteSpace: 'nowrap',
-          willChange: 'transform',
-        }}
-      >
-        {allItems.map((item, i) => (
-          <span
-            key={i}
-            style={{
-              fontFamily: 'var(--font-bebas)',
-              fontSize: '18px',
-              letterSpacing: '0.15em',
-              color: '#080604',
-              paddingLeft: 40,
-              paddingRight: 40,
-              flexShrink: 0,
-            }}
-          >
-            {item} ◆
-          </span>
-        ))}
+      <div ref={driftRef} style={{ willChange: 'transform' }}>
+        <div
+          ref={trackRef}
+          style={{
+            display: 'flex',
+            gap: 0,
+            whiteSpace: 'nowrap',
+            willChange: 'transform',
+          }}
+        >
+          {allItems.map((item, i) => (
+            <span
+              key={i}
+              style={{
+                fontFamily: 'var(--font-bebas)',
+                fontSize: '18px',
+                letterSpacing: '0.15em',
+                color: '#080604',
+                paddingLeft: 40,
+                paddingRight: 40,
+                flexShrink: 0,
+              }}
+            >
+              {item} ◆
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   )

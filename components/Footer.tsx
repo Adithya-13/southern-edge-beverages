@@ -86,16 +86,16 @@ export default function Footer() {
           <div>
             <span style={LABEL_STYLE}>Connect</span>
             <a href={SOCIAL.instagramUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-              Instagram ↗
+              Instagram
             </a>
             <a href={SOCIAL.facebookUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-              Facebook ↗
+              Facebook
             </a>
             <a href={SOCIAL.tiktokUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-              TikTok ↗
+              TikTok
             </a>
             <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-              Linktree ↗
+              Linktree
             </a>
             <div style={{ borderTop: '1px solid var(--smoke)', marginTop: '20px', paddingTop: '20px' }}>
               <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: '12px', color: 'rgba(200,200,200,0.3)', letterSpacing: '0.05em' }}>
