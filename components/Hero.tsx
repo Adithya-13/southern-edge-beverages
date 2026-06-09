@@ -20,13 +20,17 @@ interface HeroProps {
 // On the way back, onLeave kills the pin so back-scroll is one normal 100vh section.
 // Pin distance: the reveal occupies the first REVEAL_DONE_P of the pin; the
 // remaining tail is a DWELL where the bottle rests and auto-cycles products.
-const TOTAL_SCROLL = 2600
+const TOTAL_SCROLL = 3300
+
+// Atmosphere phase: the southern world plays first; frames begin once it fades.
+// Pin lengths chosen so the frame phase and dwell keep their original px feel.
+const ATMO_P = 0.21
 
 // Reveal completes at this fraction of the pin; [REVEAL_DONE_P, 1] is the dwell.
-const REVEAL_DONE_P = 0.77
+const REVEAL_DONE_P = 0.82
 
-// Frames + reveal run against rp = min(p / REVEAL_DONE_P, 1), so the reveal feel
-// is unchanged — the dwell is simply appended after.
+// Frames + reveal run against rp remapped to [ATMO_P, REVEAL_DONE_P], so the
+// reveal feel is unchanged — atmosphere is prepended, the dwell appended.
 const FRAME_END_P = 1.0
 
 // Reveal window within rp: last 30% (rp 0.70→1.0).
@@ -34,6 +38,7 @@ const REVEAL_START_P = 0.70
 const REVEAL_END_P = 1.0
 
 interface StoryBeat {
+  phase: 'atmo' | 'frames'
   peak: number
   halfWidth: number
   lines: [string, string]
@@ -42,18 +47,21 @@ interface StoryBeat {
   fontSize?: string
   fontFamily?: string
 }
+// Atmo beats run on ap (atmosphere progress); frames beats run on rp as before.
 const STORY_BEATS: StoryBeat[] = [
-  // Beat 0: welcome — visible at p=0, fades out as scrolling starts
+  // Beat 0: welcome — visible at p=0, lingers through the atmosphere phase
   {
-    peak: 0.00, halfWidth: 0.12,
+    phase: 'atmo',
+    peak: 0.00, halfWidth: 0.40,
     lines: ['SOUTHERN EDGE', 'FINE SPIRITS'],
     align: 'center',
     xStyle: { left: '50%', transform: 'translateX(-50%)', textAlign: 'center' },
     fontSize: 'clamp(28px,3.5vw,52px)',
     fontFamily: 'var(--font-bebas)',
   },
-  { peak: 0.30, halfWidth: 0.10, lines: ['CRAFTED IN', 'SOUTH CAROLINA'], align: 'left',  xStyle: { left: '8vw', right: 'auto', textAlign: 'left' } },
-  { peak: 0.55, halfWidth: 0.10, lines: ['6× DISTILLED', '60 PROOF'],     align: 'right', xStyle: { right: '8vw', left: 'auto', textAlign: 'right' } },
+  { phase: 'frames', peak: 0.30, halfWidth: 0.10, lines: ['CRAFTED IN', 'SOUTH CAROLINA'], align: 'left',  xStyle: { left: '8vw', right: 'auto', textAlign: 'left' } },
+  { phase: 'frames', peak: 0.55, halfWidth: 0.10, lines: ['6× DISTILLED', '60 PROOF'],     align: 'right', xStyle: { right: '8vw', left: 'auto', textAlign: 'right' } },
+  { phase: 'atmo',   peak: 0.60, halfWidth: 0.25, lines: ['SOUTHERN HOSPITALITY,', 'BOTTLED'], align: 'left', xStyle: { left: '8vw', right: 'auto', textAlign: 'left' } },
 ]
 
 export default function Hero({ isVisible, onRevealed }: HeroProps) {
@@ -78,6 +86,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const beat0Ref = useRef<HTMLDivElement | null>(null)
   const beat1Ref = useRef<HTMLDivElement | null>(null)
   const beat2Ref = useRef<HTMLDivElement | null>(null)
+  const beat3Ref = useRef<HTMLDivElement | null>(null)
+  // Atmosphere layer: visible at p=0, fades out as the frame phase begins.
+  const atmoRef = useRef<HTMLDivElement | null>(null)
   // Faux-3D bottle: cursor-tilt wrapper + a ref to computeReveal so the bottle
   // <img> onLoad can re-measure (raw <img> can report 0 height before load).
   const tiltRef = useRef<HTMLDivElement | null>(null)
@@ -197,8 +208,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           scrub: 0.5,
           onUpdate: (self) => {
             const p = self.progress
-            // Frames + reveal run on rp; [REVEAL_DONE_P, 1] of the pin is the dwell.
-            const rp = Math.min(p / REVEAL_DONE_P, 1)
+            // Atmosphere occupies [0, ATMO_P]; frames + reveal run on rp remapped
+            // to [ATMO_P, REVEAL_DONE_P]; [REVEAL_DONE_P, 1] of the pin is the dwell.
+            const ap = Math.min(p / ATMO_P, 1)
+            const rp = Math.min(Math.max((p - ATMO_P) / (REVEAL_DONE_P - ATMO_P), 0), 1)
+
+            // Atmosphere fades out as the frame phase takes over
+            if (atmoRef.current) {
+              const aEased = ap < 0.5 ? 2 * ap * ap : -1 + (4 - 2 * ap) * ap
+              atmoRef.current.style.opacity = String(1 - aEased)
+            }
 
             // Frame draw — clamp to frame range only
             if (canvasRef.current) {
@@ -213,20 +232,22 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             // Scroll prompt fades out immediately
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(
-                Math.max(0, 1 - rp * 60),
+                Math.max(0, 1 - p * 60),
               )
             }
 
-            // Story beats — fade in/out during frame phase only
-            const beatRefs = [beat0Ref, beat1Ref, beat2Ref]
+            // Story beats — atmo beats track ap, frames beats track rp
+            const beatRefs = [beat0Ref, beat1Ref, beat2Ref, beat3Ref]
             beatRefs.forEach((ref, i) => {
               if (!ref.current) return
-              if (rp >= REVEAL_START_P) {
+              const beat = STORY_BEATS[i]
+              if (beat.phase === 'frames' && rp >= REVEAL_START_P) {
                 ref.current.style.opacity = '0'
-              } else {
-                const dist = Math.abs(rp - STORY_BEATS[i].peak)
-                ref.current.style.opacity = String(Math.max(0, 1 - dist / STORY_BEATS[i].halfWidth))
+                return
               }
+              const ph = beat.phase === 'atmo' ? ap : rp
+              const dist = Math.abs(ph - beat.peak)
+              ref.current.style.opacity = String(Math.max(0, 1 - dist / beat.halfWidth))
             })
 
             // Phase 3: frame fades OUT, environment fades IN
@@ -357,8 +378,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           scrub: 0.5,
           onUpdate: (self) => {
             const p = self.progress
-            // Frames + reveal run on rp; [REVEAL_DONE_P, 1] of the pin is the dwell.
-            const rp = Math.min(p / REVEAL_DONE_P, 1)
+            // Atmosphere occupies [0, ATMO_P]; frames + reveal run on rp remapped
+            // to [ATMO_P, REVEAL_DONE_P]; [REVEAL_DONE_P, 1] of the pin is the dwell.
+            const ap = Math.min(p / ATMO_P, 1)
+            const rp = Math.min(Math.max((p - ATMO_P) / (REVEAL_DONE_P - ATMO_P), 0), 1)
+
+            // Atmosphere fades out as the frame phase takes over
+            if (atmoRef.current) {
+              const aEased = ap < 0.5 ? 2 * ap * ap : -1 + (4 - 2 * ap) * ap
+              atmoRef.current.style.opacity = String(1 - aEased)
+            }
 
             if (canvasRef.current) {
               const idx = Math.min(Math.round(rp * 191), 191)
@@ -373,16 +402,18 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               scrollPromptRef.current.style.opacity = String(Math.max(0, 1 - p * 60))
             }
 
-            // Story beats
-            const beatRefs = [beat0Ref, beat1Ref, beat2Ref]
+            // Story beats — atmo beats track ap, frames beats track rp
+            const beatRefs = [beat0Ref, beat1Ref, beat2Ref, beat3Ref]
             beatRefs.forEach((ref, i) => {
               if (!ref.current) return
-              if (rp >= REVEAL_START_P) {
+              const beat = STORY_BEATS[i]
+              if (beat.phase === 'frames' && rp >= REVEAL_START_P) {
                 ref.current.style.opacity = '0'
-              } else {
-                const dist = Math.abs(rp - STORY_BEATS[i].peak)
-                ref.current.style.opacity = String(Math.max(0, 1 - dist / STORY_BEATS[i].halfWidth))
+                return
               }
+              const ph = beat.phase === 'atmo' ? ap : rp
+              const dist = Math.abs(ph - beat.peak)
+              ref.current.style.opacity = String(Math.max(0, 1 - dist / beat.halfWidth))
             })
 
             if (rp >= REVEAL_START_P) {
@@ -543,9 +574,44 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }}
       />
 
-      {/* Story beats — appear during frame scroll phase */}
+      {/* L2.5 — Atmosphere: the southern world opens the hero, fades as frames begin.
+          Same z as the overlay but later in DOM so it sits above it; overlay is
+          transparent during the atmosphere phase anyway. */}
+      <div
+        ref={atmoRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 2,
+          opacity: 1,
+          pointerEvents: 'none',
+        }}
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster="/images/hero_atmosphere_poster.jpg"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        >
+          <source src="/videos/hero_atmosphere.mp4" type="video/mp4" />
+        </video>
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(180deg, rgba(8,6,4,0.3) 0%, rgba(8,6,4,0) 35%, rgba(8,6,4,0.65) 100%)',
+          }}
+        />
+      </div>
+
+      {/* Story beats — atmo beats during the atmosphere phase, frames beats during scroll */}
       {STORY_BEATS.map((beat, i) => {
-        const beatRef = [beat0Ref, beat1Ref, beat2Ref][i]
+        const beatRef = [beat0Ref, beat1Ref, beat2Ref, beat3Ref][i]
         return (
           <div
             key={i}
