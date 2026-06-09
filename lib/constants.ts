@@ -237,35 +237,111 @@ export const RECIPES: Recipe[] = [
 ]
 
 // ── OUR STORY ────────────────────────────────────────────────────────────
-// Founder narrative + interview verbatim from live /our-story (rolling out interview).
+// Brand story verbatim from client copy (Jun 2026). Editorial layout:
+// Garden & Gun / Ralph Lauren register — story interleaved with imagery slots.
+export type StoryImageSlot = {
+  id: string
+  src: string
+  videoSrc?: string
+  alt: string
+  aspect: '21:9' | '16:9' | '4:5'
+  caption?: string
+  placeholder: boolean
+}
+
+export type StoryBlock =
+  | { kind: 'paragraph'; text: string; dropCap?: boolean }
+  | { kind: 'pullquote'; text: string }
+  | { kind: 'image'; slotId: string }
+  | { kind: 'imagePair'; slotIds: [string, string] }
+  | { kind: 'textWithImage'; text: string; slotId: string; imageSide: 'left' | 'right' }
+
+export const STORY_IMAGES: StoryImageSlot[] = [
+  {
+    id: 'oaks',
+    src: '/images/story/story_01_oaks.jpg',
+    alt: 'Avenue of live oaks draped in Spanish moss at golden hour',
+    aspect: '21:9',
+    placeholder: true,
+  },
+  {
+    id: 'porch',
+    src: '/images/story/story_02_porch.jpg',
+    alt: 'Friends of all generations gathered on a porch at dusk under string lights',
+    aspect: '4:5',
+    placeholder: true,
+  },
+  {
+    id: 'streets',
+    src: '/images/story/story_03_streets.jpg',
+    alt: 'Charleston street at blue hour, gas lamps glowing against pastel facades',
+    aspect: '4:5',
+    placeholder: true,
+  },
+  {
+    id: 'table',
+    src: '/images/story/story_04_table.jpg',
+    alt: 'Hands raising glasses over a candlelit long table',
+    aspect: '4:5',
+    caption: 'Every event is connection.',
+    placeholder: true,
+  },
+  {
+    id: 'marsh',
+    src: '/images/story/story_05_marsh.jpg',
+    alt: 'Lowcountry marsh and sweetgrass at sunset',
+    aspect: '4:5',
+    caption: 'Rooted in the Lowcountry.',
+    placeholder: true,
+  },
+]
+
 export const STORY = {
   eyebrow: 'Our Story',
-  intro: 'A journey of passion, craftsmanship, and dedication to creating exceptional beverages.',
-  headline: 'Where It All Began',
-  founders: 'Ashley & Bertrina Scott',
-  foundersPhoto: '/images/founders_scott.jpg',
-  body:
-    'Ashley and Trina Scott are the founders of Southern Edge Beverage Company, a Black-owned liquor brand. Southern Edge is a brand that connects with Southern hospitality and is about creating experiences for all. Trina Scott spoke with rolling out about the company.',
-  interview: [
+  headline: 'A Sip of the South',
+  deck: 'Rooted in South Carolina. Built for the world.',
+  signOff: '— Southern Edge',
+  images: STORY_IMAGES,
+  blocks: [
     {
-      q: 'Tell us about Southern Edge Beverage',
-      a: "We've been working on trying to make some flavorful combinations that a lot of people like. We've spent a significant amount of time trying to get the right thing, listening to feedback from tons of people, sometimes good, sometimes bad, and going back to the lab numerous times. We have come up with the two drinks that are currently on the market, we have a sweet tea flavored vodka, as well as a salted caramel whiskey. I love both of these drinks, and the people who work with us love them too. Otherwise, they wouldn't be working for us. If you want a cool drink, either one of those will work well for you at any time.",
+      kind: 'paragraph',
+      dropCap: true,
+      text: "Our story begins in South Carolina. A place where every street, every sound, and every flavor carries history. From the Lowcountry's marshlands to Charleston's cobblestones, South Carolina has always been more than just a backdrop — it's been a cultural crossroads.",
+    },
+    { kind: 'image', slotId: 'oaks' },
+    {
+      kind: 'textWithImage',
+      slotId: 'porch',
+      imageSide: 'right',
+      text: "The dance floor where African, Caribbean, and European influences met and intertwined, assembling the beat to its own drum. It's where the Gullah Geechee community carried forward traditions of storytelling, soulful cooking, and hospitality that continue to shape the South today. And it's where music, art, and flavor have always been bold — layered with history, yet alive with possibility.",
+    },
+    { kind: 'pullquote', text: "We're in the culture business." },
+    {
+      kind: 'textWithImage',
+      slotId: 'streets',
+      imageSide: 'left',
+      text: "It's no coincidence our brand was born here. Because spirits, like South Carolina, are about depth. They're about honoring tradition while adding something fresh and unexpected. They're about bringing people together at the table, the way Southern hospitality has always done.",
     },
     {
-      q: 'How did the Sweet Tea Vodka come about?',
-      a: "No matter where we are, we're always going to represent the southeast. We lived in the Midwest for around 17 years, and all three of our children were born there. They are Midwesterners that have been transplanted back to the South, but we're Southerners at heart. You know you're not considered a Southerner until you sit down and drink some really good sweet tea. We wanted to have some adult drinks, so we put some vodka in it to add a little life to the party. There are a lot of recipes that come from the roots that we have in the South. How can we have Southern roots and we don't have a sweet tea? That's a necessity.",
+      kind: 'paragraph',
+      text: "We've taken familiar flavors to our distilling process, while pushing beyond the borders of common spirits. Our recipes are born at the edge of the imagination, delivering a rhythmic dance to the tastebuds while politely whispering nostalgic notes of what the south is about.",
+    },
+    { kind: 'imagePair', slotIds: ['table', 'marsh'] },
+    {
+      kind: 'paragraph',
+      text: "But this isn't just a story for South Carolina. This is a story for everyone who values culture, connection, and community. It's for the foodie who wants to taste the South while exploring flavors from across the globe. For the creative who believes art and music are as essential as air. And for every community that knows sharing a drink isn't just about what's in the glass — it's about who you share it with.",
     },
     {
-      q: 'What are three cocktail recipes that people can make with your liquor?',
-      a: 'My personal favorite right now is called "It Takes Tea to Mango," and it\'s our sweet tea-flavored vodka with mango nectar. The other one is a version of a John Daly which is vodka, iced tea, and lemonade, but we call it "Quiet on the Green," where we use sweet tea, vodka, and lemonade, preferably Simply Lemonade. My favorite Salted Caramel whiskey recipe is not a drink but a dessert. I make a salted caramel shake with Haagen Dazs Vanilla Bean ice cream and salted caramel whiskey. The salt enhances the sweet flavor of the caramel, so you don\'t need to add any sugar to it. You put that in a blender, and you\'ve got a boozy milkshake.',
+      kind: 'paragraph',
+      text: "That's why we say: Southern Edge isn't just in the spirits business — we're in the culture business. Every sip is history. Every event is connection. And every experience is an invitation to join a movement rooted in South Carolina, but built for the world.",
     },
-  ],
+  ] as StoryBlock[],
 }
 
 export const VALUES = [
   { title: 'Quality', body: 'We never compromise on quality. Every ingredient is carefully selected and every process meticulously monitored.' },
-  { title: 'Tradition', body: 'Our recipes honor Southern traditions while embracing modern techniques that enhance flavor and quality.' },
-  { title: 'Community', body: 'We believe in bringing people together through exceptional beverages and shared experiences.' },
+  { title: 'Heritage', body: 'Our recipes honor the traditions of the South — flavors layered with history, yet alive with possibility.' },
+  { title: 'Community', body: 'Hospitality is our craft. We bring people together around the table, the way the South always has.' },
 ]
 
 // ── FIND US (store locator) ──────────────────────────────────────────────
@@ -370,7 +446,7 @@ export const NAV_LINKS = [
 ]
 
 // Verbatim from ScrollRibbon.tsx ITEMS.
-export const RIBBON_ITEMS = ['TASTE THE EDGE', 'WORK HARD · DRINK SMOOTH', 'CRAFTED IN SC', 'FINE SPIRITS', '60 PROOF', 'GLUTEN FREE']
+export const RIBBON_ITEMS = ['TASTE THE EDGE', 'WORK HARD · DRINK SMOOTH', 'CRAFTED IN SC', 'SOUTHERN HOSPITALITY', '60 PROOF', 'GLUTEN FREE']
 
 // Verbatim from Community.tsx POSTS.
 export const POSTS = [
@@ -404,7 +480,7 @@ export const COPY = {
     'Join us at tastings, events, and everywhere Southern Edge pours.',
   legalName: 'The Southern Edge Beverage Company, LLC',
   footerTagline:
-    'Crafting exceptional beverages with passion and precision. Experience the perfect blend of tradition and innovation in every bottle.',
+    'Lowcountry soul in every bottle. Spirits made for the table, the porch, and the people you share them with.',
   legalFooter:
     '© 2026 The Southern Edge Beverage Company, LLC. All rights reserved.\nPlease drink responsibly. Must be 21+ to consume alcohol.',
   ageGateQuestion: 'Are you of legal drinking age?',
