@@ -262,21 +262,21 @@ export const STORY_IMAGES: StoryImageSlot[] = [
     src: '/images/story/story_01_oaks.jpg',
     alt: 'Avenue of live oaks draped in Spanish moss at golden hour',
     aspect: '21:9',
-    placeholder: true,
+    placeholder: false,
   },
   {
     id: 'porch',
     src: '/images/story/story_02_porch.jpg',
     alt: 'Friends of all generations gathered on a porch at dusk under string lights',
     aspect: '4:5',
-    placeholder: true,
+    placeholder: false,
   },
   {
     id: 'streets',
     src: '/images/story/story_03_streets.jpg',
     alt: 'Charleston street at blue hour, gas lamps glowing against pastel facades',
     aspect: '4:5',
-    placeholder: true,
+    placeholder: false,
   },
   {
     id: 'table',
@@ -284,7 +284,7 @@ export const STORY_IMAGES: StoryImageSlot[] = [
     alt: 'Hands raising glasses over a candlelit long table',
     aspect: '4:5',
     caption: 'Every event is connection.',
-    placeholder: true,
+    placeholder: false,
   },
   {
     id: 'marsh',
@@ -292,7 +292,7 @@ export const STORY_IMAGES: StoryImageSlot[] = [
     alt: 'Lowcountry marsh and sweetgrass at sunset',
     aspect: '4:5',
     caption: 'Rooted in the Lowcountry.',
-    placeholder: true,
+    placeholder: false,
   },
 ]
 
