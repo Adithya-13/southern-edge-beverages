@@ -34,7 +34,7 @@ export default function Navbar() {
           left: 0,
           right: 0,
           zIndex: 9999,
-          backgroundColor: 'rgba(0,0,0,0)',
+          background: 'linear-gradient(180deg, rgba(8,6,4,0.92) 0%, rgba(8,6,4,0.75) 60%, rgba(8,6,4,0) 100%)',
           transition: 'opacity 0.8s ease',
           opacity: visible ? 1 : 0,
           pointerEvents: visible ? 'auto' : 'none',
