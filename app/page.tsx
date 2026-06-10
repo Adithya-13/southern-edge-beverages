@@ -16,6 +16,8 @@ import Connect from '@/components/Connect'
 import Events from '@/components/Events'
 import Footer from '@/components/Footer'
 
+const SHOW_COMMUNITY = false
+
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
   const [ageVerified, setAgeVerified] = useState(false)
@@ -34,7 +36,7 @@ export default function Home() {
           <Cocktails />
           <FindUs />
           <Press />
-          <Community />
+          {SHOW_COMMUNITY && <Community />}
           <Connect />
           <Events />
           <Footer />
