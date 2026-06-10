@@ -59,7 +59,7 @@ function StoryMedia({ slotId, sizes }: { slotId: string; sizes: string }) {
         alt={slot.alt}
         fill
         sizes={sizes}
-        style={{ objectFit: 'cover' }}
+        style={{ objectFit: 'cover', objectPosition: slot.objectPosition ?? '50% 50%' }}
       />
     </div>
   )

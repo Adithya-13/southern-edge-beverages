@@ -245,6 +245,7 @@ export type StoryImageSlot = {
   videoSrc?: string
   alt: string
   aspect: '21:9' | '16:9' | '4:5'
+  objectPosition?: string
   caption?: string
   placeholder: boolean
 }
@@ -276,6 +277,7 @@ export const STORY_IMAGES: StoryImageSlot[] = [
     src: '/images/story/story_03_streets.jpg',
     alt: 'Couple sharing cocktails beside a cellist in a lantern-lit cobblestone plaza at dusk',
     aspect: '4:5',
+    objectPosition: '25% 50%',
     placeholder: false,
   },
   {
