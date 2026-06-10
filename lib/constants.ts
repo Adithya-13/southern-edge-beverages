@@ -356,6 +356,44 @@ export const FIND_US = {
   mapEmbed: 'https://www.google.com/maps/d/u/0/embed?mid=13W5baTb9iaJ6r1pg4eyQ4WenvFjeorg',
 }
 
+export type StoreLocation = {
+  name: string
+  addressLines: string[]
+}
+
+// Client-verified placements (Tashawne, Jun 2026). Georgia only so far.
+export const STORES: { state: string; locations: StoreLocation[] }[] = [
+  {
+    state: 'Georgia',
+    locations: [
+      {
+        name: 'Chamblee Package',
+        addressLines: ['2511 Chamblee Tucker Rd', 'Chamblee, GA 30341'],
+      },
+      {
+        name: "J's Beverage Depot",
+        addressLines: ['1570 Holcomb Bridge Rd, STE 610', 'Roswell, GA 30076'],
+      },
+      {
+        name: 'Marketplace Beverage',
+        addressLines: ['50 Marketplace Dr', 'Newnan, GA 30265'],
+      },
+      {
+        name: 'Prohibition Liquor and Wine',
+        addressLines: ['3150 Highlands Pkwy SE, Suite 202', 'Smyrna, GA 30082'],
+      },
+      {
+        name: 'Wilshire Liquor, Beer and Wine',
+        addressLines: ['1200 Hwy 74 S, Suite 8', 'Peachtree City, GA 30269'],
+      },
+      {
+        name: 'Wine & Liquor Emporium',
+        addressLines: ['7342 Stonecrest Concourse, Suite D', 'Stonecrest, GA 30038'],
+      },
+    ],
+  },
+]
+
 // ── PRESS (real featured articles) ───────────────────────────────────────
 export const PRESS_ARTICLES: PressArticle[] = [
   {

@@ -3,8 +3,15 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
-import { MapPin } from 'lucide-react'
-import { FIND_US } from '@/lib/constants'
+import { MapPin, ArrowUpRight } from 'lucide-react'
+import { FIND_US, STORES, type StoreLocation } from '@/lib/constants'
+
+const SHOW_MAP = false
+
+function mapsUrl(store: StoreLocation) {
+  const query = encodeURIComponent(`${store.name} ${store.addressLines.join(' ')}`)
+  return `https://www.google.com/maps/search/?api=1&query=${query}`
+}
 
 export default function FindUs() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -38,6 +45,26 @@ export default function FindUs() {
           },
         }
       )
+
+      const storeCards = gsap.utils.toArray<HTMLElement>('.store-card')
+      if (storeCards.length) {
+        gsap.fromTo(
+          storeCards,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: '.store-grid',
+              start: 'top 80%',
+              once: true,
+            },
+          }
+        )
+      }
 
       // NOTE: the map is intentionally NOT animated. A Google My Maps embed that
       // initializes while its container is opacity:0 / transformed (mid scroll-reveal)
@@ -175,30 +202,109 @@ export default function FindUs() {
           </p>
         </div>
 
-        {/* Map */}
-        <div
-          ref={mapRef}
-          style={{
-            maxWidth: 1000,
-            margin: '0 auto',
-            borderRadius: 12,
-            overflow: 'hidden',
-            border: '1px solid var(--smoke)',
-            boxShadow:
-              '0 0 0 1px rgba(212,120,26,0.08), 0 30px 80px -40px rgba(212,120,26,0.4), 0 20px 60px -30px rgba(8,6,4,0.9)',
-            background: 'var(--bg-surface)',
-          }}
-        >
-          <iframe
-            src={FIND_US.mapEmbed}
-            title="Where to purchase Southern Edge"
-            width="100%"
-            height={480}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            style={{ border: 0, display: 'block' }}
-          />
+        {/* Store list (client-verified placements) */}
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          {STORES.map((group) => (
+            <div key={group.state}>
+              <h3
+                style={{
+                  fontFamily: 'var(--font-accent)',
+                  fontWeight: 400,
+                  fontStyle: 'italic',
+                  fontSize: 'var(--fs-h3)',
+                  color: 'var(--cream)',
+                  textAlign: 'center',
+                  margin: '0 0 clamp(28px,3.5vw,40px)',
+                }}
+              >
+                {group.state}
+              </h3>
+              <div className="store-grid">
+                {group.locations.map((store) => (
+                  <a
+                    key={store.name}
+                    href={mapsUrl(store)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="store-card"
+                    aria-label={`Open ${store.name} in Google Maps`}
+                  >
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-accent)',
+                        fontWeight: 500,
+                        fontSize: '1.05rem',
+                        lineHeight: 1.35,
+                        color: 'var(--cream)',
+                        margin: 0,
+                      }}
+                    >
+                      {store.name}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontWeight: 400,
+                        fontSize: 14,
+                        lineHeight: 1.55,
+                        color: 'rgba(240,228,204,0.66)',
+                        margin: 0,
+                      }}
+                    >
+                      {store.addressLines.map((line) => (
+                        <span key={line} style={{ display: 'block' }}>
+                          {line}
+                        </span>
+                      ))}
+                    </p>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontFamily: 'var(--font-body)',
+                        fontWeight: 500,
+                        fontSize: 13,
+                        letterSpacing: 'var(--track-data)',
+                        color: 'var(--amber)',
+                        marginTop: 'auto',
+                      }}
+                    >
+                      Get Directions
+                      <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
+
+        {SHOW_MAP && (
+          <div
+            ref={mapRef}
+            style={{
+              maxWidth: 1000,
+              margin: 'clamp(40px,5vw,56px) auto 0',
+              borderRadius: 12,
+              overflow: 'hidden',
+              border: '1px solid var(--smoke)',
+              boxShadow:
+                '0 0 0 1px rgba(212,120,26,0.08), 0 30px 80px -40px rgba(212,120,26,0.4), 0 20px 60px -30px rgba(8,6,4,0.9)',
+              background: 'var(--bg-surface)',
+            }}
+          >
+            <iframe
+              src={FIND_US.mapEmbed}
+              title="Where to purchase Southern Edge"
+              width="100%"
+              height={480}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              style={{ border: 0, display: 'block' }}
+            />
+          </div>
+        )}
       </div>
 
       <style>{`
@@ -207,6 +313,41 @@ export default function FindUs() {
             flex-direction: column;
             align-items: center;
           }
+        }
+        .store-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: clamp(16px, 2vw, 24px);
+          align-items: stretch;
+        }
+        @media (max-width: 1023px) and (min-width: 640px) {
+          .store-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 639px) {
+          .store-grid {
+            grid-template-columns: 1fr;
+            max-width: 420px;
+            margin: 0 auto;
+          }
+        }
+        .store-card {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          padding: 24px 24px 22px;
+          background: var(--bg-surface);
+          border: 1px solid var(--smoke);
+          border-radius: 12px;
+          text-decoration: none;
+          transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+          will-change: transform;
+        }
+        .store-card:hover {
+          transform: translateY(-5px);
+          border-color: rgba(212,120,26,0.55);
+          box-shadow: 0 16px 36px rgba(8,6,4,0.5), 0 0 0 1px rgba(212,120,26,0.25);
         }
       `}</style>
     </section>
