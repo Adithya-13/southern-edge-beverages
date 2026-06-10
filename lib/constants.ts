@@ -274,14 +274,14 @@ export const STORY_IMAGES: StoryImageSlot[] = [
   {
     id: 'streets',
     src: '/images/story/story_03_streets.jpg',
-    alt: 'Charleston street at blue hour, gas lamps glowing against pastel facades',
+    alt: 'Couple sharing cocktails beside a cellist in a lantern-lit cobblestone plaza at dusk',
     aspect: '4:5',
     placeholder: false,
   },
   {
     id: 'table',
     src: '/images/story/story_04_table.jpg',
-    alt: 'Hands raising glasses over a candlelit long table',
+    alt: 'Friends laughing and raising whiskey glasses together on a rooftop at dusk',
     aspect: '4:5',
     caption: 'Every event is connection.',
     placeholder: false,
