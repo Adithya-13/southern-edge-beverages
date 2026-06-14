@@ -787,7 +787,20 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           pointerEvents: 'none',
         }}
       >
-        <div key={productIndex} className="hero-prod-label">
+        <div
+          key={productIndex}
+          className="hero-prod-label"
+          style={{
+            display: 'inline-block',
+            padding: '14px 32px 16px',
+            borderRadius: 16,
+            background: 'rgba(12, 9, 6, 0.5)',
+            backdropFilter: 'blur(14px) saturate(120%)',
+            WebkitBackdropFilter: 'blur(14px) saturate(120%)',
+            border: '1px solid rgba(240, 228, 204, 0.12)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+          }}
+        >
           <span
             style={{
               display: 'block',
