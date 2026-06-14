@@ -742,7 +742,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           style={{
             position: 'absolute',
             left: 'clamp(20px, 6vw, 88px)',
-            bottom: 'clamp(64px, 12vh, 128px)',
+            bottom: 'clamp(24px, 5vh, 56px)',
             textAlign: 'left',
             maxWidth: '92vw',
           }}
@@ -750,7 +750,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           <div
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(60px, 10vw, 150px)',
+              fontSize: 'clamp(40px, 6vw, 92px)',
               color: 'var(--cream)',
               lineHeight: 1.0,
               letterSpacing: '-0.01em',
@@ -762,7 +762,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
             style={{
               fontFamily: 'var(--font-accent)',
               fontStyle: 'italic',
-              fontSize: 'clamp(32px, 5.5vw, 82px)',
+              fontSize: 'clamp(24px, 4vw, 54px)',
               color: 'var(--amber)',
               lineHeight: 1.05,
               marginTop: 6,
