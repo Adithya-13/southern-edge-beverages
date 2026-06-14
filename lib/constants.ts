@@ -390,6 +390,22 @@ export const STORES: { state: string; locations: StoreLocation[] }[] = [
         name: 'Wine & Liquor Emporium',
         addressLines: ['7342 Stonecrest Concourse, Suite D', 'Stonecrest, GA 30038'],
       },
+      {
+        name: 'Sweetwater Package Store',
+        addressLines: ['3900 Peachtree Industrial Blvd', 'Duluth, GA 30096'],
+      },
+      {
+        name: 'Panhandle Package Liquors',
+        addressLines: ['1681 Flicker Rd', 'Jonesboro, GA 30236'],
+      },
+      {
+        name: 'Crooks',
+        addressLines: ['7790 Wells Street', 'Senoia, GA 30276'],
+      },
+      {
+        name: "Brandon's Package Store",
+        addressLines: ['965 Glynn St N', 'Fayetteville, GA 30214'],
+      },
     ],
   },
 ]
