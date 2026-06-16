@@ -204,8 +204,8 @@ export default function FindUs() {
 
         {/* Store list (client-verified placements) */}
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          {STORES.map((group) => (
-            <div key={group.state}>
+          {STORES.map((group, i) => (
+            <div key={group.state} style={{ marginTop: i === 0 ? 0 : 'clamp(56px,7vw,84px)' }}>
               <h3
                 style={{
                   fontFamily: 'var(--font-accent)',

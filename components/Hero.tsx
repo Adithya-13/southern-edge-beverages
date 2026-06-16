@@ -72,9 +72,11 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   onRevealedRef.current = onRevealed
   const videoRef = useRef<HTMLVideoElement | null>(null)
   // Lazy video load: the bg video (~2MB) only appears late in the reveal, so it is
-  // not loaded at page load (preload="none", no autoPlay). Fetched once the scrub
-  // approaches the reveal so it's buffered by the time it fades in.
+  // not loaded at page load (preload="none", no autoPlay). Buffering is kicked the
+  // moment the frame phase begins so it's ready well before it fades in, and the
+  // fade itself is gated on canplay so it never pops in mid-download.
   const videoStartedRef = useRef(false)
+  const videoReadyRef = useRef(false)
   // Outer wrapper: centering (transform: translate(-50%,-50%))
   const bottleOuterRef = useRef<HTMLDivElement | null>(null)
   // Inner wrapper: mouse parallax target (GSAP x/y — no centering conflict)
@@ -146,12 +148,20 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         else first.addEventListener('load', () => drawFrame(0), { once: true })
       }
 
-      // Kick the (preload="none") bg video once, as the scrub nears the reveal.
+      // Kick the (preload="none") bg video once. Fired as soon as the frame phase
+      // begins so ~2MB has the whole frame-scroll to buffer. Marks ready on canplay
+      // so the reveal fade is gated on real readiness, never a black pop-in.
       const startVideo = () => {
         if (videoStartedRef.current) return
         const v = videoRef.current
         if (!v) return
         videoStartedRef.current = true
+        const markReady = () => { videoReadyRef.current = true }
+        if (v.readyState >= 3) markReady()
+        else {
+          v.addEventListener('canplay', markReady, { once: true })
+          v.addEventListener('canplaythrough', markReady, { once: true })
+        }
         try {
           v.load()
           const pr = v.play()
@@ -226,8 +236,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               warmDecodeWindow(idx)
             }
 
-            // Lazy-load the bg video as the scrub approaches the reveal
-            if (rp > 0.45) startVideo()
+            // Buffer the bg video as soon as the frame phase begins so it's ready
+            // long before the reveal fades it in.
+            if (rp > 0.02) startVideo()
 
             // Scroll prompt fades out immediately
             if (scrollPromptRef.current) {
@@ -261,7 +272,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               const sr = Math.max(0, (phase - 0.6) / 0.4)
               const settle = sr < 0.5 ? 2 * sr * sr : -1 + (4 - 2 * sr) * sr
               if (canvasRef.current) canvasRef.current.style.opacity = String(1 - fade)
-              if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
+              if (videoRef.current) videoRef.current.style.opacity = String(videoReadyRef.current ? eased * 0.75 : 0)
               if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
               if (bottleOuterRef.current) {
                 bottleOuterRef.current.style.opacity = String(fade)
@@ -395,8 +406,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               warmDecodeWindow(idx)
             }
 
-            // Lazy-load the bg video as the scrub approaches the reveal
-            if (rp > 0.45) startVideo()
+            // Buffer the bg video as soon as the frame phase begins so it's ready
+            // long before the reveal fades it in.
+            if (rp > 0.02) startVideo()
 
             if (scrollPromptRef.current) {
               scrollPromptRef.current.style.opacity = String(Math.max(0, 1 - p * 60))
@@ -424,7 +436,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               const sr = Math.max(0, (phase - 0.6) / 0.4)
               const settle = sr < 0.5 ? 2 * sr * sr : -1 + (4 - 2 * sr) * sr
               if (canvasRef.current) canvasRef.current.style.opacity = String(1 - fade)
-              if (videoRef.current) videoRef.current.style.opacity = String(eased * 0.75)
+              if (videoRef.current) videoRef.current.style.opacity = String(videoReadyRef.current ? eased * 0.75 : 0)
               if (overlayRef.current) overlayRef.current.style.opacity = String(eased)
               if (bottleOuterRef.current) {
                 bottleOuterRef.current.style.opacity = String(fade)
@@ -535,6 +547,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           height: '100%',
           objectFit: 'cover',
           opacity: 0,
+          transition: 'opacity 0.3s linear',
           zIndex: 0,
         }}
       >
