@@ -17,6 +17,7 @@ import Events from '@/components/Events'
 import Footer from '@/components/Footer'
 
 const SHOW_COMMUNITY = false
+const SHOW_PRESS = false
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false)
@@ -35,7 +36,7 @@ export default function Home() {
           <ThePour />
           <Cocktails />
           <FindUs />
-          <Press />
+          {SHOW_PRESS && <Press />}
           {SHOW_COMMUNITY && <Community />}
           <Connect />
           <Events />

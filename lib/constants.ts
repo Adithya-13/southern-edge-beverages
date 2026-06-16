@@ -361,8 +361,153 @@ export type StoreLocation = {
   addressLines: string[]
 }
 
-// Client-verified placements (Tashawne, Jun 2026). Georgia only so far.
+// Client-verified placements (Tashawne / Charles, Jun 2026). South Carolina + Georgia.
 export const STORES: { state: string; locations: StoreLocation[] }[] = [
+  {
+    state: 'South Carolina',
+    locations: [
+      {
+        name: 'JK’s Liquor Store ABC',
+        addressLines: ['2742 E Cherokee St', 'Blacksburg, SC 29702'],
+      },
+      {
+        name: 'A to Z Liquor',
+        addressLines: ['153 Walton Dr, Ste 3', 'Gaffney, SC 29341'],
+      },
+      {
+        name: 'Lake Bowen Liquor',
+        addressLines: ['2870 Highway 292, Ste 1', 'Inman, SC 29349'],
+      },
+      {
+        name: 'Lucky ABC Party Shop',
+        addressLines: ['61A S Main St', 'Inman, SC 29369'],
+      },
+      {
+        name: 'Royal Liquors',
+        addressLines: ['11721 Asheville Hwy, Ste 1', 'Inman, SC 29349'],
+      },
+      {
+        name: 'S & J Liquor and Wine',
+        addressLines: ['9098-A Asheville Hwy', 'Boiling Springs, SC 29316'],
+      },
+      {
+        name: 'Westgate Wine & Spirits',
+        addressLines: ['1415 WO Ezell Blvd, Unit A', 'Spartanburg, SC 29301'],
+      },
+      {
+        name: 'Amar 101 Liquor',
+        addressLines: ['1985 Highway 101 S', 'Greer, SC 29651'],
+      },
+      {
+        name: 'Liquor Pointe 2',
+        addressLines: ['5844 Redville Rd, Ste B', 'Moore, SC 29369'],
+      },
+      {
+        name: 'Roebuck ABC & Corner Mart',
+        addressLines: ['4019 S Church St EXT', 'Roebuck, SC 29376'],
+      },
+      {
+        name: 'Noble Liquor',
+        addressLines: ['1625 Holly Springs Rd', 'Lyman, SC 29365'],
+      },
+      {
+        name: 'R & M Liquor',
+        addressLines: ['120 Goodjoin Rd', 'Lyman, SC 29365'],
+      },
+      {
+        name: 'O’Darby’s',
+        addressLines: ['127 Fairwinds Dr', 'Landrum, SC 29356'],
+      },
+      {
+        name: 'Jakob Food Mart Liquor',
+        addressLines: ['927 North Main St, B', 'Clover, SC 29710'],
+      },
+      {
+        name: 'Klee’s ABC Package and Party',
+        addressLines: ['703 N Main St, Ste A', 'Clover, SC 29710'],
+      },
+      {
+        name: 'Klee’s Spirit Shoppe',
+        addressLines: ['1087 Filbert Hwy', 'York, SC 29745'],
+      },
+      {
+        name: 'Pride Liquor Store',
+        addressLines: ['328 S Congress St, Ste B'],
+      },
+      {
+        name: 'Lake Wylie Liquor',
+        addressLines: ['5081 Charlotte Hwy', 'Clover, SC 29710'],
+      },
+      {
+        name: 'Liquor @ the Lake',
+        addressLines: ['4034 Charlotte Hwy, Unit 104', 'Lake Wylie, SC 29710'],
+      },
+      {
+        name: 'Rock Hill Crossing ABC',
+        addressLines: ['4811 Old York Rd', 'Rock Hill, SC 29732'],
+      },
+      {
+        name: 'O’Darby’s Heckle',
+        addressLines: ['1740 Heckle Blvd', 'Rock Hill, SC 29730'],
+      },
+      {
+        name: 'O’Darby’s Dave Lyle',
+        addressLines: ['2350 Dave Lyle Blvd', 'Rock Hill, SC 29730'],
+      },
+      {
+        name: 'O’Darby’s Riverchase',
+        addressLines: ['1421 Riverchase Blvd', 'Rock Hill, SC 29732'],
+      },
+      {
+        name: 'Albright ABC',
+        addressLines: ['1377 E Main St', 'Rock Hill, SC 29730'],
+      },
+      {
+        name: 'Discount Liquor',
+        addressLines: ['400 N Dobys Bridge Rd, Unit 103', 'Fort Mill, SC 29715'],
+      },
+      {
+        name: 'FairWay ABC',
+        addressLines: ['1290 Tom Hall St', 'Fort Mill, SC 29715'],
+      },
+      {
+        name: 'Clary’s Liquor Shop',
+        addressLines: ['3160 US-21, Ste 104', 'Fort Mill, SC 29715'],
+      },
+      {
+        name: 'Stateline Beverages',
+        addressLines: ['3670 Highway 51', 'Fort Mill, SC 29715'],
+      },
+      {
+        name: 'Stateline Elite',
+        addressLines: ['9804 B Charlotte Hwy', 'Fort Mill, SC 29707'],
+      },
+      {
+        name: 'Lazy Day Liquors',
+        addressLines: ['833 Stockbridge Dr', 'Fort Mill, SC 29708'],
+      },
+      {
+        name: 'Churchill’s Liquor & Wine',
+        addressLines: ['1826 SC-160, Unit 102', 'Fort Mill, SC 29708'],
+      },
+      {
+        name: 'Gold Hill Discount Spirit',
+        addressLines: ['940 Gold Hill Rd', 'Fort Mill, SC 29708'],
+      },
+      {
+        name: 'Carolina Wine & Spirits',
+        addressLines: ['6277 Carolina Commons Dr, Ste 1000', 'Fort Mill, SC 29707'],
+      },
+      {
+        name: 'Winnsboro Package Store',
+        addressLines: ['318 S Congress St', 'Winnsboro, SC 29180'],
+      },
+      {
+        name: 'Country Mart Liquor',
+        addressLines: ['16683 US-21', 'Great Falls, SC 29055'],
+      },
+    ],
+  },
   {
     state: 'Georgia',
     locations: [

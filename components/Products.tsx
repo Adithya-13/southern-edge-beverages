@@ -7,6 +7,54 @@ import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useGSAP } from '@gsap/react'
 import { PRODUCTS } from '@/lib/constants'
 
+function AwardBadge({ award }: { award: string }) {
+  const [medal, source, score] = award.split('—').map((s) => s.trim())
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 14,
+        padding: '12px 20px',
+        borderRadius: 12,
+        background:
+          'linear-gradient(135deg, rgba(212,160,60,0.20) 0%, rgba(212,160,60,0.05) 100%)',
+        border: '1px solid rgba(212,160,60,0.5)',
+        boxShadow: '0 8px 26px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(212,160,60,0.08)',
+      }}
+    >
+      <Award size={30} strokeWidth={1.5} style={{ color: 'var(--gold)', flexShrink: 0 }} aria-hidden />
+      <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <span
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 20,
+            lineHeight: 1,
+            color: 'var(--gold)',
+          }}
+        >
+          {medal}
+          {score ? ` · ${score}` : ''}
+        </span>
+        {source && (
+          <span
+            style={{
+              fontFamily: 'var(--font-dm-sans)',
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'rgba(240,228,204,0.6)',
+            }}
+          >
+            {source}
+          </span>
+        )}
+      </span>
+    </div>
+  )
+}
+
 export default function Products() {
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -266,29 +314,14 @@ export default function Products() {
               <div
                 style={{
                   marginTop: 'auto',
-                  paddingTop: product.award ? 20 : 0,
+                  paddingTop: product.award ? 24 : 0,
                   borderTop: product.award ? '1px solid var(--smoke)' : 'none',
                   minHeight: 22,
                   display: 'flex',
                   alignItems: 'center',
                 }}
               >
-                {product.award && (
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      fontFamily: 'var(--font-dm-sans)',
-                      fontSize: 11,
-                      letterSpacing: '0.04em',
-                      color: 'var(--gold)',
-                    }}
-                  >
-                    <Award size={14} strokeWidth={1.6} aria-hidden />
-                    {product.award}
-                  </span>
-                )}
+                {product.award && <AwardBadge award={product.award} />}
               </div>
             </article>
           ))}
