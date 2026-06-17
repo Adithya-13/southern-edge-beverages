@@ -597,6 +597,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           inset: 0,
           zIndex: 2,
           opacity: 1,
+          background: '#080604',
           pointerEvents: 'none',
         }}
       >
@@ -607,7 +608,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           playsInline
           preload="auto"
           poster="/images/hero_atmosphere_poster.jpg"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', background: '#080604' }}
         >
           <source src="/videos/hero_atmosphere.mp4" type="video/mp4" />
         </video>
