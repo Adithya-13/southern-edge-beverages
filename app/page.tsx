@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Preloader from '@/components/Preloader'
 import AgeGate from '@/components/AgeGate'
 import Hero from '@/components/Hero'
+import BottleReveal from '@/components/BottleReveal'
 import Products from '@/components/Products'
 import ScrollRibbon from '@/components/ScrollRibbon'
 import OurStory from '@/components/OurStory'
@@ -30,6 +31,7 @@ export default function Home() {
       {ageVerified && (
         <main>
           <Hero isVisible={ageVerified} />
+          <BottleReveal />
           <Products />
           <ScrollRibbon />
           <OurStory />
