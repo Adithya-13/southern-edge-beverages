@@ -64,6 +64,95 @@ const STORY_BEATS: StoryBeat[] = [
   { phase: 'atmo',   peak: 0.60, halfWidth: 0.25, lines: ['SOUTHERN HOSPITALITY,', 'BOTTLED'], align: 'left', xStyle: { left: '8vw', right: 'auto', textAlign: 'left' } },
 ]
 
+function parseAward(award: string) {
+  const parts = award.split('—').map((s) => s.trim()).filter(Boolean)
+  const medal = (parts[0] || '').replace(/medal/i, '').trim()
+  const points = (parts[parts.length - 1] || '').replace(/[^0-9]/g, '')
+  const middle = parts.slice(1, -1).join(' — ')
+  const year = (middle.match(/\b(?:19|20)\d{2}\b/) || [''])[0]
+  const competition = (year ? middle.replace(year, '') : middle).trim()
+  return { medal, points, competition, year }
+}
+
+const MEDAL_PALETTES: Record<string, { from: string; to: string }> = {
+  gold: { from: '#F6D27A', to: '#B8860B' },
+  silver: { from: '#EFF1F5', to: '#9AA0AB' },
+  bronze: { from: '#E2A977', to: '#9C5A2C' },
+}
+function medalPalette(medal: string) {
+  const k = medal.toLowerCase()
+  if (k.includes('gold')) return MEDAL_PALETTES.gold
+  if (k.includes('bronze')) return MEDAL_PALETTES.bronze
+  return MEDAL_PALETTES.silver
+}
+
+// One laurel branch (bottom→top arc of leaves); mirrored for the other side.
+function laurelBranch(side: 'left' | 'right', from: string, to: string) {
+  const cx = 100
+  const cy = 112
+  const R = 78
+  const N = 8
+  const start = side === 'left' ? 96 : 84
+  const end = side === 'left' ? 232 : -52
+  const leaves = []
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1)
+    const deg = start + (end - start) * t
+    const a = (deg * Math.PI) / 180
+    const x = cx + R * Math.cos(a)
+    const y = cy + R * Math.sin(a)
+    const rot = deg + 90
+    const scale = 1.0 - 0.42 * t
+    leaves.push(
+      <ellipse
+        key={`${side}-${i}`}
+        cx="0"
+        cy="-9"
+        rx="4.2"
+        ry="9.5"
+        transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${scale.toFixed(2)})`}
+      />,
+    )
+  }
+  return leaves
+}
+
+function AwardSeal({ award }: { award: string }) {
+  const { medal, points, competition, year } = parseAward(award)
+  const pal = medalPalette(medal)
+  const gradId = `laurel-${medal.toLowerCase() || 'award'}`
+  const metalText = {
+    backgroundImage: `linear-gradient(145deg, ${pal.from}, ${pal.to})`,
+    WebkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    color: 'transparent',
+  } as React.CSSProperties
+  return (
+    <div className="award-emblem">
+      <svg className="award-laurel" viewBox="0 0 200 210" aria-hidden>
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={pal.from} />
+            <stop offset="55%" stopColor={pal.to} />
+            <stop offset="100%" stopColor={pal.from} />
+          </linearGradient>
+        </defs>
+        <g fill={`url(#${gradId})`}>
+          {laurelBranch('left', pal.from, pal.to)}
+          {laurelBranch('right', pal.from, pal.to)}
+        </g>
+      </svg>
+      <div className="award-emblem-text">
+        <span className="award-emblem-medal" style={metalText}>{medal || 'Award'} Medal</span>
+        {points && <span className="award-emblem-points">{points}</span>}
+        {points && <span className="award-emblem-pts">Points</span>}
+        {competition && <span className="award-emblem-comp">{competition}</span>}
+        {year && <span className="award-emblem-year" style={metalText}>{year}</span>}
+      </div>
+    </div>
+  )
+}
+
 export default function Hero({ isVisible, onRevealed }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -100,8 +189,15 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
   // Product auto-cycle (only while the reveal is fully complete / dwelling).
   const [productIndex, setProductIndex] = useState(DEFAULT_PRODUCT)
+  // Manual bottle selection pauses the auto-cycle until the reveal resets.
+  const [paused, setPaused] = useState(false)
   const [atRest, setAtRest] = useState(false)
   const product = PRODUCTS[productIndex]
+
+  const selectProduct = (i: number) => {
+    setProductIndex(i)
+    setPaused(true)
+  }
 
   useGSAP(
     () => {
@@ -514,13 +610,15 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!atRest || reduced) {
       setProductIndex(DEFAULT_PRODUCT)
+      setPaused(false)
       return
     }
+    if (paused) return
     const id = setInterval(() => {
       setProductIndex((i) => (i + 1) % PRODUCTS.length)
     }, 5000)
     return () => clearInterval(id)
-  }, [atRest])
+  }, [atRest, paused])
 
   return (
     <section
@@ -753,96 +851,96 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         {/* Brand label removed — navbar wordmark covers this role post-reveal (was doubling) */}
 
         <div
+          className="hero-info"
           style={{
             position: 'absolute',
             left: 'clamp(20px, 6vw, 88px)',
             bottom: 'clamp(24px, 5vh, 56px)',
             textAlign: 'left',
-            maxWidth: '92vw',
+            maxWidth: 'min(540px, 92vw)',
           }}
         >
-          <div
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(40px, 6vw, 92px)',
-              color: 'var(--cream)',
-              lineHeight: 1.0,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Work Hard.
+          <div key={productIndex} className="hero-info-swap">
+            <span className="hero-eyebrow">{product.type}</span>
+            <h2 className="hero-name">{product.spiritShort}</h2>
+            <div
+              className="hero-taste"
+              style={{
+                fontFamily: 'var(--font-accent)',
+                fontStyle: 'italic',
+                color: 'var(--amber)',
+                lineHeight: 1.12,
+                margin: '10px 0 0',
+                textShadow: '0 2px 20px rgba(0,0,0,0.6)',
+              }}
+            >
+              {product.taste}
+            </div>
+            <p
+              className="hero-notes"
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 400,
+                lineHeight: 1.55,
+                color: 'rgba(240,228,204,0.85)',
+                margin: '12px 0 0',
+                textShadow: '0 2px 16px rgba(0,0,0,0.7)',
+              }}
+            >
+              {product.officialNotes}
+            </p>
           </div>
+
+          {/* Bottle selector — manual switch, interactive during the dwell */}
           <div
+            className="hero-selector"
             style={{
-              fontFamily: 'var(--font-accent)',
-              fontStyle: 'italic',
-              fontSize: 'clamp(24px, 4vw, 54px)',
-              color: 'var(--amber)',
-              lineHeight: 1.05,
-              marginTop: 6,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 10,
+              marginTop: 'clamp(18px, 2.5vw, 28px)',
+              opacity: atRest ? 1 : 0,
+              pointerEvents: atRest ? 'auto' : 'none',
+              transition: 'opacity 0.5s ease',
             }}
           >
-            Drink Smooth.
+            {PRODUCTS.map((p, i) => {
+              const active = i === productIndex
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => selectProduct(i)}
+                  aria-pressed={active}
+                  className="hero-selector-pill"
+                  style={{
+                    borderColor: active ? p.accentColor : 'rgba(240,228,204,0.22)',
+                    color: active ? 'var(--cream)' : 'rgba(240,228,204,0.6)',
+                    background: active ? `${p.accentColor}26` : 'rgba(12,9,6,0.45)',
+                  }}
+                >
+                  {p.spiritShort}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {/* Product name — fades in only during the dwell auto-cycle */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '15%',
-          left: 0,
-          right: 0,
-          textAlign: 'center',
-          zIndex: 6,
-          opacity: atRest ? 1 : 0,
-          transition: 'opacity 0.6s ease',
-          pointerEvents: 'none',
-        }}
-      >
+      {/* Award seal — highlighted medallion on the open right side, dwell only */}
+      {product.award && (
         <div
-          key={productIndex}
-          className="hero-prod-label"
+          className="award-seal"
+          aria-label={product.award}
           style={{
-            display: 'inline-block',
-            padding: '14px 32px 16px',
-            borderRadius: 16,
-            background: 'rgba(12, 9, 6, 0.5)',
-            backdropFilter: 'blur(14px) saturate(120%)',
-            WebkitBackdropFilter: 'blur(14px) saturate(120%)',
-            border: '1px solid rgba(240, 228, 204, 0.12)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+            opacity: atRest ? 1 : 0,
+            transition: 'opacity 0.6s ease',
+            pointerEvents: 'none',
           }}
         >
-          <span
-            style={{
-              display: 'block',
-              fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.24em',
-              textTransform: 'uppercase',
-              color: 'var(--amber)',
-              marginBottom: 10,
-            }}
-          >
-            {product.type}
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(22px, 3vw, 38px)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.01em',
-              color: 'var(--cream)',
-            }}
-          >
-            {product.spiritShort}
-          </span>
+          <AwardSeal key={productIndex} award={product.award} />
         </div>
-      </div>
+      )}
 
       {/* L7 — Scroll prompt */}
       <div
@@ -918,6 +1016,144 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        .hero-info-swap { animation: heroInfoIn 0.5s ease; }
+        @keyframes heroInfoIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-eyebrow {
+          display: block;
+          font-family: var(--font-body);
+          font-weight: 500;
+          font-size: 11px;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          color: var(--amber);
+          margin-bottom: 10px;
+        }
+        .hero-name {
+          margin: 0;
+          font-family: var(--font-display);
+          font-weight: 400;
+          font-size: clamp(30px, 4.4vw, 60px);
+          line-height: 1.0;
+          letter-spacing: -0.01em;
+          color: var(--cream);
+          text-shadow: 0 2px 24px rgba(0,0,0,0.65);
+        }
+        .hero-taste { font-size: clamp(20px, 2.6vw, 34px); }
+        .hero-notes { font-size: clamp(14px, 1.5vw, 18px); }
+        @media (max-width: 768px) {
+          .hero-info { max-width: 78vw; bottom: clamp(20px, 4vh, 40px); }
+          .hero-eyebrow { font-size: 10px; margin-bottom: 7px; }
+          .hero-name { font-size: 22px; }
+          .hero-taste { font-size: 15px; margin-top: 7px; }
+          .hero-notes { font-size: 12px; line-height: 1.45; margin-top: 8px; }
+          .hero-selector { margin-top: 14px; gap: 7px; }
+          .hero-selector-pill { font-size: 11px; padding: 7px 12px; }
+          .hero-bottle-img { max-height: 50vh !important; }
+        }
+        .award-seal {
+          position: absolute;
+          right: clamp(20px, 6vw, 96px);
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 6;
+        }
+        .award-emblem {
+          position: relative;
+          width: 208px;
+          height: 218px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: heroInfoIn 0.55s ease;
+          filter: drop-shadow(0 12px 30px rgba(0,0,0,0.5));
+        }
+        .award-laurel {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .award-emblem-text {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          width: 124px;
+        }
+        .award-emblem-text::before {
+          content: '';
+          position: absolute;
+          inset: -26px -18px;
+          background: radial-gradient(ellipse at center, rgba(8,6,4,0.72) 35%, rgba(8,6,4,0) 72%);
+          z-index: -1;
+        }
+        .award-emblem-medal {
+          font-family: var(--font-body);
+          font-weight: 600;
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+        }
+        .award-emblem-points {
+          font-family: var(--font-display);
+          font-weight: 400;
+          font-size: 54px;
+          line-height: 0.95;
+          color: var(--cream);
+          margin-top: 4px;
+        }
+        .award-emblem-pts {
+          font-family: var(--font-body);
+          font-weight: 500;
+          font-size: 9px;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          color: rgba(240,228,204,0.55);
+          margin-top: 1px;
+        }
+        .award-emblem-comp {
+          font-family: var(--font-body);
+          font-weight: 400;
+          font-size: 10.5px;
+          line-height: 1.3;
+          letter-spacing: 0.03em;
+          color: rgba(240,228,204,0.72);
+          margin-top: 9px;
+          max-width: 118px;
+        }
+        .award-emblem-year {
+          font-family: var(--font-body);
+          font-weight: 600;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          margin-top: 3px;
+        }
+        @media (max-width: 768px) {
+          .award-seal {
+            right: 8px;
+            top: clamp(70px, 11vh, 104px);
+            transform: scale(0.6);
+            transform-origin: top right;
+          }
+        }
+        .hero-selector-pill {
+          font-family: var(--font-body);
+          font-weight: 500;
+          font-size: 13px;
+          letter-spacing: 0.04em;
+          padding: 9px 16px;
+          border-radius: 999px;
+          border: 1px solid;
+          cursor: pointer;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+        }
+        .hero-selector-pill:hover { transform: translateY(-2px); color: var(--cream); }
         @media (prefers-reduced-motion: reduce) {
           .hero-bottle-float { animation: none; }
           .hero-bottle-tilt { transition: none; }

@@ -1,6 +1,8 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
@@ -8,20 +10,31 @@ import { smoothScrollTo } from '@/lib/scroll'
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null)
+  const pathname = usePathname()
+  const onLanding = pathname === '/'
   const [menuOpen, setMenuOpen] = useState(false)
-  // Manages own visibility — revealed when hero-revealed event fires
+  // On the landing page the navbar is revealed by the hero-revealed event; on every
+  // other route there's no hero, so it's visible immediately.
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
+    if (!onLanding) {
+      setVisible(true)
+      return
+    }
     const handler = () => setVisible(true)
     window.addEventListener('hero-revealed', handler)
     return () => window.removeEventListener('hero-revealed', handler)
-  }, [])
+  }, [onLanding])
 
+  // Hash links scroll in-page on the landing route; everywhere else they fall back to
+  // normal navigation (to '/#section'), and pure route links (/story) always navigate.
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault()
     setMenuOpen(false)
-    smoothScrollTo(href)
+    if (onLanding && href.includes('#')) {
+      e.preventDefault()
+      smoothScrollTo('#' + href.split('#')[1])
+    }
   }
 
   return (
@@ -41,11 +54,11 @@ export default function Navbar() {
         }}
         className="px-6 md:px-12 py-4 flex items-center justify-between"
       >
-        <a
-          href="#hero"
+        <Link
+          href="/#hero"
           aria-label="Southern Edge home"
           className="flex-shrink-0"
-          onClick={(e) => handleLinkClick(e, '#hero')}
+          onClick={(e) => handleLinkClick(e, '/#hero')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -73,12 +86,12 @@ export default function Navbar() {
           >
             SOUTHERN EDGE
           </span>
-        </a>
+        </Link>
 
         <ul className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <li key={link.label}>
-              <a
+              <Link
                 href={link.href}
                 className="font-sans font-light text-sm tracking-wide"
                 style={{ color: 'rgba(240,228,204,0.70)', transition: 'color 0.2s' }}
@@ -92,7 +105,7 @@ export default function Navbar() {
                 }
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -126,7 +139,7 @@ export default function Navbar() {
         }}
       >
         {NAV_LINKS.map((link) => (
-          <a
+          <Link
             key={link.label}
             href={link.href}
             onClick={(e) => handleLinkClick(e, link.href)}
@@ -139,7 +152,7 @@ export default function Navbar() {
             }}
           >
             {link.label}
-          </a>
+          </Link>
         ))}
       </div>
     </>

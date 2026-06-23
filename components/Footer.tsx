@@ -1,6 +1,8 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { NAV_LINKS, SOCIAL } from '@/lib/constants'
 import { LABEL_STYLE, LINK_STYLE } from '@/lib/styles'
 import { smoothScrollTo } from '@/lib/scroll'
@@ -12,13 +14,15 @@ function hoverOut(e: React.MouseEvent<HTMLAnchorElement>) {
   e.currentTarget.style.color = 'rgba(240,228,204,0.55)'
 }
 
-function handleSectionClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-  if (!href.startsWith('#')) return
-  e.preventDefault()
-  smoothScrollTo(href)
-}
-
 export default function Footer() {
+  const onLanding = usePathname() === '/'
+
+  function handleSectionClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!onLanding || !href.includes('#')) return
+    e.preventDefault()
+    smoothScrollTo('#' + href.split('#')[1])
+  }
+
   return (
     <footer
       style={{
@@ -69,7 +73,7 @@ export default function Footer() {
           <div>
             <span style={LABEL_STYLE}>Explore</span>
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 style={LINK_STYLE}
@@ -78,7 +82,7 @@ export default function Footer() {
                 onMouseLeave={hoverOut}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 

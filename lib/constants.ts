@@ -350,9 +350,9 @@ export const VALUES = [
 export const FIND_US = {
   eyebrow: 'Where to Buy',
   headline: 'Find Us Near You',
-  sub: 'We are now in stores in South Carolina, Georgia, and Florida!',
+  sub: 'We are now in stores across South Carolina and Georgia!',
   cta: 'Find a store near you.',
-  states: ['South Carolina', 'Georgia', 'Florida'],
+  states: ['South Carolina', 'Georgia'],
   mapEmbed: 'https://www.google.com/maps/d/u/0/embed?mid=13W5baTb9iaJ6r1pg4eyQ4WenvFjeorg',
 }
 
@@ -638,12 +638,10 @@ export const SOCIAL = {
 
 // Navigation links — expanded to mirror the live site's information architecture.
 export const NAV_LINKS = [
-  { label: 'Products', href: '#products' },
-  { label: 'Our Story', href: '#story' },
-  { label: 'Cocktails', href: '#cocktails' },
-  { label: 'Find Us', href: '#findus' },
-  { label: 'Press', href: '#press' },
-  { label: 'Connect', href: '#connect' },
+  { label: 'Our Story', href: '/story' },
+  { label: 'Cocktails', href: '/cocktails' },
+  { label: 'Find Us', href: '/#findus' },
+  { label: 'Connect', href: '/#connect' },
 ]
 
 // Verbatim from ScrollRibbon.tsx ITEMS.
