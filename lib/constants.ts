@@ -551,6 +551,26 @@ export const STORES: { state: string; locations: StoreLocation[] }[] = [
         name: "Brandon's Package Store",
         addressLines: ['965 Glynn St N', 'Fayetteville, GA 30214'],
       },
+      {
+        name: 'Dunwoody World of Beverages',
+        addressLines: ['4621 N Shallowford Rd', 'Dunwoody, GA 30338'],
+      },
+      {
+        name: 'Forsyth World of Beverage',
+        addressLines: ['3535 Peachtree Parkway', 'Suwanee, GA 30024'],
+      },
+      {
+        name: 'Camp Creek World of Beverages',
+        addressLines: ['3780 Princeton Lakes Pkwy SW', 'Atlanta, GA 30344'],
+      },
+      {
+        name: 'Georgia World of Beverage',
+        addressLines: ['8455 Senoia Road', 'Fairburn, GA 30213'],
+      },
+      {
+        name: 'Arbor Place Beverage',
+        addressLines: ['7455 Douglas Boulevard', 'Douglasville, GA 30135'],
+      },
     ],
   },
 ]
