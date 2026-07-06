@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import ScrollSmootherProvider from '@/components/ScrollSmootherProvider'
 import Navbar from '@/components/Navbar'
+import UmamiAnalytics from '@/components/UmamiAnalytics'
 
 // Display — classical wide Caslon revival. Roman-only on Google Fonts (no italic),
 // so italic accents come from Libre Caslon Text below.
@@ -62,6 +63,7 @@ export default function RootLayout({
         <Navbar />
         <ScrollSmootherProvider>{children}</ScrollSmootherProvider>
         <Analytics />
+        <UmamiAnalytics />
       </body>
     </html>
   )
