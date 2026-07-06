@@ -40,7 +40,16 @@ export default function Home() {
     if (!ageVerified) return
     const hash = window.location.hash
     if (!hash) return
-    const t = setTimeout(() => smoothScrollTo(hash), 600)
+    let attempts = 0
+    let t: ReturnType<typeof setTimeout>
+    const tryScroll = () => {
+      if (document.querySelector(hash)) {
+        smoothScrollTo(hash)
+        return
+      }
+      if (attempts++ < 20) t = setTimeout(tryScroll, 300)
+    }
+    t = setTimeout(tryScroll, 600)
     return () => clearTimeout(t)
   }, [ageVerified])
 

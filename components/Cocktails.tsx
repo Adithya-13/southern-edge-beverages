@@ -221,70 +221,11 @@ function CocktailColumn({
       </div>
 
       {/* Body */}
-      {group.comingSoon ? (
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            padding: '48px 20px',
-            marginTop: 24,
-            border: `1px solid ${group.accentColor}26`,
-            borderRadius: 10,
-            background: `linear-gradient(160deg, ${group.accentColor}0D 0%, transparent 70%)`,
-          }}
-        >
-          <span style={{ display: 'block', width: 32, height: 1, background: group.accentColor, opacity: 0.6, marginBottom: 24 }} />
-          <p
-            style={{
-              margin: 0,
-              fontFamily: 'var(--font-accent)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.4rem,2vw,1.7rem)',
-              lineHeight: 1.35,
-              color: 'var(--cream)',
-              marginBottom: 16,
-            }}
-          >
-            Signature cocktails coming soon
-          </p>
-          <p
-            style={{
-              margin: 0,
-              maxWidth: 260,
-              fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              fontSize: 13,
-              lineHeight: 1.6,
-              color: 'rgba(240,228,204,0.6)',
-            }}
-          >
-            Our Passionberry recipes are in the lab.
-          </p>
-          <span
-            style={{
-              fontFamily: 'var(--font-accent)',
-              fontStyle: 'italic',
-              fontSize: 26,
-              color: group.accentColor,
-              opacity: 0.85,
-              marginTop: 22,
-            }}
-          >
-            Stay tuned
-          </span>
-        </div>
-      ) : (
-        <div style={{ marginTop: 8 }}>
-          {group.cocktails.map((cocktail) => (
-            <CocktailRow key={cocktail.id} cocktail={cocktail} accentColor={group.accentColor} />
-          ))}
-        </div>
-      )}
+      <div style={{ marginTop: 8 }}>
+        {group.cocktails.map((cocktail) => (
+          <CocktailRow key={cocktail.id} cocktail={cocktail} accentColor={group.accentColor} />
+        ))}
+      </div>
     </div>
   )
 }
@@ -393,7 +334,6 @@ export default function Cocktails() {
           </p>
         </div>
 
-        {/* 3-column layout */}
         <div className="cocktails-grid">
           {COCKTAIL_GROUPS.map((group, i) => (
             <CocktailColumn
@@ -410,9 +350,11 @@ export default function Cocktails() {
       <style>{`
         .cocktails-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: clamp(32px, 4vw, 56px);
+          grid-template-columns: repeat(${COCKTAIL_GROUPS.length}, 1fr);
+          gap: clamp(40px, 6vw, 88px);
           align-items: start;
+          max-width: ${Math.min(1180, COCKTAIL_GROUPS.length * 470)}px;
+          margin: 0 auto;
         }
         @media (max-width: 900px) {
           .cocktails-grid {

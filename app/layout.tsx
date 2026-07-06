@@ -4,6 +4,7 @@ import {
   Libre_Caslon_Text,
   Hanken_Grotesk,
 } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import ScrollSmootherProvider from '@/components/ScrollSmootherProvider'
 import Navbar from '@/components/Navbar'
@@ -60,6 +61,7 @@ export default function RootLayout({
         */}
         <Navbar />
         <ScrollSmootherProvider>{children}</ScrollSmootherProvider>
+        <Analytics />
       </body>
     </html>
   )

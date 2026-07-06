@@ -6,9 +6,9 @@ import { useGSAP } from '@gsap/react'
 import { FRAME_COUNT, frameCache, preloadAllAssets } from '@/lib/preload'
 import { PRODUCTS } from '@/lib/constants'
 
-// The reveal frames bake in the Salted Caramel bottle (PRODUCTS index 2) — so it
-// is the default and the revert target when the reveal plays in reverse.
-const DEFAULT_PRODUCT = 2
+// The reveal frames bake in the Salted Caramel bottle — so it is the default
+// and the revert target when the reveal plays in reverse.
+const DEFAULT_PRODUCT = Math.max(0, PRODUCTS.findIndex((p) => p.id === 'caramel'))
 
 interface HeroProps {
   isVisible: boolean
@@ -19,7 +19,7 @@ interface HeroProps {
 // No dwell phase — pin releases immediately when reveal completes.
 // On the way back, onLeave kills the pin so back-scroll is one normal 100vh section.
 // Pin distance: the reveal occupies the first REVEAL_DONE_P of the pin; the
-// remaining tail is a DWELL where the bottle rests and auto-cycles products.
+// remaining tail is a DWELL where the bottle rests.
 const TOTAL_SCROLL = 3300
 
 // Atmosphere phase: the southern world plays first; frames begin once it fades.
@@ -187,16 +187,12 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
   // Edge-tracker so onUpdate only flips the React atRest state on transitions.
   const atRestEdgeRef = useRef(false)
 
-  // Product auto-cycle (only while the reveal is fully complete / dwelling).
   const [productIndex, setProductIndex] = useState(DEFAULT_PRODUCT)
-  // Manual bottle selection pauses the auto-cycle until the reveal resets.
-  const [paused, setPaused] = useState(false)
   const [atRest, setAtRest] = useState(false)
   const product = PRODUCTS[productIndex]
 
   const selectProduct = (i: number) => {
     setProductIndex(i)
-    setPaused(true)
   }
 
   useGSAP(
@@ -274,6 +270,16 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       const reveal = { scale: 1.45, y: -22, ready: false }
       const computeReveal = () => {
         if (typeof window === 'undefined') return
+        const sectionEl = sectionRef.current
+        const infoEl = textRef.current?.querySelector<HTMLElement>('.hero-info')
+        let reserve = 0
+        if (sectionEl && infoEl) {
+          reserve = Math.max(
+            0,
+            sectionEl.getBoundingClientRect().bottom - infoEl.getBoundingClientRect().top,
+          )
+          sectionEl.style.setProperty('--hero-bottle-reserve', `${Math.round(reserve)}px`)
+        }
         const img = bottleInnerRef.current?.querySelector('img')
         // offsetHeight = untransformed layout height (getBoundingClientRect would be
         // polluted by the scale() already applied to the outer wrapper pre-reveal).
@@ -282,11 +288,14 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         const coverScale = Math.max(window.innerWidth / 960, window.innerHeight / 720)
         const frameH = 720 * coverScale
         reveal.scale = Math.min(2.6, Math.max(1, (0.78 * frameH) / bh))
-        reveal.y = -(0.5 - 0.475) * frameH
+        reveal.y = reserve / 2 - (0.5 - 0.475) * frameH
       }
       computeReveal()
       computeRevealRef.current = computeReveal
-      if (typeof window !== 'undefined') window.addEventListener('resize', computeReveal)
+      if (typeof window !== 'undefined') {
+        window.addEventListener('resize', computeReveal)
+        document.fonts?.ready.then(() => computeReveal()).catch(() => {})
+      }
 
       const mm = gsap.matchMedia()
 
@@ -390,8 +399,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
-            // At-rest (dwell) edge → drives the React auto-cycle. Scroll back below
-            // REVEAL_DONE_P flips this false and the effect reverts to the default bottle.
+            // At-rest (dwell) edge. Scroll back below REVEAL_DONE_P flips this
+            // false and the effect reverts to the default bottle.
             const nowAtRest = p >= REVEAL_DONE_P
             if (nowAtRest !== atRestEdgeRef.current) {
               atRestEdgeRef.current = nowAtRest
@@ -410,7 +419,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           // Pin stays alive — reveal is scrub-bound both ways so the user can scroll
           // back up and replay it. Just ensure the navbar fires once on first forward exit.
           onLeave: () => {
-            // Scrolled past the pin — bottle is off-screen; stop cycling + reset.
+            // Scrolled past the pin — bottle is off-screen; reset.
             atRestEdgeRef.current = false
             setAtRest(false)
             if (!revealedRef.current) {
@@ -429,14 +438,25 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
 
         // Mouse parallax — only affects the inner bottle wrapper and glow.
         // Skipped entirely for reduced-motion users (autonomous-feel motion).
+        const quickParallax = (el: Element | null) =>
+          el
+            ? {
+                x: gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power2.out' }),
+                y: gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power2.out' }),
+              }
+            : null
+        const bottleParallax = quickParallax(bottleInnerRef.current)
+        const glowParallax = quickParallax(glowRef.current)
         function onMouseMove(e: MouseEvent) {
           const x = (e.clientX / window.innerWidth - 0.5) * 2
           const y = (e.clientY / window.innerHeight - 0.5) * 2
-          if (bottleInnerRef.current) {
-            gsap.to(bottleInnerRef.current, { x: x * 18, y: y * 18, duration: 0.9, ease: 'power2.out' })
+          if (bottleParallax) {
+            bottleParallax.x(x * 18)
+            bottleParallax.y(y * 18)
           }
-          if (glowRef.current) {
-            gsap.to(glowRef.current, { x: x * 10, y: y * 10, duration: 0.9, ease: 'power2.out' })
+          if (glowParallax) {
+            glowParallax.x(x * 10)
+            glowParallax.y(y * 10)
           }
           // Faux-3D: tilt the bottle toward the cursor + slide the glass glint
           // (CSS vars inherit down to the masked glint child).
@@ -553,7 +573,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (textRef.current) textRef.current.style.opacity = '0'
             }
 
-            // At-rest (dwell) edge → drives the React auto-cycle (mobile).
+            // At-rest (dwell) edge (mobile).
             const nowAtRest = p >= REVEAL_DONE_P
             if (nowAtRest !== atRestEdgeRef.current) {
               atRestEdgeRef.current = nowAtRest
@@ -570,7 +590,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           },
           // Pin stays alive — reveal is scrub-bound both ways so the user can replay it.
           onLeave: () => {
-            // Scrolled past the pin — bottle is off-screen; stop cycling + reset.
+            // Scrolled past the pin — bottle is off-screen; reset.
             atRestEdgeRef.current = false
             setAtRest(false)
             if (!revealedRef.current) {
@@ -600,25 +620,13 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
     { scope: sectionRef, dependencies: [isVisible] },
   )
 
-  // Auto-cycle products every 5s while the reveal is at rest (dwell). When atRest
-  // flips false (scroll-back or scroll-past), this reverts to the default Salted
-  // Caramel bottle baked into the reveal frames, so the reverse reveal stays
-  // frame-perfect. Paused entirely under reduced-motion.
   useEffect(() => {
-    const reduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!atRest || reduced) {
-      setProductIndex(DEFAULT_PRODUCT)
-      setPaused(false)
-      return
-    }
-    if (paused) return
-    const id = setInterval(() => {
-      setProductIndex((i) => (i + 1) % PRODUCTS.length)
-    }, 5000)
-    return () => clearInterval(id)
-  }, [atRest, paused])
+    if (!atRest) setProductIndex(DEFAULT_PRODUCT)
+  }, [atRest])
+
+  useEffect(() => {
+    computeRevealRef.current()
+  }, [productIndex])
 
   return (
     <section
@@ -773,7 +781,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         style={{
           position: 'absolute',
           left: '50%',
-          top: '55%',
+          top: 'calc((100% - var(--hero-bottle-reserve, 0px)) / 2)',
           transform: 'translate(-50%, -50%)',
           width: 400,
           height: 400,
@@ -791,7 +799,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         ref={bottleOuterRef}
         style={{
           position: 'absolute',
-          inset: 0,
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 'var(--hero-bottle-reserve, 0px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -801,36 +812,43 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }}
       >
         <div ref={bottleInnerRef}>
-          <div className="hero-bottle-float">
-            <div className="hero-bottle-persp">
-              <div ref={tiltRef} className="hero-bottle-tilt">
-                <div className="hero-bottle-stack" key={productIndex}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={product.bottleFile}
-                    alt={`Southern Edge ${product.spiritShort}`}
-                    width={340}
-                    height={580}
-                    onLoad={() => computeRevealRef.current()}
-                    className="hero-bottle-img"
-                    style={{
-                      display: 'block',
-                      objectFit: 'contain',
-                      maxHeight: '70vh',
-                      width: 'auto',
-                      height: 'auto',
-                    }}
-                  />
-                  {/* Glass glint — masked to the bottle silhouette, tracks the cursor */}
-                  <div
-                    className="hero-bottle-glint"
-                    aria-hidden
-                    style={{
-                      WebkitMaskImage: `url(${product.bottleFile})`,
-                      maskImage: `url(${product.bottleFile})`,
-                    }}
-                  />
-                </div>
+          <div className="hero-bottle-persp">
+            <div ref={tiltRef} className="hero-bottle-tilt">
+              <div className="hero-bottle-stack" key={productIndex}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={product.bottleFile}
+                  alt={`Southern Edge ${product.spiritShort}`}
+                  width={340}
+                  height={580}
+                  decoding="async"
+                  onLoad={() => computeRevealRef.current()}
+                  className="hero-bottle-img"
+                  style={{
+                    display: 'block',
+                    objectFit: 'contain',
+                    maxHeight: 'min(70vh, calc(100vh - var(--hero-bottle-reserve, 0px) - 6vh))',
+                    width: 'auto',
+                    height: 'auto',
+                  }}
+                />
+                {/* Glass glint — masked to the bottle silhouette, tracks the cursor */}
+                <div
+                  className="hero-bottle-glint"
+                  aria-hidden
+                  style={{
+                    WebkitMaskImage: `url(${product.bottleFile})`,
+                    maskImage: `url(${product.bottleFile})`,
+                  }}
+                />
+                <div
+                  className="hero-bottle-chill"
+                  aria-hidden
+                  style={{
+                    WebkitMaskImage: `url(${product.bottleFile})`,
+                    maskImage: `url(${product.bottleFile})`,
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -980,10 +998,6 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       </div>
 
       <style>{`
-        .hero-bottle-float {
-          animation: heroBottleFloat 6.5s ease-in-out infinite;
-          will-change: transform;
-        }
         .hero-bottle-persp { perspective: 1100px; }
         .hero-bottle-tilt {
           transform-style: preserve-3d;
@@ -1003,9 +1017,17 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           mix-blend-mode: screen;
           pointer-events: none;
         }
-        @keyframes heroBottleFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
+        .hero-bottle-chill {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(90deg, rgba(202,226,244,0.30) 0%, rgba(202,226,244,0) 15%, rgba(202,226,244,0) 85%, rgba(202,226,244,0.30) 100%),
+            radial-gradient(130% 46% at 50% 2%, rgba(214,236,250,0.18), transparent 60%);
+          -webkit-mask-size: contain; mask-size: contain;
+          -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+          -webkit-mask-position: center; mask-position: center;
+          mix-blend-mode: screen;
+          pointer-events: none;
         }
         @keyframes heroBottleSwap {
           from { opacity: 0; }
@@ -1051,7 +1073,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           .hero-notes { font-size: 12px; line-height: 1.45; margin-top: 8px; }
           .hero-selector { margin-top: 14px; gap: 7px; }
           .hero-selector-pill { font-size: 11px; padding: 7px 12px; }
-          .hero-bottle-img { max-height: 50vh !important; }
+          .hero-bottle-img { max-height: min(50vh, calc(100vh - var(--hero-bottle-reserve, 0px) - 6vh)) !important; }
         }
         .award-seal {
           position: absolute;
@@ -1155,7 +1177,6 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
         .hero-selector-pill:hover { transform: translateY(-2px); color: var(--cream); }
         @media (prefers-reduced-motion: reduce) {
-          .hero-bottle-float { animation: none; }
           .hero-bottle-tilt { transition: none; }
           .hero-bottle-stack, .hero-prod-label { animation: none; }
         }

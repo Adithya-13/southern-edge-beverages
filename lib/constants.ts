@@ -1,6 +1,5 @@
 // Single source of truth for all site data + copy.
 // Content aligned to the brand's live site (see southern-edge-live-content.md).
-// Product lineup: Sweet Tea Vodka · Passionberry Tequila · Salted Caramel Whiskey.
 
 export type Product = {
   id: string
@@ -82,30 +81,6 @@ export const PRODUCTS: Product[] = [
     bottleFile: '/images/bottle_sweettea.png',
   },
   {
-    id: 'passionberry',
-    name: 'Passionberry Flavored Tequila',
-    type: 'Tequila',
-    spiritShort: 'Passionberry Tequila',
-    accentColor: '#B23A6F',
-    accentVar: '--berry',
-    description:
-      "From your first sip to your last, you'll enjoy every nuance of this ultra-premium flavored Tequila. We are committed to bringing you only the best of the best of our time tested recipes so that you can sit back, kick your feet up, and enjoy.",
-    aroma: 'Bright, vibrant passion-fruit and berry',
-    taste: 'Ultra-premium, smooth and nuanced',
-    officialNotes:
-      'An ultra-premium flavored tequila built on time-tested recipes — smooth and full of nuance from the first sip to the last.',
-    shortNotes: 'Ultra-premium · Smooth & nuanced · Time-tested recipe',
-    notesShort: ['Ultra-premium', 'Smooth & nuanced', 'Time-tested recipe'],
-    tastingNotes: ['Ultra-premium flavored tequila', 'Smooth, nuanced palate', 'Time-tested recipe'],
-    award: null,
-    // Signature serve not finalized on the live site — tease only.
-    pourCocktail: {
-      name: 'Signature Serve — Coming Soon',
-      ingredients: ['Our Passionberry cocktails are in the lab', 'Best enjoyed neat or over ice for now'],
-    },
-    bottleFile: '/images/bottle_passionberry.png',
-  },
-  {
     id: 'caramel',
     name: 'Salted Caramel Flavored Whiskey',
     type: 'Whiskey',
@@ -133,7 +108,6 @@ export const PRODUCTS: Product[] = [
 
 // ── COCKTAILS ────────────────────────────────────────────────────────────
 // Real recipes verbatim from the live Cocktails page (accordion content).
-// Passionberry recipes are placeholders on the live site (not finalized).
 export type Cocktail = {
   id: string
   name: string
@@ -145,7 +119,6 @@ export type CocktailGroup = {
   spirit: string
   accentColor: string
   bottleFile: string
-  comingSoon?: boolean
   cocktails: Cocktail[]
 }
 
@@ -175,14 +148,6 @@ export const COCKTAIL_GROUPS: CocktailGroup[] = [
         instructions: 'Mix all ingredients and pour over ice. Garnish with a lemon wheel. Serve & Enjoy.',
       },
     ],
-  },
-  {
-    spiritId: 'passionberry',
-    spirit: 'Passionberry Tequila',
-    accentColor: '#B23A6F',
-    bottleFile: '/images/bottle_passionberry.png',
-    comingSoon: true,
-    cocktails: [],
   },
   {
     spiritId: 'caramel',
@@ -270,6 +235,7 @@ export const STORY_IMAGES: StoryImageSlot[] = [
     src: '/images/story/story_02_porch.jpg',
     alt: 'Friends of all generations gathered on a porch at dusk under string lights',
     aspect: '4:5',
+    objectPosition: '91% 50%',
     placeholder: false,
   },
   {
@@ -326,7 +292,7 @@ export const STORY = {
     },
     {
       kind: 'paragraph',
-      text: "We've taken familiar flavors to our distilling process, while pushing beyond the borders of common spirits. Our recipes are born at the edge of the imagination, delivering a rhythmic dance to the tastebuds while politely whispering nostalgic notes of what the south is about.",
+      text: "We've taken familiar flavors to our distilling process, while pushing beyond the borders of common spirits. Our recipes are born at the edge of the imagination, delivering a rhythmic dance to the tastebuds while politely whispering nostalgic notes of what the South is about.",
     },
     { kind: 'imagePair', slotIds: ['table', 'marsh'] },
     {
