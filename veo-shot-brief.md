@@ -34,3 +34,39 @@ Drop finished files at these exact paths — the site picks them up by filename.
 ## Upgrade path
 
 Every still slot also accepts an ambient video loop later (same scene, subtle motion — flickering candles, swaying moss). Same filename with `.mp4` under `videos/story/`; tell me and I flip one flag per slot, zero layout change.
+
+## Shot 9 — Hero bottle reveal (replaces the 192-frame scroll sequence)
+
+Replaces the current reveal video whose bottle floats and has condensation drips (client: bottle grounded, dry glass, "lighting to illuminate the bottle").
+
+**Tool:** Google Flow (Veo). Workflow: generate the two keyframe images first, then Frames-to-Video.
+
+1. **END frame (image)** — attach `se_reveal_ref_lit.png` as reference, use Prompt A. Verify the label reads correctly; regenerate if garbled.
+2. **START frame (image)** — attach the *generated end frame from step 1* (NOT the original reference) and use Prompt B. Reusing the generated frame keeps both keyframes pixel-consistent, which Frames-to-Video needs — inconsistent frames make the bottle morph/drift.
+3. **VIDEO** — Frames-to-Video: first frame = step 2 output, last frame = step 1 output, Prompt C.
+
+**Prompt A — end frame (fully lit):**
+
+> Same scene, same bottle, same camera and framing as the attached reference image: a bottle of Southern Edge Fine Spirits Salted Caramel Flavored Whiskey standing upright on a dark subtly-reflective surface, soft natural reflection under its base, pitch-black background. Fully illuminated by a single warm amber overhead spotlight — a visible cone of golden light from above, the amber whiskey glowing from within, warm rim light tracing the glass edges, a gentle pool of light on the surface around the base. The glass is clean and completely dry: no condensation, no droplets, no frost. The label reads exactly "Se — SOUTHERN EDGE — FINE SPIRITS — SALTED CARAMEL FLAVORED WHISKEY". Photorealistic, premium bourbon-bar mood, 16:9.
+
+**Prompt B — start frame (near dark, from the generated end frame):**
+
+> Exactly the same image as the attached reference — same bottle, same position, same camera, same reflection — but before the spotlight turns on: the scene is in near-total darkness. Only a very faint rim of light traces the bottle's silhouette against the pitch-black background; the label is barely visible in shadow; no light cone, no glow, no pool of light on the surface. The glass remains clean and completely dry: no condensation, no droplets, no frost. Photorealistic, 16:9.
+
+**Prompt C — video (Frames-to-Video between the two):**
+
+> Locked-off static camera, absolutely no camera movement. The bottle stands perfectly still on the dark reflective surface for the entire shot — it never moves, rotates, tilts, or floats. The only change is light: a single warm amber overhead spotlight slowly blooms to life above the bottle, its cone of golden light gradually widening and brightening, smoothly carrying the scene from the near-darkness of the first frame to the fully illuminated last frame — the amber liquid beginning to glow from within, warm rim light creeping along the glass edges. The glass stays clean and completely dry throughout: no condensation forming, no droplets, no drips, no frost. One slow, even, continuous light bloom across the full 8 seconds — no flicker, no pulsing, no cuts. Premium bourbon-bar mood, photorealistic.
+
+**Specs (hard requirements):**
+- 8 seconds, highest resolution available, 16:9. Delivered as mp4 — I convert to the 192-frame webp sequence.
+- Locked-off camera: zero camera movement, zero zoom.
+- Bottle framing must match the reference stills: bottle ≈ 78% of frame height, vertically centered at ~47.5% of frame height, horizontally centered. (The site center-crops 16:9 → 4:3, so keep everything important in the middle 4:3 region — nothing meaningful in the outer 160px on each side.)
+- Label must read exactly: "Se / SOUTHERN EDGE / FINE SPIRITS / SALTED CARAMEL FLAVORED WHISKEY". Regenerate if Veo garbles it.
+
+**Prompt:**
+
+> Studio product cinematography, locked-off static camera, absolutely no camera movement. A bottle of Southern Edge Fine Spirits Salted Caramel Flavored Whiskey — exactly as in the reference image: black label, metallic "Se" citrus emblem, amber whiskey — standing upright, perfectly still, firmly planted on a dark subtly-reflective surface with a soft natural reflection under its base. Pitch-black background. The scene opens in near-total darkness, only a faint silhouette of the bottle visible. A single warm amber overhead spotlight slowly blooms to life, its cone of golden light widening and intensifying until the bottle is fully, dramatically illuminated — amber liquid glowing from within, warm rim light tracing the glass edges. The glass is clean and completely dry: no condensation, no droplets, no drips, no frost, no moisture. The bottle never moves, rotates, tilts, or floats. Premium bourbon-bar mood, photorealistic, 8 seconds.
+
+**Avoid (paste into negative/notes):** condensation, water droplets, drips, frost, floating, levitation, hovering, camera motion, rotation, zoom, label text morphing, extra props.
+
+**Delivery:** drop the mp4 anywhere in the repo (or send it) and tell me — I run the frame-extraction pipeline and swap `public/images/frames/`.
