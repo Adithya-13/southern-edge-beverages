@@ -230,7 +230,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       const drawFrame = (idx: number) => {
         const img = frameCache[idx]
         if (ctx && img && img.complete && img.naturalWidth > 0) {
-          ctx.drawImage(img, 0, 0, 960, 720)
+          ctx.drawImage(img, 0, 0, 1280, 720)
         }
       }
       // Paint frame 0 immediately (or as soon as it loads) so the canvas is never blank pre-scroll.
@@ -264,28 +264,35 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
       }
 
       // Bottle reveal sizing — start the fading-in PNG at the apparent size of the
-      // bottle in the final reveal frame (cover-fit 4:3 canvas), then settle it down
+      // bottle in the final reveal frame (cover-fit 16:9 canvas), then settle it down
       // to its resting size, so the frame→bottle handoff has no size "pop".
       // 0.78 = bottle height as a fraction of the frame; 0.475 = its vertical center.
-      const reveal = { scale: 1.45, y: -22, ready: false }
+      // Desktop rests the bottle on the right (shift) with the info text on the left,
+      // so no vertical reserve is needed; mobile stacks them and keeps the reserve.
+      const reveal = { scale: 1.45, y: -22, shift: 0, ready: false }
       const computeReveal = () => {
         if (typeof window === 'undefined') return
+        const isDesktop = window.matchMedia('(min-width: 769px)').matches
         const sectionEl = sectionRef.current
         const infoEl = textRef.current?.querySelector<HTMLElement>('.hero-info')
         let reserve = 0
-        if (sectionEl && infoEl) {
+        if (!isDesktop && sectionEl && infoEl) {
           reserve = Math.max(
             0,
             sectionEl.getBoundingClientRect().bottom - infoEl.getBoundingClientRect().top,
           )
+        }
+        reveal.shift = isDesktop ? Math.round(window.innerWidth * 0.22) : 0
+        if (sectionEl) {
           sectionEl.style.setProperty('--hero-bottle-reserve', `${Math.round(reserve)}px`)
+          sectionEl.style.setProperty('--hero-bottle-shift', `${reveal.shift}px`)
         }
         const img = bottleInnerRef.current?.querySelector('img')
         // offsetHeight = untransformed layout height (getBoundingClientRect would be
         // polluted by the scale() already applied to the outer wrapper pre-reveal).
         const bh = img ? img.offsetHeight : window.innerHeight * 0.6
         if (!bh) return
-        const coverScale = Math.max(window.innerWidth / 960, window.innerHeight / 720)
+        const coverScale = Math.max(window.innerWidth / 1280, window.innerHeight / 720)
         const frameH = 720 * coverScale
         reveal.scale = Math.min(2.6, Math.max(1, (0.78 * frameH) / bh))
         reveal.y = reserve / 2 - (0.5 - 0.475) * frameH
@@ -382,9 +389,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (bottleOuterRef.current) {
                 bottleOuterRef.current.style.opacity = String(fade)
                 const s = reveal.scale + (1 - reveal.scale) * settle
-                bottleOuterRef.current.style.transform = `translateY(${reveal.y * (1 - settle)}px) scale(${s})`
+                bottleOuterRef.current.style.transform = `translate(${reveal.shift * settle}px, ${reveal.y * (1 - settle)}px) scale(${s})`
               }
-              if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
+              if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.42)
               if (textRef.current) textRef.current.style.opacity = String(eased)
             } else {
               // Still in frame phase — keep environment hidden, bottle primed at frame size
@@ -557,9 +564,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
               if (bottleOuterRef.current) {
                 bottleOuterRef.current.style.opacity = String(fade)
                 const s = reveal.scale + (1 - reveal.scale) * settle
-                bottleOuterRef.current.style.transform = `translateY(${reveal.y * (1 - settle)}px) scale(${s})`
+                bottleOuterRef.current.style.transform = `translate(${reveal.shift * settle}px, ${reveal.y * (1 - settle)}px) scale(${s})`
               }
-              if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.3)
+              if (glowRef.current) glowRef.current.style.opacity = String(eased * 0.42)
               if (textRef.current) textRef.current.style.opacity = String(eased)
             } else {
               if (canvasRef.current) canvasRef.current.style.opacity = '1'
@@ -665,7 +672,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           before drawFrame(0) decodes — restores the old <img> pre-paint behavior. */}
       <canvas
         ref={canvasRef}
-        width={960}
+        width={1280}
         height={720}
         style={{
           position: 'absolute',
@@ -780,7 +787,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         ref={glowRef}
         style={{
           position: 'absolute',
-          left: '50%',
+          left: 'calc(50% + var(--hero-bottle-shift, 0px))',
           top: 'calc((100% - var(--hero-bottle-reserve, 0px)) / 2)',
           transform: 'translate(-50%, -50%)',
           width: 400,
@@ -815,6 +822,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           <div className="hero-bottle-persp">
             <div ref={tiltRef} className="hero-bottle-tilt">
               <div className="hero-bottle-stack" key={productIndex}>
+                <div className="hero-bottle-ground" aria-hidden />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={product.bottleFile}
@@ -848,6 +856,13 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
                     WebkitMaskImage: `url(${product.bottleFile})`,
                     maskImage: `url(${product.bottleFile})`,
                   }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={product.bottleFile}
+                  alt=""
+                  aria-hidden
+                  className="hero-bottle-reflection"
                 />
               </div>
             </div>
@@ -1005,7 +1020,31 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           transition: transform 0.3s ease-out;
         }
         .hero-bottle-stack { position: relative; display: inline-block; animation: heroBottleSwap 0.55s ease; }
-        .hero-bottle-img { filter: drop-shadow(0 30px 55px rgba(0,0,0,0.6)); }
+        .hero-bottle-img { filter: drop-shadow(0 14px 26px rgba(0,0,0,0.5)); }
+        .hero-bottle-ground {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          width: 78%;
+          height: 24px;
+          transform: translate(-50%, -50%);
+          background: radial-gradient(50% 50% at 50% 50%,
+            rgba(0,0,0,0.6), rgba(0,0,0,0.3) 55%, transparent 78%);
+          pointer-events: none;
+        }
+        .hero-bottle-reflection {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          height: auto;
+          transform: scaleY(-1);
+          opacity: 0.22;
+          filter: blur(2px);
+          -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 26%);
+          mask-image: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 26%);
+          pointer-events: none;
+        }
         .hero-bottle-glint {
           position: absolute;
           inset: 0;
@@ -1021,8 +1060,8 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           position: absolute;
           inset: 0;
           background:
-            linear-gradient(90deg, rgba(202,226,244,0.30) 0%, rgba(202,226,244,0) 15%, rgba(202,226,244,0) 85%, rgba(202,226,244,0.30) 100%),
-            radial-gradient(130% 46% at 50% 2%, rgba(214,236,250,0.18), transparent 60%);
+            linear-gradient(90deg, rgba(202,226,244,0.14) 0%, rgba(202,226,244,0) 15%, rgba(202,226,244,0) 85%, rgba(202,226,244,0.14) 100%),
+            radial-gradient(130% 46% at 50% 2%, rgba(214,236,250,0.10), transparent 60%);
           -webkit-mask-size: contain; mask-size: contain;
           -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
           -webkit-mask-position: center; mask-position: center;
@@ -1065,6 +1104,9 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
         .hero-taste { font-size: clamp(20px, 2.6vw, 34px); }
         .hero-notes { font-size: clamp(14px, 1.5vw, 18px); }
+        @media (min-width: 769px) {
+          .hero-bottle-img { max-height: 74vh !important; }
+        }
         @media (max-width: 768px) {
           .hero-info { max-width: 78vw; bottom: clamp(20px, 4vh, 40px); }
           .hero-eyebrow { font-size: 10px; margin-bottom: 7px; }
@@ -1077,9 +1119,10 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
         }
         .award-seal {
           position: absolute;
-          right: clamp(20px, 6vw, 96px);
-          top: 50%;
-          transform: translateY(-50%);
+          right: clamp(20px, 4vw, 64px);
+          bottom: clamp(24px, 6vh, 64px);
+          transform: scale(0.85);
+          transform-origin: bottom right;
           z-index: 6;
         }
         .award-emblem {
@@ -1158,6 +1201,7 @@ export default function Hero({ isVisible, onRevealed }: HeroProps) {
           .award-seal {
             right: 8px;
             top: clamp(70px, 11vh, 104px);
+            bottom: auto;
             transform: scale(0.6);
             transform-origin: top right;
           }

@@ -25,8 +25,7 @@ export default function ScrollSmootherProvider({
         const smoother = ScrollSmoother.create({
           wrapper: wrapperRef.current!,
           content: contentRef.current!,
-          smooth: 1.5,
-          effects: true,
+          smooth: 0.8,
         })
         smoother.scrollTop(0)
         // Force all registered ScrollTrigger instances to recalibrate
