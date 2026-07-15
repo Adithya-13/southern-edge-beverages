@@ -62,7 +62,7 @@ export default function Footer() {
               onMouseEnter={hoverIn}
               onMouseLeave={hoverOut}
             >
-              contact@southernedgespirits.com
+              contact@southernedgebeverages.com
             </a>
             <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: 11, color: 'rgba(200,200,200,0.25)', display: 'block', marginTop: 8, letterSpacing: '0.08em' }}>
               Crafted in South Carolina.
@@ -97,9 +97,6 @@ export default function Footer() {
             </a>
             <a href={SOCIAL.tiktokUrl} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
               TikTok
-            </a>
-            <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" style={LINK_STYLE} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-              Linktree
             </a>
             <div style={{ borderTop: '1px solid var(--smoke)', marginTop: '20px', paddingTop: '20px' }}>
               <span style={{ fontFamily: 'var(--font-dm-sans)', fontWeight: 300, fontSize: '12px', color: 'rgba(200,200,200,0.3)', letterSpacing: '0.05em' }}>

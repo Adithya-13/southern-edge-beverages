@@ -537,6 +537,10 @@ export const STORES: { state: string; locations: StoreLocation[] }[] = [
         name: 'Arbor Place Beverage',
         addressLines: ['7455 Douglas Boulevard', 'Douglasville, GA 30135'],
       },
+      {
+        name: 'Capital City Wine & Spirits',
+        addressLines: ['784 Collier Rd NW', 'Atlanta, GA 30318'],
+      },
     ],
   },
 ]
@@ -574,7 +578,7 @@ export const CONNECT = {
   body:
     'Thank you for your interest in The Southern Edge Beverage Company. Please use the provided form or contact information to get in touch and sign up for our monthly newsletters.',
   locationsNote: 'Want to purchase Southern Edge? Visit the Find Us section to locate a retailer in your state.',
-  email: 'contact@southernedgespirits.com',
+  email: 'contact@southernedgebeverages.com',
 }
 
 // Structured event data. NOTE: not rendered directly — the live UI renders MARQUEE_TEXT.
@@ -616,8 +620,7 @@ export const SOCIAL = {
   facebook: 'Southern Edge Beverage Company',
   facebookUrl: 'https://web.facebook.com/SouthernEdgeBeverages',
   tiktokUrl: 'https://www.tiktok.com/@southernedgebeverages',
-  linktree: 'https://linktr.ee/southernedgebeverages',
-  email: 'contact@southernedgespirits.com',
+  email: 'contact@southernedgebeverages.com',
   website: 'southernedgespirits.com',
   hashtags: ['#TasteTheEdge', '#SavorYourExperience'],
 }
